@@ -15,7 +15,7 @@ Led::Led(int pin)
     _pin = pin;
 }
 
-Motor::Motor(int pinAA, int pinAB, int pinBA, int pinBB)
+Carro::Carro(int pinAA, int pinAB, int pinBA, int pinBB, int largura)
 {
     pinMode(pinAA, OUTPUT);
     pinMode(pinAB, OUTPUT);
@@ -38,7 +38,7 @@ void Led::blink(int interval, int times)
     }
 }
 
-void Motor::linha(int velocidade, int sentido)
+void Carro::linha(int velocidade, int sentido)
 {
     if (velocidade > 0) {
         
@@ -61,6 +61,12 @@ void Motor::linha(int velocidade, int sentido)
         }
     }
     else {
+        
+        analogWrite(_pinAA, 255);
+        analogWrite(_pinAB, 255);
+        analogWrite(_pinBA, 255);
+        analogWrite(_pinBB, 255);
+        
         if (sentido == 1) {
             digitalWrite(_pinAA, LOW);
             digitalWrite(_pinAB, HIGH);
@@ -77,7 +83,51 @@ void Motor::linha(int velocidade, int sentido)
         
 }
 
-void Motor::gira(int velocidade, int sentido)
+void Carro::gira(int velocidade, int sentido)
 {
+    analogWrite(_pinAA, velocidade);
+    analogWrite(_pinAB, velocidade);
+    analogWrite(_pinBA, velocidade);
+    analogWrite(_pinBB, velocidade);
+    
+    if (sentido == 1) {
+        digitalWrite(_pinAA, LOW);
+        digitalWrite(_pinAB, HIGH);
+        digitalWrite(_pinBA, HIGH);
+        digitalWrite(_pinBB, LOW);
+    }
+    else {
+        digitalWrite(_pinAA, HIGH);
+        digitalWrite(_pinAB, LOW);
+        digitalWrite(_pinBA, LOW);
+        digitalWrite(_pinBB, HIGH);
+    }
+}
+
+void Carro::curva(int velocidade, int raio, int setor, int sentido)
+{
+    int velMaior = velocidade;
+    int velMenor = velMaior * ((raio - largura/2)/(raio + largura/2));
+    
+    if(sentido == 0) {
+        
+        analogWrite(_pinAA, velMaior);
+        analogWrite(_pinAB, velMaior);
+        analogWrite(_pinBA, velMenor);
+        analogWrite(_pinBB, velMenor);
+        
+    }
+    else {
+        
+        analogWrite(_pinAA, velMaior);
+        analogWrite(_pinAB, velMaior);
+        analogWrite(_pinBA, velMenor);
+        analogWrite(_pinBB, velMenor);
+    }
+    
+    digitalWrite(_pinAA, HIGH);
+    digitalWrite(_pinAB, LOW);
+    digitalWrite(_pinBA, HIGH);
+    digitalWrite(_pinBB, LOW);
     
 }

@@ -21,15 +21,15 @@ private:
 
 };
 
-class Motor
+class Carro
 {
 public:
-    Motor(int pinAA, int pinAB, int pinBA, int pinBB);
+    Carro(int pinAA, int pinAB, int pinBA, int pinBB, int largura);
     void linha(int velocidade, int sentido);
     void gira(int velocidade, int sentido);      // sentido = 0 - horário, 1 - anti-horário
-    void curva(int velocidade, int razaoVelocidades, int sentido);
+    void curva(int velocidade, int raio, int setor, int sentido); // sentido = 0 - horário, 1 - anti-horário
 private:
-    int _pinAA, _pinAB, _pinBA, _pinBB, _velocidade, _sentido, _razaoVelocidades;
+    int _pinAA, _pinAB, _pinBA, _pinBB, _largura, _velocidade, _sentido, _razaoVelocidades, _setor, _raio;
     
 };
 
