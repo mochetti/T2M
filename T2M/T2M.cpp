@@ -25,6 +25,11 @@ Carro::Carro(int pinAA, int pinAB, int pinBA, int pinBB, int largura)
     _pinAA = pinAA;
 }
 
+IRarray::IRarray(int clock, int portaAnalogica)
+{
+    pinMode(clock, OUTPUT);
+}
+
 void Led::blink(int interval, int times)
 {
     int a;
@@ -130,4 +135,25 @@ void Carro::curva(int velocidade, int raio, int setor, int sentido)
     digitalWrite(_pinBA, HIGH);
     digitalWrite(_pinBB, LOW);
     
+}
+
+void IRarray::varredura()
+{
+    int atual;
+    int soma;
+    for (int a = 0; a < 5; a = a++) {
+        atual = analogRead(_portaAnalogica);
+        if (atual >= 700)atual = 1*10ˆa;
+        else atual = 0;
+        soma = soma + atual;
+        digitalWrite(_clock, HIGH);
+        delay(2);
+        digitalWrite(_clock, LOW);
+        delay(2);
+        digitalWrite(_clock, HIGH);
+        delay(2);
+        digitalWrite(_clock, LOW);
+        delay(2);
+    }
+    return soma;
 }

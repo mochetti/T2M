@@ -33,4 +33,13 @@ private:
     
 };
 
+class IRarray
+{
+public:
+    IRarray(int clock, int portaAnalogica);
+    int varredura();
+private:
+    int _clock, _portaAnalogica;
+};
+
 #endif
