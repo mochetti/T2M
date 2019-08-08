@@ -68,16 +68,16 @@ void andar(byte velEsq, byte velDir) {
   bool dirD, dirE;
   
   // verifica roda esquerda
-  /* (expression) ? (true-value) : (false-value). Logo, se velEsq < 128 então dirE é LOW, do contrário (velEsq >= 128), dirE é HIGH */
-  dirE = velEsq < 128 ? LOW : HIGH;
+  /* (expression) ? (true-value) : (false-value). Logo, se velEsq < 64 então dirE é LOW, do contrário (velEsq >= 64), dirE é HIGH */
+  dirE = velEsq < 64 ? LOW : HIGH;
   // verifica roda direita
-  dirD = velDir < 128 ? LOW : HIGH;
+  dirD = velDir < 64 ? LOW : HIGH;
 
   //Mapeamento do PWM na estrutura veloDirecao
-  if(dirE) velEsq = velEsq - 128;
-  if(dirD) velDir = velDir - 128;
-  velPWMEsq = velEsq * 2;
-  velPWMDir = velDir * 2;
+  if(dirE) velEsq = velEsq - 64;
+  if(dirD) velDir = velDir - 64;
+  velPWMEsq = velEsq * 4;
+  velPWMDir = velDir * 4;
   // ------- Debug Serial -----------
   /*Serial.print("Veldir: " );
   Serial.println((int)velPWMDir);

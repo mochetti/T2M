@@ -4,22 +4,22 @@ void enviar() {
   txBuffer[0] = byte(128);
   if(radio) {
     for(Robo r : robos) {
-      if(r.velE < 0) txBuffer[r.index+1] = byte(abs(r.velE));
-      if(r.velE >= 0) txBuffer[r.index+1] = byte(r.velE+128);
-      if(r.velD < 0) txBuffer[r.index+2] = byte(abs(r.velD));
-      if(r.velD >= 0) txBuffer[r.index+2] = byte(r.velD+128);
+      println("SERIAL: Robo " + r.index + "  Esq = " + r.velE + "  Dir = " + r.velD);
+      txBuffer[2*(r.index)+1] = r.velE;
+      txBuffer[2*(r.index)+2] = r.velD;
     }
   }
+  // Para o robo se o radio for desabilitado
   else {
     for(Robo r : robos) {
-      txBuffer[r.index+1] = 100;
-      txBuffer[r.index+2] = -100;
+      txBuffer[r.index+1] = 0;
+      txBuffer[r.index+2] = 0;
     }
   }
   print("SERIAL: ");
   for(byte data : txBuffer) {
     myPort.write(data);
-    print(int(data) + "  ");
+    print(data + "  ");
   }
   println("");
 }

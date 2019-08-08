@@ -5,7 +5,7 @@ class Robo {
   float ang = 0;
   byte velD, velE;
   // Velocidade maxima do robo
-  byte velMax = byte(200);
+  byte velMax = 64;
   int v = 0;
   int index;
   
@@ -43,6 +43,7 @@ class Robo {
       break;
       
       case 1: // o centro é deslocado
+        //centro.x = (posVermelho.x) + lado*sqrt(2)/2*cos(ang+3*PI/4);
         centro.x = (posVerde.x + posVermelho.x) / 2;
         centro.y = (posVerde.y + posVermelho.y) / 2;
       break;
@@ -52,6 +53,7 @@ class Robo {
         centro.y = (posVerde.y + posVermelho.y) / 2;
       break;
     }
+    pos = new PVector(centro.x, centro.y);
     return centro;
   }
   
@@ -87,13 +89,13 @@ class Robo {
         //line(blobs.get(1).center().x, blobs.get(1).center().y, blobs.get(4).center().x, blobs.get(4).center().y);
       break;
       
-      case 1:    // verde na esquerda
+      case 1:    // vermelho na esquerda
         ang = atan2(- blobs.get(2).center().y + blobs.get(5).center().y, - blobs.get(2).center().x + blobs.get(5).center().x);
         ang += (PI/2 - atan(2));
         //line(blobs.get(2).center().x, blobs.get(2).center().y, blobs.get(5).center().x, blobs.get(5).center().y);
       break;
       
-      case 2:    // verde na direita
+      case 2:    // vermelho na direita
         ang = atan2(- blobs.get(3).center().y + blobs.get(6).center().y, - blobs.get(3).center().x + blobs.get(6).center().x);
         ang -= (PI/2 - atan(2));
         //line(blobs.get(3).center().x, blobs.get(3).center().y, blobs.get(6).center().x, blobs.get(6).center().y);
@@ -106,7 +108,7 @@ class Robo {
   
   // Funcoes de debug
   void debugAng() {
-    //println(degrees(ang));
+    //println("ROBO: " + index + "  ang = " + degrees(ang));
     arrow(pos.x, pos.y, pos.x + 50*cos(ang), pos.y + 50*sin(ang));
   }
   void debugObj() {

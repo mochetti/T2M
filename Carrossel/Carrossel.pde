@@ -17,9 +17,9 @@ Serial myPort = new Serial(this, Serial.list()[3], 115200);
 
 // Salvas as cores num txt pra poupar tempo na hora de calibrar (?)
 // Cores
-color cores[] = { color(242, 161, 7), // Laranja
-                  color(18, 155, 110), // Verde
-                  color(221, 2, 2) // Vermelho
+color cores[] = { color(245, 207, 4), // Laranja
+                  color(6, 158, 120), // Verde
+                  color(229, 2, 2) // Vermelho
                 };               
 
 // id de cada objeto
@@ -99,22 +99,27 @@ void draw() {
 
   if(debug) return;
   // Confere o numero de ids validos
-  int idsValidos = 0;
-  for(Blob b : oldBlobs) if(b.id >= 0) idsValidos++;
-  println("MAIN: ids validos = " + idsValidos);
+  print("MAIN: ids validos: ");
+  for(Blob b : oldBlobs) if(b.id >= 0) print(b.id + "  ");
+  println("");
   // Busca os objetos
   if(!track()) return;
   
   //showBola();
-  velBola();
+  //velBola();
   
   // Inicializa os robos
-  robos.clear();
-  for(int i=0; i<3; i++) {
-    robos.add(new Robo(i));
+  if(robos.size() == 0) {
+    robos.clear();
+    for(int i=0; i<3; i++) {
+      robos.add(new Robo(i));
+    }
+  }
+  for(int i=0; i<robos.size(); i++) {
+    robos.get(i).getAng();
+    robos.get(i).getPos();
     robos.get(i).debugAng();
   }
-
   // Define as estratégias dos robos
   robos.get(0).setEstrategia(0);
   robos.get(0).debugObj();
@@ -124,7 +129,9 @@ void draw() {
   //robos.get(2).setEstrategia(1);
   //for(Robo r : robos) r.debugObj();
   
-  alinha(robos.get(0));
+  alinhandando(robos.get(0));
+  //alinha(robos.get(1));
+  //alinha(robos.get(2));
   
   // Envia os comandos
   enviar();
@@ -149,12 +156,20 @@ void keyPressed() {
     radio = !radio;
   }
   if(key == 'o') {
-    println("vel increase");
+    println("vel giro increase");
     velGiro++;
   }
   if(key == 'p') {
-    println("vel decrease");
+    println("vel giro decrease");
     velGiro--;
+  }
+  if(key == 'k') {
+    println("vel viagem increase");
+    velViagem++;
+  }
+  if(key == 'l') {
+    println("vel viagem decrease");
+    velViagem--;
   }
 }
 

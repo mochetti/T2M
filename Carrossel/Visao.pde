@@ -309,27 +309,27 @@ boolean id() {
             //if(ang < 0) ang += PI/4;
             //else ang -= PI/4;
             
-            //ang += (PI/2 - atan(2));
-            ang += PI/4;
+            ang += (PI/2 - atan(2));
+            //ang += PI/4;
             
             // Coordenada de onde pode haver vermelho ou preto
             cx = v.center().x + distVV * cos(ang);
             cy = v.center().y + distVV * sin(ang);
-            
+            int ladoC = 6;
             // Raio de busca por outra quina
-            //noFill();
-            //stroke(255);
-            //rectMode(CENTER);
-            //rect(cx, cy, 5, 5);
-            //rectMode(CORNER);
+            noFill();
+            stroke(255);
+            rectMode(CENTER);
+            rect(cx, cy, ladoC, ladoC);
+            rectMode(CORNER);
             
             //line(v.center().x, v.center().y, b.center().x, b.center().y);
-            //line(cx, cy, v.center().x, v.center().y);
+            line(cx, cy, v.center().x, v.center().y);
             
             // Verifica a cor daquela regiao
             int pixelsVerdes = 0;
-            for(int x=int(cx)-2; x<cx+2; x++) {
-              for(int y=int(cy)-2; y<cy+2; y++) {
+            for(int x=int(cx)-ladoC/2; x<cx+ladoC/2; x++) {
+              for(int y=int(cy)-ladoC/2; y<cy+ladoC/2; y++) {
                 int loc = x + y * cam.width;
                 // What is current color
                 color currentColor = cam.pixels[loc];
@@ -337,7 +337,7 @@ boolean id() {
               }
             }
             // A regiao projetada é verde
-            if(pixelsVerdes > 10) {
+            if(pixelsVerdes > 0.6*ladoC*ladoC) {
               b.id = 2;
               v.id = 5;
             }
@@ -353,7 +353,7 @@ boolean id() {
   // Confere o numero de ids validos
   int idsValidos = 0;
   for(Blob b : blobs) if(b.id >= 0) idsValidos++;
-  if(idsValidos >= 3) {
+  if(idsValidos >= 7) {
     // Coloca em ordem crescente de id
     if(ordenar()) return true;
   }
@@ -415,7 +415,7 @@ PVector velBola() {
   PVector bolaAtual = new PVector(blobs.get(0).center().x, blobs.get(0).center().y);
   
   // Mostra o rastro na tela
-  for(int i = 0; i < rastro.size()-1; i++) ellipse(rastro.get(i).x, rastro.get(i).y, 15, 15);
+  //for(int i = 0; i < rastro.size()-1; i++) ellipse(rastro.get(i).x, rastro.get(i).y, 15, 15);
   
   // Descobre o angulo e o modulo da bola
   float ang = 0;
@@ -438,7 +438,7 @@ PVector velBola() {
   vel.x = modulo*cos(ang);
   vel.y = modulo*sin(ang);
   //vel.mult(10);
-  arrow(bolaAtual.x, bolaAtual.y, PVector.add(bolaAtual, vel).x, PVector.add(bolaAtual, vel).y);
+  //arrow(bolaAtual.x, bolaAtual.y, PVector.add(bolaAtual, vel).x, PVector.add(bolaAtual, vel).y);
 
   return vel;
 }
