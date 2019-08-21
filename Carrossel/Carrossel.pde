@@ -1,8 +1,5 @@
 import processing.video.*;
 import processing.serial.*;
-//import java.awt.Robot;
-//import java.awt.AWTException;
-//import java.awt.Rectangle;
 
 // Flags de debug
 boolean debug = true;
@@ -12,19 +9,21 @@ boolean campoDimensionado = false;
 boolean buscandoCor = true;
 boolean algumPonto = false;
 boolean radio = true;
+// Verifica se ainda estamos configurando o robo
+boolean configRobo = false;
 
 Serial myPort = new Serial(this, Serial.list()[3], 115200);
 
 // Salvas as cores num txt pra poupar tempo na hora de calibrar (?)
 // Cores
-color cores[] = { color(245, 207, 4), // Laranja
-                  color(6, 158, 120), // Verde
-                  color(229, 2, 2) // Vermelho
+color cores[] = { color(250, 190, 7), // Laranja
+                  color(0, 140, 118), // Verde
+                  color(230, 2, 2) // Vermelho
                 };               
 
 // id de cada objeto
 // 0 - Bola
-// 1 - Meio Robo 0 (vermelho embaixo)
+// 1 - Meio Robo 0 (vermelho maior)
 // 2 - Meio Robo 1 (vermelho na esquerda)
 // 3 - Meio Robo 2 (vermelho na direita)
 // 4 - Quina Robo 0
@@ -43,6 +42,10 @@ color mouseColor;
 int calColor = -1;
 // Numero de pixels do maior blob da cor vermelha
 int numMaior = 0;
+// Conta o tempo de execucao
+double tempo = 0;
+// Quantidade de quadros para vencer a inercia no controle alinhandando
+int contagemAlinhandando = 0;
 
 // Propriedades do campo
 int Y_AREA = 200;
@@ -82,6 +85,7 @@ void captureEvent(Capture c) {
 }
 
 void draw() {
+  tempo = millis();
   //screenshot();
   image(cam, 0, 0);
   // Mostra o campo na tela
@@ -93,9 +97,6 @@ void draw() {
   oldBlobs.clear();
   for(Blob b : blobs) oldBlobs.add(new Blob(b.clone()));
   blobs.clear();
-  
-  //print("MAIN: Quantidade de blobs: ");
-  //println(oldBlobs.size());
 
   if(debug) return;
   // Confere o numero de ids validos
@@ -105,20 +106,28 @@ void draw() {
   // Busca os objetos
   if(!track()) return;
   
+  if(configRobo) {
+    configRobo(robos.get(0));
+    return;
+  }
+  
   //showBola();
   //velBola();
   
   // Inicializa os robos
   if(robos.size() == 0) {
-    robos.clear();
+    //robos.clear();
     for(int i=0; i<3; i++) {
       robos.add(new Robo(i));
     }
   }
-  for(int i=0; i<robos.size(); i++) {
-    robos.get(i).getAng();
-    robos.get(i).getPos();
-    robos.get(i).debugAng();
+  else {
+    // Atualiza os robos
+    for(int i=0; i<robos.size(); i++) {
+      robos.get(i).getAng();
+      robos.get(i).getPos();
+      robos.get(i).debugAng();
+    }
   }
   // Define as estratégias dos robos
   robos.get(0).setEstrategia(0);
@@ -140,36 +149,60 @@ void draw() {
   
 void keyPressed() {
   if(key == 'd') {
-    println("debug on/off");
+    println("KEY: debug on/off");
     debug = !debug;
   }
   if(key == 'c') {
-    println("calibra on/off");
+    println("KEY: calibra on/off");
     calibra = !calibra;
   }
-  if(key >= 0) {
-    println("Cor " + key);
+  if(key >= '0' && key <= '9') {
+    println("KEY: Cor " + key);
     calColor = key;
   }
   if(key == 'r') {
-    println("radio on/off");
+    println("KEY: radio on/off");
     radio = !radio;
   }
-  if(key == 'o') {
-    println("vel giro increase");
-    velGiro++;
-  }
-  if(key == 'p') {
-    println("vel giro decrease");
-    velGiro--;
-  }
   if(key == 'k') {
-    println("vel viagem increase");
+    println("KEY: vel viagem increase");
     velViagem++;
   }
   if(key == 'l') {
-    println("vel viagem decrease");
+    println("KEY: vel viagem decrease");
     velViagem--;
+  }
+  if(key == 'u') {
+    //println("KEY: velE increase");
+    robos.get(0).velE = 10;
+  }
+  if(key == 'i') {
+    //println("KEY: velD increase");
+    robos.get(0).velE = 20;
+    robos.get(0).velD = 20;
+  }
+  if(key == 'o') {
+    //println("KEY: velE increase");
+    robos.get(0).velE = 40;
+    robos.get(0).velD = 40;
+  }
+  if(key == 'p') {
+    //println("KEY: velD increase");
+    robos.get(0).velE = 60;
+    robos.get(0).velD = 60;
+  }
+  if(key == 'y') {
+    println("KEY: Config Robo");
+    configEsq = false;
+    configRobo = !configRobo;
+    configRobo(robos.get(0));
+  }
+}
+
+void keyReleased() {
+  if(robos.size() > 0) {
+    robos.get(0).velE = 0;
+    robos.get(0).velD = 0;
   }
 }
 

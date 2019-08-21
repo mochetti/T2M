@@ -310,21 +310,22 @@ boolean id() {
             //else ang -= PI/4;
             
             ang += (PI/2 - atan(2));
+            // PI/4 é a média dos dois angulos ideais (atan(2) e (PI/2 - atan(2)))
             //ang += PI/4;
             
             // Coordenada de onde pode haver vermelho ou preto
-            cx = v.center().x + distVV * cos(ang);
-            cy = v.center().y + distVV * sin(ang);
-            int ladoC = 6;
+            cx = v.center().x + 0.6 * distVV * cos(ang);
+            cy = v.center().y + 0.6 * distVV * sin(ang);
+            int ladoC = 8;
             // Raio de busca por outra quina
             noFill();
             stroke(255);
             rectMode(CENTER);
-            rect(cx, cy, ladoC, ladoC);
+            //rect(cx, cy, ladoC, ladoC);
             rectMode(CORNER);
             
             //line(v.center().x, v.center().y, b.center().x, b.center().y);
-            line(cx, cy, v.center().x, v.center().y);
+            //line(cx, cy, v.center().x, v.center().y);
             
             // Verifica a cor daquela regiao
             int pixelsVerdes = 0;
@@ -337,7 +338,7 @@ boolean id() {
               }
             }
             // A regiao projetada é verde
-            if(pixelsVerdes > 0.6*ladoC*ladoC) {
+            if(pixelsVerdes > 0.5*ladoC*ladoC) {
               b.id = 2;
               v.id = 5;
             }
@@ -351,20 +352,20 @@ boolean id() {
     }
   }
   // Confere o numero de ids validos
+  int elementos = 0;
+  for(int a : corAchada) elementos += a;
   int idsValidos = 0;
   for(Blob b : blobs) if(b.id >= 0) idsValidos++;
-  if(idsValidos >= 7) {
+  if(idsValidos >= elementos) {
     // Coloca em ordem crescente de id
     if(ordenar()) return true;
   }
+  println("VISÃO: Erro no numero de ids validos");
   return false;
 }
 
 // Funcao para fazer coincidir o id do blob com o index dele dentro do array
 boolean ordenar() {
-  int elementos = 0;
-  for(int a : corAchada) elementos += a;
-  //println("VISÃO: Quantidade de elementos = " + elementos);
   // Ainda que nem todo mundo esteja em campo, inicializa o array todo
   ArrayList<Blob> newBlobs = new ArrayList<Blob>();
   for(int i=0; i<10; i++) {

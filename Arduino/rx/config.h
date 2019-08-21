@@ -1,3 +1,6 @@
+//B11111000 | B00000011;
+
+
 #include <SPI.h>
 // #include <nRF24L01.h>
 #include <RF24.h> /* By TMRh20 - http://tmrh20.github.io/RF24/ */

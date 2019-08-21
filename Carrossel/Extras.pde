@@ -144,4 +144,89 @@ boolean id() {
   if(ordenar()) return true;
   return false;
 }
-*/
+
+
+boolean idf() {
+  // raio de busca com o vermelho no centro
+  int raioBusca = 55;
+  for(Blob b : blobs) {
+    // Laranja
+    if(b.cor == 0) {
+      // O objeto só pode ser a bola
+      b.id = 0;
+      continue;
+    }
+      
+    // Verde
+    if(b.cor == 1) {
+        for(Blob v : blobs) {
+          // Verifica se o v já foi catalogado
+          //if(v.id >= 0) continue;
+          if(v.cor == 2 && (distSq(b.center(), v.center()) < (raioBusca*raioBusca))) {
+            noFill();
+            stroke(255);
+            //ellipse(b.center().x, b.center().y, raioBusca, raioBusca);
+            
+            // Verifica se é o vermelho comprido
+            if(v.numPixels == numMaior) {
+              b.id = 1;
+              v.id = 4;
+              continue;
+            }
+            
+            // Tem que separar entre os dois vermelhos simetricos (na esquerda e na direita)
+            // Tentativa de usar o angulo entre os pontos: centro do verde, (xMax Verde, yMedio Verde), centro do vermelho
+            PVector verdVerm = new PVector();
+            verdVerm = b.center().sub(v.center());
+            PVector verdMX = new PVector(b.center().x - b.maxx, b.center().y);
+            float ang = PVector.angleBetween(verdVerm, verdMX);
+          }
+        }
+    }
+            
+            
+  }
+  // Confere o numero de ids validos
+  int idsValidos = 0;
+  for(Blob b : blobs) if(b.id >= 0) idsValidos++;
+  if(idsValidos >= 7) {
+    // Coloca em ordem crescente de id
+    if(ordenar()) return true;
+  }
+  return false;
+}
+
+
+if(dAng < radians(tolAng)) {
+    // Anda reto
+    println("CONTROLE: Anda reto");
+    r.velE = velMaxima;
+    r.velD = velMaxima;
+  }
+  
+  else {
+    // gira horario
+    if(r.getAng() < atan2(robObj.y, robObj.x)) {
+      println("CONTROLE: Gira horário");
+      if(r.velD < limiteMenor && r.velD > 0) r.velD -= taxaVel;
+      if(r.velD == 0) r.velD = limiteMenor + velMinima;
+      else if(r.velD >= limiteMenor && r.velD < limiteMenor+velMaxima) r.velD += taxaVel;
+      
+      if(r.velE >= limiteMenor) r.velE = velMinima;
+      if(r.velE < velMinima) r.velE = velMinima;
+      else if(r.velE < velMaxima) r.velE += taxaVel;
+    }
+    // gira anti horario
+    else {
+      println("CONTROLE: Gira antihorário");
+      if(r.velE < limiteMenor && r.velE > 0) r.velE -= taxaVel;
+      if(r.velE == 0) r.velE = limiteMenor + velMinima;
+      else if(r.velE >= limiteMenor && r.velE < limiteMenor+velMaxima) r.velE += taxaVel;
+      
+      if(r.velD > limiteMenor) r.velD = velMinima;
+      if(r.velD < velMinima) r.velD = velMinima;
+      else if(r.velD < velMaxima) r.velD += taxaVel;
+    }
+  }
+  
+  */

@@ -55,6 +55,7 @@ class Blob {
     fill(c);
     strokeWeight(2);
     Blob b = new Blob(this);
+    
     // Como retangulos
     //rectMode(CORNERS);
     //rect(minx, miny, maxx, maxy);

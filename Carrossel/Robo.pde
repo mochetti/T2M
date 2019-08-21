@@ -1,11 +1,15 @@
 // Classe que gerencia os robos
 
 class Robo {
-  PVector pos, vel, obj;
-  float ang = 0;
-  byte velD, velE;
-  // Velocidade maxima do robo
-  byte velMax = 64;
+  PVector pos = new PVector(), posAnt, vel, obj;
+  float ang = 0, angAnt = 0;
+  // Armazena o erro no valor do angulo do frame anterior
+  // É propriedade da classe robo para evitar multiplas variaveis globais
+  float dAngAnt = 0;
+  float velD, velE;
+  // Velocidades limite do robo (0 - 64)
+  int velMax = 64;
+  int velMin = 0;
   int v = 0;
   int index;
   
@@ -27,8 +31,13 @@ class Robo {
   void setVel(PVector income) {
     vel = income;
   }
-  void setVel(float v1, float v2) {
-    vel.set(v1, v2);
+  void setVel(float vE, float vD) {
+    // Verifica se as velocidades estão dentro dos limites estabelecidos
+    // Os ajustes para velocidade negativa é feito direto na serial
+    if(vE > velMax) vE = velMax;
+    if(vD > velMax) vD = velMax;
+    velE = vE;
+    velD = vD;
   }
   
   // Calcula o centro real do robo
@@ -53,6 +62,8 @@ class Robo {
         centro.y = (posVerde.y + posVermelho.y) / 2;
       break;
     }
+    
+    posAnt = new PVector(pos.x, pos.y);
     pos = new PVector(centro.x, centro.y);
     return centro;
   }
@@ -60,7 +71,6 @@ class Robo {
   // Define posicao do objetivo como vetor
   void setObj(PVector income) {
     obj = income;
-    //println(velObj);
   }
   
   // Define posicao do objetivo como coordenadas
@@ -77,32 +87,41 @@ class Robo {
   void setEstrategia(int n) {
     estrategia(this, n);
   }
-  void setAng(float income) {
-    ang = income;
+  
+  // Retorna um vetor correspondente à direçao do robo
+  PVector getDir() {
+    PVector dir = new PVector();
+    dir.x = cos(ang);
+    dir.y = sin(ang);
+    return dir;
   }
   
+  // Retorna o angulo do robo
   float getAng() {
     
     switch(index) {
-      case 0:    // verde embaixo
+      case 0:    // vermelho maior
         ang = atan2(- blobs.get(1).center().y + blobs.get(4).center().y, - blobs.get(1).center().x + blobs.get(4).center().x);
         //line(blobs.get(1).center().x, blobs.get(1).center().y, blobs.get(4).center().x, blobs.get(4).center().y);
       break;
       
       case 1:    // vermelho na esquerda
         ang = atan2(- blobs.get(2).center().y + blobs.get(5).center().y, - blobs.get(2).center().x + blobs.get(5).center().x);
-        ang += (PI/2 - atan(2));
+        ang += PI/2 - atan(2);
         //line(blobs.get(2).center().x, blobs.get(2).center().y, blobs.get(5).center().x, blobs.get(5).center().y);
       break;
       
       case 2:    // vermelho na direita
         ang = atan2(- blobs.get(3).center().y + blobs.get(6).center().y, - blobs.get(3).center().x + blobs.get(6).center().x);
-        ang -= (PI/2 - atan(2));
+        ang += atan(2) - PI/2;
         //line(blobs.get(3).center().x, blobs.get(3).center().y, blobs.get(6).center().x, blobs.get(6).center().y);
       break;
     }
     while(ang > 2*PI) ang -= 2*PI;
     while(ang < -2*PI) ang += 2*PI;
+    
+    println("ROBO: " + index + " ang = " + degrees(ang));
+    
     return ang;
   }
   
