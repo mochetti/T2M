@@ -11,7 +11,7 @@ class Robo {
   int velMax = 63;
   int velMin = -63;
   int velEmin = 30;
-  int velDmin = 36;
+  int velDmin = 50;
   int v = 0;
   int index;
   

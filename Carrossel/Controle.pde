@@ -9,8 +9,9 @@ byte velViagem = 30;
 void alinha(Robo r) {
   // Vetor robo -> obj
   PVector robObj = new PVector();
-  
-  float dAng = PVector.angleBetween(robObj, r.getPos());
+  robObj = r.obj.sub(r.getPos());
+  float ang = atan2(robObj.y, robObj.x);
+  float dAng = PVector.angleBetween(robObj, r.getDir());
   //if(dAng > PI) dAng = 2*PI - dAng;
   // Angulo do robo
   float angRobo = r.getAng();
@@ -58,7 +59,7 @@ boolean inercia(Robo r) {
   println("CONTROLE: tempo = " + tempo + "  antes = " + antes);
   if(tempo - antes < 100) {
     println("CONTROLE: ajuste de inercia");
-    r.setVel(r.velMax*0.8, r.velMax);
+    r.setVel(0, r.velMax);
     return true;
   }
   antes = tempo;
