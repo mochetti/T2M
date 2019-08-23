@@ -4,6 +4,7 @@ import processing.serial.*;
 // Flags de debug
 boolean debug = true;
 boolean calibra = true;
+boolean visao = false;
 boolean dimensionaCampo = true;
 boolean campoDimensionado = false;
 boolean buscandoCor = true;
@@ -11,20 +12,24 @@ boolean algumPonto = false;
 boolean radio = true;
 // Verifica se ainda estamos configurando o robo
 boolean configRobo = false;
+// Verifica se é a primeira vez que chamamos millis() no alinhandando
+boolean primeiraVezAlinhandando = true;
+
+boolean andaReto = false;
 
 Serial myPort = new Serial(this, Serial.list()[3], 115200);
 
 // Salvas as cores num txt pra poupar tempo na hora de calibrar (?)
 // Cores
-color cores[] = { color(250, 190, 7), // Laranja
-                  color(0, 140, 118), // Verde
-                  color(230, 2, 2) // Vermelho
+color cores[] = { color(250, 178, 2), // Laranja
+                  color(0, 177, 138), // Verde
+                  color(223, 2, 2) // Vermelho
                 };               
 
 // id de cada objeto
 // 0 - Bola
 // 1 - Meio Robo 0 (vermelho maior)
-// 2 - Meio Robo 1 (vermelho na esquerda)
+// 2 - Meio Robo 1 (robo xadrez)
 // 3 - Meio Robo 2 (vermelho na direita)
 // 4 - Quina Robo 0
 // 5 - Quina Robo 1
@@ -42,10 +47,14 @@ color mouseColor;
 int calColor = -1;
 // Numero de pixels do maior blob da cor vermelha
 int numMaior = 0;
+// Numero de pixels do menor blob da cor verde
+int numMenor = 0;
 // Conta o tempo de execucao
-double tempo = 0;
+double tempo = millis();
+double antes = millis();
 // Quantidade de quadros para vencer a inercia no controle alinhandando
 int contagemAlinhandando = 0;
+
 
 // Propriedades do campo
 int Y_AREA = 200;
@@ -105,7 +114,8 @@ void draw() {
   println("");
   // Busca os objetos
   if(!track()) return;
-  
+  // debug da visao
+  if(visao) return;
   if(configRobo) {
     configRobo(robos.get(0));
     return;
@@ -130,7 +140,7 @@ void draw() {
     }
   }
   // Define as estratégias dos robos
-  robos.get(0).setEstrategia(0);
+  robos.get(0).setEstrategia(4);
   robos.get(0).debugObj();
   
   //robos.get(0).setEstrategia(3);
@@ -138,7 +148,7 @@ void draw() {
   //robos.get(2).setEstrategia(1);
   //for(Robo r : robos) r.debugObj();
   
-  alinhandando(robos.get(0));
+  alinha(robos.get(0));
   //alinha(robos.get(1));
   //alinha(robos.get(2));
   
@@ -182,20 +192,22 @@ void keyPressed() {
     robos.get(0).velD = 20;
   }
   if(key == 'o') {
-    //println("KEY: velE increase");
-    robos.get(0).velE = 40;
-    robos.get(0).velD = 40;
+    println("KEY: velE increase");
+    robos.get(0).velEmin++;
   }
   if(key == 'p') {
-    //println("KEY: velD increase");
-    robos.get(0).velE = 60;
-    robos.get(0).velD = 60;
+    println("KEY: velD increase");
+    robos.get(0).velDmin++;
   }
   if(key == 'y') {
     println("KEY: Config Robo");
     configEsq = false;
     configRobo = !configRobo;
     configRobo(robos.get(0));
+  }
+  if(key == 'v') {
+    println("KEY: debug visao on/off");
+    visao = !visao;
   }
 }
 

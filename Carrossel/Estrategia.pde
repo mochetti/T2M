@@ -215,5 +215,9 @@ void estrategia(Robo r, int n) {
       r.setObj(inter);
       
     break;
+    
+    case 4:  // Segue a bola
+      r.setObj(bola);
+    break;
   }
 }

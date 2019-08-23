@@ -66,12 +66,12 @@ class Blob {
   PVector center() {
     PVector centro = new PVector();
     // Centro como média das extremidades
-    //centro.x = (minx+maxx)/2;
-    //centro.y = (miny+maxy)/2;
+    centro.x = (minx+maxx)/2;
+    centro.y = (miny+maxy)/2;
     
     // Centro como média de todos os pixels encontrados
-    centro.x = massaX / numPixels;
-    centro.y = massaY / numPixels;
+    //centro.x = massaX / numPixels;
+    //centro.y = massaY / numPixels;
     //println("massa x = " + massaX + "  massa y = " + massaY + "  numPixels = " + numPixels);
     return centro;
   }

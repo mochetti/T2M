@@ -229,4 +229,57 @@ if(dAng < radians(tolAng)) {
     }
   }
   
+  *******
+  CÓDIGO PARA ETIQUETAS SIMETRICAS
+  *******
+  // Verifica de qual lado está o vermelho
+            float distVV = dist(b.center().x, b.center().y, v.center().x, v.center().y);
+            float ang, cx, cy;
+            // Calcula o angulo da reta formada pelos centros do vermelho e verde
+            ang = atan2(- v.center().y + b.center().y, - v.center().x + b.center().x);
+            //println("Ang = " + ang*180/PI);
+                
+            // Soma 45 graus nesse angulo
+            //if(ang < 0) ang += PI/4;
+            //else ang -= PI/4;
+            
+            ang += (PI/2 - atan(2));
+            // PI/4 é a média dos dois angulos ideais (atan(2) e (PI/2 - atan(2)))
+            //ang += PI/4;
+            
+            // Coordenada de onde pode haver vermelho ou preto
+            cx = v.center().x + 0.6 * distVV * cos(ang);
+            cy = v.center().y + 0.6 * distVV * sin(ang);
+            int ladoC = 8;
+            // Raio de busca por outra quina
+            noFill();
+            stroke(255);
+            rectMode(CENTER);
+            rect(cx, cy, ladoC, ladoC);
+            rectMode(CORNER);
+            
+            //line(v.center().x, v.center().y, b.center().x, b.center().y);
+            line(cx, cy, v.center().x, v.center().y);
+            
+            // Verifica a cor daquela regiao
+            int pixelsVerdes = 0;
+            for(int x=int(cx)-ladoC/2; x<cx+ladoC/2; x++) {
+              for(int y=int(cy)-ladoC/2; y<cy+ladoC/2; y++) {
+                int loc = x + y * cam.width;
+                // What is current color
+                color currentColor = cam.pixels[loc];
+                if(msmCor(currentColor, cores[1])) pixelsVerdes++;
+              }
+            }
+            // A regiao projetada é verde
+            if(pixelsVerdes > 0.5*ladoC*ladoC) {
+              b.id = 2;
+              v.id = 5;
+            }
+            // A regiao projetada é preta
+            else {
+              b.id = 3;
+              v.id = 6;
+            }
+  
   */

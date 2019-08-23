@@ -6,10 +6,12 @@ class Robo {
   // Armazena o erro no valor do angulo do frame anterior
   // É propriedade da classe robo para evitar multiplas variaveis globais
   float dAngAnt = 0;
-  float velD, velE;
+  float velD, velE, dAntiga, eAntiga;
   // Velocidades limite do robo (0 - 64)
-  int velMax = 64;
-  int velMin = 0;
+  int velMax = 63;
+  int velMin = -63;
+  int velEmin = 30;
+  int velDmin = 36;
   int v = 0;
   int index;
   
@@ -35,7 +37,9 @@ class Robo {
     // Verifica se as velocidades estão dentro dos limites estabelecidos
     // Os ajustes para velocidade negativa é feito direto na serial
     if(vE > velMax) vE = velMax;
+    else if(vE < -velMax) vE = -velMax;
     if(vD > velMax) vD = velMax;
+    else if(vD < -velMax) vD = -velMax;
     velE = vE;
     velD = vD;
   }
@@ -51,13 +55,12 @@ class Robo {
         centro.y = (posVerde.y + posVermelho.y) / 2;
       break;
       
-      case 1: // o centro é deslocado
-        //centro.x = (posVermelho.x) + lado*sqrt(2)/2*cos(ang+3*PI/4);
+      case 1: 
         centro.x = (posVerde.x + posVermelho.x) / 2;
         centro.y = (posVerde.y + posVermelho.y) / 2;
       break;
       
-      case 2:
+      case 2:  // o centro é deslocado
         centro.x = (posVerde.x + posVermelho.x) / 2;
         centro.y = (posVerde.y + posVermelho.y) / 2;
       break;
@@ -105,9 +108,9 @@ class Robo {
         //line(blobs.get(1).center().x, blobs.get(1).center().y, blobs.get(4).center().x, blobs.get(4).center().y);
       break;
       
-      case 1:    // vermelho na esquerda
+      case 1:    // robo xadrez
         ang = atan2(- blobs.get(2).center().y + blobs.get(5).center().y, - blobs.get(2).center().x + blobs.get(5).center().x);
-        ang += PI/2 - atan(2);
+        ang += PI/4;
         //line(blobs.get(2).center().x, blobs.get(2).center().y, blobs.get(5).center().x, blobs.get(5).center().y);
       break;
       
@@ -120,7 +123,7 @@ class Robo {
     while(ang > 2*PI) ang -= 2*PI;
     while(ang < -2*PI) ang += 2*PI;
     
-    println("ROBO: " + index + " ang = " + degrees(ang));
+    //println("ROBO: " + index + " ang = " + degrees(ang));
     
     return ang;
   }

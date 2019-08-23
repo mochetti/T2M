@@ -1,35 +1,70 @@
 // Tolerancia de diferença entre os angulos em graus
-float tolAng = 30;
+float tolAng = 15;
 // Velocidade inicial de giro
-byte velGiro = 8;
+//byte velGiro = 30;
 // Velocidade inicial para andar reto
-byte velViagem = 8;
+byte velViagem = 30;
 
 // Alinha e anda
 void alinha(Robo r) {
-  // Angulo do objetivo
-  float ang = atan2(r.obj.y, r.obj.x) - PI;
-  float dAng = abs(r.getAng() - ang);
-  //println("CONTROLE: ang obj = " + degrees(ang));
-  //println("CONTROLE: ang robo = " + degrees(r.getAng()));
-  //println("CONTROLE: dAng = " + degrees(dAng));
+  // Vetor robo -> obj
+  PVector robObj = new PVector();
+  
+  float dAng = PVector.angleBetween(robObj, r.getPos());
+  //if(dAng > PI) dAng = 2*PI - dAng;
+  // Angulo do robo
+  float angRobo = r.getAng();
+  println("CONTROLE: ang obj = " + degrees(ang));
+  println("CONTROLE: ang robo = " + degrees(r.getAng()));
+  println("CONTROLE: dAng = " + degrees(dAng));
   if(dAng < radians(tolAng)) {
+    // Vence a inercia
+    if(!andaReto) {
+      antes = tempo;
+      if(inercia(r)) return;
+    }
+    // Controle para nao vencer a inercia toda vez
+    // Só chama inercia() quando o comando anterior era de giro
+    andaReto = true;
     // Anda reto
     println("CONTROLE: Anda reto");
-    r.velE = velViagem;
-    r.velD = velViagem;
+    r.velE = r.velEmin;
+    r.velD = r.velDmin;
   }
   else {
+    andaReto = false;
     // Alinha
-    if(r.getAng() < ang) {
+    if(ang - angRobo > 0 && ang - angRobo < PI) {
       println("CONTROLE: Gira horário");
       gira(r, true);
     }
-    else {
+    else if(ang - angRobo > PI) {
       println("CONTROLE: Gira anti horário");
       gira(r, false);
     }
+    else if(angRobo - ang > 0 && angRobo - ang < PI) {
+      println("CONTROLE: Gira anti horário");
+      gira(r, false);
+    }
+    else if(angRobo - ang > PI) {
+      println("CONTROLE: Gira horário");
+      gira(r, true);
+    }
   }
+}
+
+// Veririca se o robo já venceu a inércia
+boolean inercia(Robo r) {
+  println("CONTROLE: tempo = " + tempo + "  antes = " + antes);
+  if(tempo - antes < 100) {
+    println("CONTROLE: ajuste de inercia");
+    r.setVel(r.velMax*0.8, r.velMax);
+    return true;
+  }
+  antes = tempo;
+  r.velE = r.eAntiga;
+  r.velD = r.dAntiga;
+  return false;
 }
 
 // Gira o robo r no proprio eixo na velocidade velGiro
@@ -37,12 +72,12 @@ void alinha(Robo r) {
 // sentido false : gira anti horário
 void gira(Robo r, boolean sentido) {
   if(sentido) {
-    r.velD = byte(velGiro);
-    r.velE = byte(velGiro + 64);
+    r.velD = r.velDmin;
+    r.velE = -r.velEmin;
   }
   else {
-    r.velE = byte(velGiro);
-    r.velD = byte(velGiro + 64);
+    r.velD = -r.velDmin;
+    r.velE = r.velEmin;
   }
 }
 
@@ -56,15 +91,19 @@ void alinhandando(Robo r) {
   float velD = r.velD;
   
   // Velocidades mínima e máxima
-  int velMin = 20;
+  int velMin = 30;
   int velMax = 50;
   
-  // Angulo do objetivo
-  PVector robObj = r.obj.sub(r.pos);
-  //PVector robObj = r.getPos().sub(r.obj);
-  float dAng = PVector.angleBetween(r.getDir(), robObj);
+  // Define o lado de menor angulo
+  int giraHorario = 1;
   
-  println("CONTROLE: Angulo robObj = " + degrees(atan2(robObj.y, robObj.x)));
+  // Angulo do objetivo
+  float angObj = atan2(r.obj.y, r.obj.x) - PI;
+  //PVector robObj = r.obj.sub(r.pos);
+  //PVector robObj = r.getPos().sub(r.obj);
+  float dAng = r.getAng() - angObj;
+  
+  println("CONTROLE: Angulo robObj = " + degrees(angObj));
   println("CONTROLE: Angulo robo = " + degrees(r.getAng()));
   println("CONTROLE: dAng = " + degrees(dAng));
   
@@ -78,7 +117,7 @@ void alinhandando(Robo r) {
   }
   */
   // Verifica a inercia por contagem de quadros
-  if(contagemAlinhandando < 10) {
+  if(contagemAlinhandando < 50) {
     // Vence a inercia
     println("CONTROLE: Vencendo a inércia");
     r.setVel(velMax, velMax);
@@ -88,26 +127,27 @@ void alinhandando(Robo r) {
   
   // Já estamos alinhando
   // PD
-  float kp = 0.1, kd = 0;
-  double dt = millis() - tempo;
+  float kp = 1, kd = 10;
+  // Se ao inves de ler o dt entre dois frames, ele for constante, a variacao do ang pro angAnt é maior
+  double dt = 50;
+  if(tempo - antes < dt) {
+    println("");
+    println("");
+    return;
+  }
+  antes = tempo;
   // A saída é a soma dos fatores P e D
-  double out = kp * dAng + kd * (dAng - r.dAngAnt) / dt;
+  double p = kp * dAng;
+  double d = kd * (dAng - r.dAngAnt) / dt;
+  double out = p + d;
   
-  println("CONTROLE: dt = " + dt);
+  println("CONTROLE: P = " + p + "  D = " + d);
   println("CONTROLE: out = " + out);
   
-  velE -= out;
-  velD += out;
-  
-  // Confere os limites de velocidade
-  if(velE < -velMax) velE = -velMax;
-  else if(velE < 0 && velE > -velMin) velE = -velMin;
-  else if(velE > 0 && velE < velMin) velE = velMin;
-  else if(velE > velMax) velE = velMax;
-  if(velD < -velMax) velD = -velMax;
-  else if(velD < 0 && velD > -velMin) velD = -velMin;
-  else if(velD > 0 && velD < velMin) velD = velMin;
-  else if(velD > velMax) velD = velMax;
+  if(dAng > PI || dAng < -PI) giraHorario = -1;
+  else giraHorario = 1;
+  velE -= out * giraHorario;
+  velD += out * giraHorario;
   
   // Atribui as velocidades ao robo
   r.setVel(velE, velD);
