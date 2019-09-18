@@ -85,7 +85,11 @@ class Blob {
  
   // Verifica se um ponto (x, y) está perto do blob
   boolean isNear(float px, float py) {
+<<<<<<< Updated upstream:Carrossel 2019/CarrosselVideo/Blob.pde
     int distancia = 15;
+=======
+    int distancia = 22;
+>>>>>>> Stashed changes:Carrossel/Blob.pde
     // Coordenadas do centro
     float cx = (minx+maxx)/2;
     float cy = (miny+maxy)/2;
