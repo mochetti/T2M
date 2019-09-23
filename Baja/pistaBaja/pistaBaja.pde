@@ -7,9 +7,9 @@ boolean desenhado = false;
 int pac = 0;
 
 // coordenadas da pista
-// pares - x
-// impares - y
-FloatList coord = new FloatList();
+FloatList cX = new FloatList();
+FloatList cY = new FloatList();
+
 PImage pacMan;
 
 void setup() {
@@ -29,21 +29,21 @@ void draw() {
 }
 
 void acquire() {
-  if(coord.size() > 5*raioTolerancia) 
-    if(distSq(mouseX, mouseY, coord.get(0), coord.get(1)) < raioTolerancia*raioTolerancia) {
+  if(cX.size() > 5*raioTolerancia) 
+    if(distSq(mouseX, mouseY, cX.get(0), cY.get(0)) < raioTolerancia*raioTolerancia) {
       print("ACQUIRE: Voltamos ao início !!");
       desenhado = true;
       return;
     }
   // valores do mouse
-  coord.append(mouseX);
-  coord.append(mouseY);
+  cX.append(mouseX);
+  cY.append(mouseY);
   point(mouseX, mouseY);
 }
 
 void display() {
-  for(int i=0; i<coord.size(); i+=2) {
-    point(coord.get(i), coord.get(i+1));
+  for(int i=0; i<cX.size(); i++) {
+    point(cX.get(i), cY.get(i));
   }
 }
 
@@ -51,18 +51,18 @@ void simulate() {
   int imageSize = 20;
   background(0);
   display();
-  pac += 2;
-  if(pac > coord.size() - 4) pac = 0;
+  pac++;
+  if(pac > cX.size() - 2) pac = 0;
   // calcula o angulo de rotacao baseado no proximo ponto
-  float ang = atan2(coord.get(pac+3)-coord.get(pac+1), coord.get(pac+2)-coord.get(pac));
+  float ang = atan2(cY.get(pac+1)-cY.get(pac), cX.get(pac+1)-cX.get(pac));
   push();
-  translate(coord.get(pac), coord.get(pac+1));
+  translate(cX.get(pac), cY.get(pac));
   rotate(ang);
   //ellipse(coord.get(pac), coord.get(pac+1), 5, 5);
   image(pacMan, - imageSize/2, - imageSize/2, imageSize, imageSize);
   pop();
   
-  delay(0);
+  delay(10);
 }
 
 float distSq(float x1, float y1, float x2, float y2) {
