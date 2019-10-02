@@ -1,23 +1,27 @@
 void estrategia(Robo r, int n) {
   // Mudar para as coordenadas do gol inimigo
-  PVector golInimigo = new PVector(width, height/2);
+  noFill();
+  //PVector golInimigo = new PVector(finalCampo.x, (finalCampo.y + comecoCampo.y)/2);
+  PVector golInimigo = new PVector((campo[1].x + campo[2].x) /2, (campo[1].y+campo[2].y) / 2);
   ellipse(golInimigo.x, golInimigo.y, 20, 20);
-  // Mudar para as coordenadas do nosso gol
-  PVector golAmigo = new PVector(0, height/2);
+  //PVector golAmigo = new PVector(comecoCampo.x, (finalCampo.y + comecoCampo.y)/2);
+  PVector golAmigo = new PVector((campo[0].x + campo[3].x) /2, (campo[0].y+campo[3].y) / 2);
   ellipse(golAmigo.x, golAmigo.y, 20, 20);
   // Distancia que o robo pega pra empurrar a bola
   float distSombra = 50;
   // Distancia entre o X do goleiro e o X do centro do gol
-  float distGoleiro = 20;
+  float distGoleiro = 30;
   // Parametros da reta da bola
   float aBola, bBola;
   // Raio de tolerancia para colisao
   int distColisao = 100;
+  // Raio de tolerancia pro goleiro alinhar quando estiver próximo ao objetivo
+  int limiteDistGoleiro = 10;
   
   PVector velBola = velBola();
-  PVector bola = new PVector(blobs.get(0).center().x, blobs.get(0).center().y);
+  
   // Raio de colisao da bola
-  ellipse(bola.x, bola.y, distColisao, distColisao);
+  //ellipse(bola.x, bola.y, distColisao, distColisao);
   PVector inter = new PVector();
   
   switch(n) {
@@ -28,28 +32,34 @@ void estrategia(Robo r, int n) {
       inter.y = blobs.get(0).center().y;
       if(inter.y > golAmigo.y + Y_AREA/2) inter.y = golAmigo.y + Y_AREA/2;
       if(inter.y < golAmigo.y - Y_AREA/2) inter.y = golAmigo.y - Y_AREA/2;
-      ellipse(inter.x, inter.y, 15, 15);
+      //ellipse(inter.x, inter.y, 15, 15);
+      
+      // Checa se o goleiro já está perto do objetivo
+      if(distSq(r.pos, inter) < limiteDistGoleiro*limiteDistGoleiro) r.angObj = radians(90);
+      else r.angObj = -1;
       r.setObj(inter);
+      
     break;
     
     case 1:    // Empurra a bola pro gol através da sombra
       // Calcula a sombra da bola
-      float ang = atan2(golInimigo.y - blobs.get(0).center().y, golInimigo.x - blobs.get(0).center().x);
+      float ang = atan2(golAmigo.y - blobs.get(0).center().y, golAmigo.x - blobs.get(0).center().x);
       ang += PI;
       PVector sombra = new PVector();
       sombra.x = bola.x + distSombra * cos(ang);
       sombra.y = bola.y + distSombra * sin(ang);
       
       // Condiciona a sombra dentro do campo
-      if(sombra.x < 0) sombra.x = 0;
-      if(sombra.y < 0) sombra.y = 0;
-      if(sombra.x > width) sombra.x = width;
-      if(sombra.y > height) sombra.y = height;
+      if(sombra.x < comecoCampo.x) sombra.x = comecoCampo.x;
+      if(sombra.y < comecoCampo.y) sombra.y = comecoCampo.y;
+      if(sombra.x > finalCampo.x) sombra.x = finalCampo.x;
+      if(sombra.y > finalCampo.y) sombra.y = finalCampo.y;
       
       noFill();
       stroke(255);
       ellipse(sombra.x, sombra.y, 20, 20);
-      line(sombra.x, sombra.y, golInimigo.x, golInimigo.y);
+      //line(sombra.x, sombra.y, golInimigo.x, golInimigo.y);
+      arrow(sombra.x, sombra.y, bola.x, bola.y);
       
       // Verifica se o robo esta perto o suficiente da sombra
       if(distSq(r.pos.x, r.pos.y, sombra.x, sombra.y) < 15*15) {
@@ -213,6 +223,16 @@ void estrategia(Robo r, int n) {
       ellipse(inter.x, inter.y, 15, 15);
       r.setObj(inter);
       
+    break;
+    
+    // segue a bola
+    case 4:
+      r.setObj(bola);
+    break;
+    
+    // segue o mouse
+    case 5:
+      r.setObj(mouseX, mouseY);
     break;
   }
 }

@@ -370,7 +370,9 @@ void showBola() {
   for(Blob b : blobs) {
     if(b.cor == 0) {
       PVector bolaAtual = new PVector(b.center().x, b.center().y);
-      ellipse(bolaAtual.x, bolaAtual.y, 30, 30);
+      // cor laranja
+      fill(255, 150, 0);
+      ellipse(bolaAtual.x, bolaAtual.y, 10, 10);
     }
   }
 }
@@ -534,6 +536,17 @@ void calibra() {
 
 // Dimensiona o campo
 void dimensionaCampo() {
+  // dimensiona o campo como quatro pontos
+  if(campo[0] == null) {
+    // espera clicar com o mouse
+    for(int i=0; i<campo.length; i++) {
+      while(!mousePressed);
+      campo[i] = new PVector(mouseX, mouseY);
+      delay(10);
+    }
+  }
+  /*
+  // dimensiona o campo como dois pontos
   if(algumPonto) {
     finalCampo.x = mouseX;
     finalCampo.y = mouseY;
@@ -545,6 +558,7 @@ void dimensionaCampo() {
     comecoCampo.y = mouseY;
     algumPonto = true;
   }
+  */
   
   return;
 }

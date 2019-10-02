@@ -18,13 +18,13 @@ boolean primeiraVezAlinhandando = true;
 
 boolean andaReto = false;
 
-Serial myPort = new Serial(this, Serial.list()[3], 115200);
+Serial myPort;
 
 // Salvar as cores num txt pra poupar tempo na hora de calibrar (?)
 // Cores
-color cores[] = { color(250, 178, 2), // Laranja
-                  color(0, 150, 112), // Verde
-                  color(223, 2, 2) // Vermelho
+color cores[] = { color(239, 161, 0), // Laranja
+                  color(0, 140, 102), // Verde
+                  color(210, 0, 0) // Vermelho
                 };               
 
 // id de cada objeto
@@ -41,6 +41,10 @@ color cores[] = { color(250, 178, 2), // Laranja
 // 8 - Quina 1 Robo 2
 // 9 - Quina 2 Robo 2
 // 10 - Inimigo
+
+// campo[i]
+// 0        1
+// 3        2
 
 color trackColor;
 color mouseColor; 
@@ -59,8 +63,11 @@ int contagemAlinhandando = 0;
 
 // Propriedades do campo
 int Y_AREA = 200;
+// define o campo como dois pontos
 PVector comecoCampo = new PVector();
 PVector finalCampo = new PVector();
+// define o campo como quatro pontos
+PVector campo[] = {new PVector(), new PVector(), new PVector(), new PVector()};
 
 //Movie mov;
 Capture cam;
@@ -71,15 +78,17 @@ Capture cam;
 // 0 - Laranja
 // 1 - Verde
 // 2 - Vermelho
-int[] quantCor = {0, 3, 3};
+int[] quantCor = {1, 3, 3};
 
 ArrayList<Blob> blobs = new ArrayList<Blob>();
 ArrayList<Blob> oldBlobs = new ArrayList<Blob>();
 ArrayList<Robo> robos = new ArrayList<Robo>();
 ArrayList<PVector> rastro = new ArrayList<PVector>();
+PVector bola;
 
 void setup() {
   printArray(Serial.list());
+  myPort = new Serial(this, Serial.list()[3], 115200);
   size(960, 540);  
   frame.removeNotify();
   frameRate(30);
@@ -98,38 +107,36 @@ void draw() {
   //screenshot();
   image(cam, 0, 0);
   // Mostra o campo na tela
-  noFill();
-  rectMode(CORNERS);
-  rect(comecoCampo.x, comecoCampo.y, finalCampo.x, finalCampo.y);
-  fill(255);
+  line(campo[0].x, campo[0].y, campo[1].x, campo[1].y);
+  line(campo[1].x, campo[1].y, campo[2].x, campo[2].y);
+  line(campo[2].x, campo[2].y, campo[3].x, campo[3].y);
+  line(campo[3].x, campo[3].y, campo[0].x, campo[0].y);
+  
   // Armazena as ultimas coordenadas de cada blob
   oldBlobs.clear();
   for(Blob b : blobs) oldBlobs.add(new Blob(b.clone()));
   blobs.clear();
 
-  if(debug) {
-    andaReto = false;
-    antes = tempo;
-    return;
-  }
+  if(debug) return;
+  
   // Confere o numero de ids validos
-  print("MAIN: ids validos: ");
-  for(Blob b : oldBlobs) if(b.id >= 0) print(b.id + "  ");
-  println("");
+  //print("MAIN: ids validos: ");
+  //for(Blob b : oldBlobs) if(b.id >= 0) print(b.id + "  ");
+  //println("");
   // Busca os objetos
-  if(!track()) {
-    andaReto = false;
-    antes = tempo;
-    return;
-  }
+  if(!track()) return;
+  
   // debug da visao
   if(visao) return;
+  
   if(configRobo) {
     configRobo(robos.get(0));
     return;
   }
   
-  //showBola();
+  bola = new PVector(blobs.get(0).center().x, blobs.get(0).center().y);
+  
+  showBola();
   //velBola();
   
   // Inicializa os robos
@@ -142,25 +149,26 @@ void draw() {
   else {
     // Atualiza os robos
     for(int i=0; i<robos.size(); i++) {
-      robos.get(i).getAng();
-      robos.get(i).getPos();
-      robos.get(i).debugAng();
+      robos.get(i).atualiza();
     }
   }
   // Define as estratégias dos robos
-  robos.get(0).setEstrategia(4);
-  //robos.get(0).debugObj();
+  robos.get(0).setEstrategia(0);
+  robos.get(0).debugObj();
+  
+  robos.get(1).setEstrategia(1);
+  robos.get(1).debugObj();
   
   //robos.get(0).setEstrategia(3);
   //robos.get(1).setEstrategia(2);
   //robos.get(2).setEstrategia(1);
   //for(Robo r : robos) r.debugObj();
   
-  // Seleciona controle manual ou automatico
+  // Seleciona controle manual ou automatico para o robo 0
   if(gameplay) gameplay(robos.get(0));
   else {
-    alinha(robos.get(0));
-    //alinha(robos.get(1));
+    alinhaGoleiro(robos.get(0));
+    alinhaAnda(robos.get(1));
     //alinha(robos.get(2));
   }
   // Envia os comandos

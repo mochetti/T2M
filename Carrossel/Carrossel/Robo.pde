@@ -2,16 +2,16 @@
 
 class Robo {
   PVector pos = new PVector(), posAnt, vel, obj;
-  float ang = 0, angAnt = 0;
+  float ang = 0, angAnt = 0, angObj = -1;
   // Armazena o erro no valor do angulo do frame anterior
   // É propriedade da classe robo para evitar multiplas variaveis globais
   float dAngAnt = 0;
   float velD, velE, dAntiga, eAntiga;
   // Velocidades limite do robo (0 - 64)
-  int velMax = 63;
-  int velMin = -63;
-  int velEmin = 8;
-  int velDmin = 8;
+  int velMax = 10;
+  int velMin = -10;
+  float velEmin = 4;
+  float velDmin = 4;
   int v = 0;
   int index;
   
@@ -126,6 +126,28 @@ class Robo {
     //println("ROBO: " + index + " ang = " + degrees(ang));
     
     return ang;
+  }
+  
+  // atualiza alguns parametros do robo
+  void atualiza() {
+    Robo r = new Robo(this);
+    r.getAng();
+    r.getPos();
+    r.debugAng();
+    switch(r.index) {
+      case 0:
+        velEmin = 4;
+        velDmin = 4;
+      break;
+      case 1:
+        velEmin = 3.5;
+        velDmin = 4;
+      break;
+      default:
+        velEmin = 4;
+        velDmin = 4;
+      break;
+    }
   }
   
   // Funcoes de debug

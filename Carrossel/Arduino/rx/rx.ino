@@ -3,7 +3,7 @@
 
 /* ------------ Declarações Relacionadas ao Robo que terá este código gravodo ----------- */
 /* Define qual robo é esse (valores possíveis: 0, 1 ou 2) */
-const byte NUM_ROBO = 0;
+const byte NUM_ROBO = 1;
 
 /* Somamos 1 no inicio pois o primeiro elemento do buffer é fixo, nomalmente 0x80. */
 const int INDEX_RODA_ESQ = 1 + 2 * NUM_ROBO; /* index da roda esquerda no array rxBuffer. */
@@ -46,12 +46,12 @@ void setup() {
   radio.setPALevel(RF24_PA_LOW);      //potência do módulo em baixa, para maiores distâncias aumentar a potência
   radio.openReadingPipe(Config::IND_PIPE_LEITURA, Config::PIPE_CHAVE); //abertura do tubo de leitura
   radio.startListening();         //garantir que o rádio é o receptor
+
 }
 
 void loop() {
   // Rotina do receptor
   if (radio.available()) {
-    tempo = millis();
     Serial.println("Recebemos algo");
     /* lendo o buffer do rádio */
     radio.read(&rxBuffer, sizeof(rxBuffer));
@@ -64,14 +64,16 @@ void loop() {
     //END DEBUG */
     if(rxBuffer[0] == Config::CARACTERE_INICIAL) {
       Serial.println("Chave correta");
+      tempo = millis();
       andar(rxBuffer[INDEX_RODA_ESQ], rxBuffer[INDEX_RODA_DIR]);
     }
   }
   else {
-    //if(tempo - millis() < 3000) return;
-    //tempo = millis();
-    //Serial.println("Rádio Indisponível");
-    //andar(0, 0);
+    // Só considera desconectado se ficar 1s sem receber dados
+    if(millis() - tempo < 1000) return;
+    tempo = millis();
+    Serial.println("Rádio Indisponível");
+    andar(0, 0);
   }
 }
 

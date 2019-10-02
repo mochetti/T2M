@@ -6,7 +6,7 @@ float tolAng = 15;
 byte velViagem = 30;
 
 // Alinha e anda
-void alinha(Robo r) {
+void alinhaAnda(Robo r) {
   // Vetor robo -> obj
   PVector robObj = new PVector();
   robObj = r.obj.sub(r.getPos());
@@ -19,38 +19,94 @@ void alinha(Robo r) {
   //println("CONTROLE: ang robo = " + degrees(r.getAng()));
   //println("CONTROLE: dAng = " + degrees(dAng));
   if(dAng < radians(tolAng)) {
-    // Vence a inercia
-    //andaReto = true;
-    if(!andaReto) {
-      if(inercia(r)) return;
-      antes = tempo;
-    }
-    
     // Anda reto
     println("CONTROLE: Anda reto");
     r.velE = r.velMax;
-    r.velD = 0.8*r.velMax;
+    r.velD = r.velMax;
   }
   else {
-    andaReto = false;
-    antes = tempo;
     // Alinha
-    if(ang - angRobo > 0 && ang - angRobo < PI) {
-      println("CONTROLE: Gira horário");
-      gira(r, true);
-    }
-    else if(ang - angRobo > PI) {
-      println("CONTROLE: Gira anti horário");
-      gira(r, false);
-    }
-    else if(angRobo - ang > 0 && angRobo - ang < PI) {
-      println("CONTROLE: Gira anti horário");
-      gira(r, false);
-    }
-    else if(angRobo - ang > PI) {
-      println("CONTROLE: Gira horário");
-      gira(r, true);
-    }
+    alinhaP(r, ang);
+  }
+}
+
+// Alinha
+void alinha(Robo r, float ang) {
+  
+  // Angulo do robo
+  float angRobo = r.getAng();
+  
+  if(ang - angRobo > 0 && ang - angRobo < PI) {
+    println("CONTROLE: Gira horário");
+    gira(r, true);
+  }
+  else if(ang - angRobo > PI) {
+    println("CONTROLE: Gira anti horário");
+    gira(r, false);
+}
+  else if(angRobo - ang > 0 && angRobo - ang < PI) {
+    println("CONTROLE: Gira anti horário");
+    gira(r, false);
+  }
+  else if(angRobo - ang > PI) {
+    println("CONTROLE: Gira horário");
+    gira(r, true);
+  }
+}
+
+// Alinha proporcional à distancia do angulo desejado
+void alinhaP(Robo r, float ang) {
+  // Constante de proporcionalidade
+  float kP = 0.4;
+  // Angulo do robo
+  float angRobo = r.getAng();
+  float dAng = ang - angRobo;
+  
+  if(sin(dAng) > 0) {
+    println("CONTROLE: Gira horário");
+    r.setVel(r.velEmin+kP*abs(dAng)*r.velEmin, -r.velDmin+kP*-abs(dAng)*r.velDmin);
+  }
+  else if(sin(dAng) < 0) {
+    println("CONTROLE: Gira anti horário");
+    r.setVel(-r.velEmin+kP*-abs(dAng)*r.velEmin, r.velDmin+kP*abs(dAng)*r.velDmin);
+  }
+}
+
+// Alinha e anda e alinha
+void alinhaGoleiro(Robo r) {
+  // Verifica se a bola está perto
+  if(distSq(r.getPos(), bola) < 15*15) {
+    gira(r, true);
+    return;
+  }
+  
+  if(r.angObj != -1) {
+    // Verifica se está dentro da tolerancia
+    if(abs(r.ang - r.angObj) < radians(tolAng)) r.setVel(0, 0);
+    // Se não estiver, alinha
+    else alinhaP(r, r.angObj);
+    return;
+  }
+  // Vetor robo -> obj
+  PVector robObj = new PVector();
+  robObj = r.obj.sub(r.getPos());
+  float ang = atan2(robObj.y, robObj.x);
+  float dAng = PVector.angleBetween(robObj, r.getDir());
+  //if(dAng > PI) dAng = 2*PI - dAng;
+  // Angulo do robo
+  float angRobo = r.getAng();
+  //println("CONTROLE: ang obj = " + degrees(ang));
+  //println("CONTROLE: ang robo = " + degrees(r.getAng()));
+  //println("CONTROLE: dAng = " + degrees(dAng));
+  if(dAng < radians(tolAng)) {
+    // Anda reto
+    println("CONTROLE: Anda reto");
+    r.velE = r.velMax;
+    r.velD = r.velMax;
+  }
+  else {
+    // Alinha
+    alinhaP(r, ang);
   }
 }
 
@@ -76,12 +132,12 @@ boolean inercia(Robo r) {
 // sentido false : gira anti horário
 void gira(Robo r, boolean sentido) {
   if(sentido) {
-    r.velD = -r.velEmin;
-    r.velE = r.velDmin;
+    r.velD = -r.velDmin;
+    r.velE = r.velEmin;
   }
   else {
-    r.velD = r.velEmin;
-    r.velE = -r.velDmin;
+    r.velD = r.velDmin;
+    r.velE = -r.velEmin;
   }
 }
 

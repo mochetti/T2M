@@ -31,23 +31,23 @@ void setup() {
   // construtor da shape do aviao
   shapeAviao();
   // simula coordenadas
-  //coordenadas();
+  coordenadas();
   pos = new PVector(0, 0, 0);
   vel = new PVector(1, 1, 1);
   
   // conecta ao mqtt
-  client = new MQTTClient(this);
-  client.connect("mqtt://test.mosquitto.org", "arebaba");
-  client.subscribe("/MPUphi", 2);
-  client.subscribe("/MPUtheta", 2);
+  //client = new MQTTClient(this);
+  //client.connect("mqtt://test.mosquitto.org", "arebaba");
+  //client.subscribe("/MPUphi", 2);
+  //client.subscribe("/MPUtheta", 2);
 }
 
 void draw() {
   vel.set(1, 1, 1);
   background(0);
   perspectiva();
-  //simulador();
-  simulator();
+  simulador();
+  //simulator();
 }
 
 // Muda a visao de acordo com as coordenadas do mouse
@@ -96,7 +96,7 @@ void simulador() {
   //println(degrees(angY));
   rotateY(angY);
   float dY = cY.get(n+1) - cY.get(n);
-  rotateX(-2*dY);
+  //rotateX(-2*dY);
   
   //shapeMode(CENTER);
   shape(s);
