@@ -550,9 +550,10 @@ void calibra() {
 // Dimensiona o campo
 void dimensionaCampo(int x, int y) {
   // dimensiona o campo como quatro pontos
-  shapeCampo.strokeWeight(2);
+
   shapeCampo.setStroke(255);
   shapeCampo.beginShape();
+  shapeCampo.strokeWeight(2);
   shapeCampo.noFill();
   shapeCampo.beginContour();
   shapeCampo.vertex(x, y);
