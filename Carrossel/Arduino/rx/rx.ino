@@ -67,6 +67,13 @@ void loop() {
       tempo = millis();
       andar(rxBuffer[INDEX_RODA_ESQ], rxBuffer[INDEX_RODA_DIR]);
     }
+    else {
+      // Só considera desconectado se ficar 1s sem receber dados
+      if(millis() - tempo < 1000) return;
+      tempo = millis();
+      Serial.println("Rádio Indisponível");
+      andar(0, 0);
+    }
   }
   else {
     // Só considera desconectado se ficar 1s sem receber dados

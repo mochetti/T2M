@@ -12,6 +12,8 @@ class Robo {
   int velMin = -10;
   float velEmin = 4;
   float velDmin = 4;
+  // coeficiente proporcional para o controle
+  float kP;
   int v = 0;
   int index;
   
@@ -138,14 +140,17 @@ class Robo {
       case 0:
         velEmin = 4;
         velDmin = 4;
+        kP = 0.4;
       break;
       case 1:
-        velEmin = 3.5;
+        velEmin = 4;
         velDmin = 4;
+        kP = 0.2;
       break;
       default:
         velEmin = 4;
         velDmin = 4;
+        kP = 0.4;
       break;
     }
   }
