@@ -1,3 +1,15 @@
+/*
+
+  Variáveis 
+
+*/
+
+
+boolean isCampoDimensionado = false;
+PShape shapeCampo;
+
+
+
 void camConfig() {
   
   String[] cameras = Capture.list();
@@ -36,6 +48,12 @@ void screenshot() {
   catch (AWTException e){ }
   frame.setLocation(displayWidth/2, 0);
 }
+*/
+
+/*
+0 - Laranja
+1 - Verde
+2 - Vermelho
 */
 int[] corAchada = {0, 0, 0};
 
@@ -105,12 +123,12 @@ boolean track() {
     }
     
   // Distingue o vermelho maior dos outros
-  numMaior = 0;
-  for(Blob b : blobs) if(b.cor == 2) if(b.numPixels > numMaior) numMaior = b.numPixels;
+  pxMaiorBlobVermelho = 0;
+  for(Blob b : blobs) if(b.cor == 2) if(b.numPixels > pxMaiorBlobVermelho) pxMaiorBlobVermelho = b.numPixels;
   // Distingue o verde maior dos outros
-  numMenor = numMaior;
-  for(Blob b : blobs) if(b.cor == 1) if(b.numPixels < numMenor) numMenor = b.numPixels;
-  //println("VISÃO: numMaior = " + numMaior);
+  pxMenorBlobVerde = pxMaiorBlobVermelho;
+  for(Blob b : blobs) if(b.cor == 1) if(b.numPixels < pxMenorBlobVerde) pxMenorBlobVerde = b.numPixels;
+  //println("VISÃO: pxMaiorBlobVermelho = " + pxMaiorBlobVermelho);
 
   // if desnecessario
   if(!erro) {
@@ -298,16 +316,16 @@ boolean id() {
             
             // Verifica se é o vermelho comprido
             //println("VISÃO: numPixels = " + v.numPixels);
-            if(v.numPixels == numMaior) {
+            if(v.numPixels == pxMaiorBlobVermelho) {
               b.id = 1;
               v.id = 4;
               continue;
             }
             
             // Verifica se é o xadrez
-            //println("VISÃO: numMenor = " + numMenor);
+            //println("VISÃO: pxMenorBlobVerde = " + pxMenorBlobVerde);
             //println("VISÃO: numPixels = " + b.numPixels);
-            if(b.numPixels == numMenor) {
+            if(b.numPixels == pxMenorBlobVerde) {
               b.id = 2;
               v.id = 5;
               continue;
@@ -535,30 +553,18 @@ void calibra() {
 }
 
 // Dimensiona o campo
-void dimensionaCampo() {
+void dimensionaCampo(int x, int y) {
   // dimensiona o campo como quatro pontos
-  if(campo[0] == null) {
-    // espera clicar com o mouse
-    for(int i=0; i<campo.length; i++) {
-      while(!mousePressed);
-      campo[i] = new PVector(mouseX, mouseY);
-      delay(10);
-    }
+  shapeCampo.setStroke(color(255));
+  shapeCampo.beginShape();
+  shapeCampo.beginContour();
+  shapeCampo.vertex(x, y);
+  shapeCampo.endContour();
+  shapeCampo.endShape();
+  
+  if(shapeCampo.getVertexCount() == 4){
+    isCampoDimensionado = true;
   }
-  /*
-  // dimensiona o campo como dois pontos
-  if(algumPonto) {
-    finalCampo.x = mouseX;
-    finalCampo.y = mouseY;
-    dimensionaCampo = false;
-    campoDimensionado = true;
-  }
-  else {
-    comecoCampo.x = mouseX;
-    comecoCampo.y = mouseY;
-    algumPonto = true;
-  }
-  */
   
   return;
 }
