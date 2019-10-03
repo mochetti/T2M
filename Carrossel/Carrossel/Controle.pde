@@ -57,18 +57,17 @@ void alinha(Robo r, float ang) {
 // Alinha proporcional à distancia do angulo desejado
 void alinhaP(Robo r, float ang) {
   // Constante de proporcionalidade
-  float kP = 0.4;
   // Angulo do robo
   float angRobo = r.getAng();
   float dAng = ang - angRobo;
   
   if(sin(dAng) > 0) {
     println("CONTROLE: Gira horário");
-    r.setVel(r.velEmin+kP*abs(dAng)*r.velEmin, -r.velDmin+kP*-abs(dAng)*r.velDmin);
+    r.setVel(r.velEmin+r.kP*abs(dAng)*r.velEmin, -r.velDmin+r.kP*-abs(dAng)*r.velDmin);
   }
   else if(sin(dAng) < 0) {
     println("CONTROLE: Gira anti horário");
-    r.setVel(-r.velEmin+kP*-abs(dAng)*r.velEmin, r.velDmin+kP*abs(dAng)*r.velDmin);
+    r.setVel(-r.velEmin+r.kP*-abs(dAng)*r.velEmin, r.velDmin+r.kP*abs(dAng)*r.velDmin);
   }
 }
 

@@ -112,6 +112,10 @@ void draw() {
   line(campo[2].x, campo[2].y, campo[3].x, campo[3].y);
   line(campo[3].x, campo[3].y, campo[0].x, campo[0].y);
   
+  rectMode(CORNERS);
+  noFill();
+  rect(comecoCampo.x, comecoCampo.y, finalCampo.x, finalCampo.y);
+  
   // Armazena as ultimas coordenadas de cada blob
   oldBlobs.clear();
   for(Blob b : blobs) oldBlobs.add(new Blob(b.clone()));
@@ -125,10 +129,8 @@ void draw() {
   //println("");
   // Busca os objetos
   if(!track()) return;
-  
   // debug da visao
   if(visao) return;
-  
   if(configRobo) {
     configRobo(robos.get(0));
     return;
@@ -168,7 +170,7 @@ void draw() {
   if(gameplay) gameplay(robos.get(0));
   else {
     alinhaGoleiro(robos.get(0));
-    alinhaAnda(robos.get(1));
+    alinhaGoleiro(robos.get(1));
     //alinha(robos.get(2));
   }
   // Envia os comandos

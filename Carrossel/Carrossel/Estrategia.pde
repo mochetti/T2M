@@ -1,11 +1,11 @@
 void estrategia(Robo r, int n) {
   // Mudar para as coordenadas do gol inimigo
   noFill();
-  //PVector golInimigo = new PVector(finalCampo.x, (finalCampo.y + comecoCampo.y)/2);
-  PVector golInimigo = new PVector((campo[1].x + campo[2].x) /2, (campo[1].y+campo[2].y) / 2);
+  PVector golInimigo = new PVector(finalCampo.x, (finalCampo.y + comecoCampo.y)/2);
+  //PVector golInimigo = new PVector((campo[1].x + campo[2].x) /2, (campo[1].y+campo[2].y) / 2);
   ellipse(golInimigo.x, golInimigo.y, 20, 20);
-  //PVector golAmigo = new PVector(comecoCampo.x, (finalCampo.y + comecoCampo.y)/2);
-  PVector golAmigo = new PVector((campo[0].x + campo[3].x) /2, (campo[0].y+campo[3].y) / 2);
+  PVector golAmigo = new PVector(comecoCampo.x, (finalCampo.y + comecoCampo.y)/2);
+  //PVector golAmigo = new PVector((campo[0].x + campo[3].x) /2, (campo[0].y+campo[3].y) / 2);
   ellipse(golAmigo.x, golAmigo.y, 20, 20);
   // Distancia que o robo pega pra empurrar a bola
   float distSombra = 50;
