@@ -110,21 +110,21 @@ void alinhaGoleiro(Robo r) {
 }
 
 // Verifica se o robo já venceu a inércia
-boolean inercia(Robo r) {
-  println("CONTROLE: tempo = " + tempo + "  antes = " + antes);
-  if(tempo - antes < 200) {
-    println("CONTROLE: ajuste de inercia");
-    r.setVel(r.velMax, 0);
-    return true;
-  }
-  // Controle para nao vencer a inercia toda vez
-  // Só chama inercia() quando o comando anterior era de giro
-  andaReto = true;
-  antes = tempo;
-  r.velE = r.eAntiga;
-  r.velD = r.dAntiga;
-  return false;
-}
+//boolean inercia(Robo r) {
+//  println("CONTROLE: tempo = " + tempo + "  antes = " + antes);
+//  if(tempo - antes < 200) {
+//    println("CONTROLE: ajuste de inercia");
+//    r.setVel(r.velMax, 0);
+//    return true;
+//  }
+//  // Controle para nao vencer a inercia toda vez
+//  // Só chama inercia() quando o comando anterior era de giro
+//  andaReto = true;
+//  antes = tempo;
+//  r.velE = r.eAntiga;
+//  r.velD = r.dAntiga;
+//  return false;
+//}
 
 // Gira o robo r no proprio eixo na velocidade velGiro
 // sentido true : gira horário
@@ -176,13 +176,13 @@ void alinhandando(Robo r) {
   }
   */
   // Verifica a inercia por contagem de quadros
-  if(contagemAlinhandando < 50) {
-    // Vence a inercia
-    println("CONTROLE: Vencendo a inércia");
-    r.setVel(0, velMax);
-    contagemAlinhandando++;
-    return;
-  }
+  //if(contagemAlinhandando < 50) {
+  //  // Vence a inercia
+  //  println("CONTROLE: Vencendo a inércia");
+  //  r.setVel(0, velMax);
+  //  contagemAlinhandando++;
+  //  return;
+  //}
   
   // Já estamos alinhando
   // PD
@@ -267,7 +267,7 @@ void configRobo(Robo r) {
       r.angAnt = r.getAng();
       println("CONTROLE: Velocidades definidas para o Robo " + r.index);
       println("CONTROLE: vEsq = " + r.velE + "  vDir = " + r.velD);
-      configRobo = false;
+      //configRobo = false;
     }
     else {
       // Incrementa velD

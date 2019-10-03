@@ -1,11 +1,13 @@
 void estrategia(Robo r, int n) {
   // Mudar para as coordenadas do gol inimigo
   noFill();
-  PVector golInimigo = new PVector(finalCampo.x, (finalCampo.y + comecoCampo.y)/2);
-  //PVector golInimigo = new PVector((campo[1].x + campo[2].x) /2, (campo[1].y+campo[2].y) / 2);
+
+  //PVector golInimigo = new PVector(shapeCampo.getVertex(2).x, (shapeCampo.getVertex(2).y + shapeCampo.getVertex(0).y)/2);
+  PVector golInimigo = new PVector((shapeCampo.getVertex(1).x + shapeCampo.getVertex(2).x) /2, (shapeCampo.getVertex(1).y+shapeCampo.getVertex(2).y) / 2);
   ellipse(golInimigo.x, golInimigo.y, 20, 20);
-  PVector golAmigo = new PVector(comecoCampo.x, (finalCampo.y + comecoCampo.y)/2);
-  //PVector golAmigo = new PVector((campo[0].x + campo[3].x) /2, (campo[0].y+campo[3].y) / 2);
+  //PVector golAmigo = new PVector(shapeCampo.getVertex(0).x, (shapeCampo.getVertex(2).y + shapeCampo.getVertex(0).y)/2);
+  PVector golAmigo = new PVector((shapeCampo.getVertex(0).x + shapeCampo.getVertex(3).x) /2, (shapeCampo.getVertex(0).y+shapeCampo.getVertex(3).y) / 2);
+
   ellipse(golAmigo.x, golAmigo.y, 20, 20);
   // Distancia que o robo pega pra empurrar a bola
   float distSombra = 50;
@@ -50,10 +52,10 @@ void estrategia(Robo r, int n) {
       sombra.y = bola.y + distSombra * sin(ang);
       
       // Condiciona a sombra dentro do campo
-      if(sombra.x < comecoCampo.x) sombra.x = comecoCampo.x;
-      if(sombra.y < comecoCampo.y) sombra.y = comecoCampo.y;
-      if(sombra.x > finalCampo.x) sombra.x = finalCampo.x;
-      if(sombra.y > finalCampo.y) sombra.y = finalCampo.y;
+      if(sombra.x < shapeCampo.getVertex(0).x) sombra.x = shapeCampo.getVertex(0).x;
+      if(sombra.y < shapeCampo.getVertex(0).y) sombra.y = shapeCampo.getVertex(0).y;
+      if(sombra.x > shapeCampo.getVertex(2).x) sombra.x = shapeCampo.getVertex(2).x;
+      if(sombra.y > shapeCampo.getVertex(2).y) sombra.y = shapeCampo.getVertex(2).y;
       
       noFill();
       stroke(255);

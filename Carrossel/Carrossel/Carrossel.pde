@@ -3,29 +3,26 @@ import processing.serial.*;
 
 // Flags de debug
 boolean debug = true;
-boolean calibra = true;
-boolean visao = false;
-boolean dimensionaCampo = true;
-boolean campoDimensionado = false;
-boolean buscandoCor = true;
-boolean algumPonto = false;
-boolean gameplay = false;
-boolean radio = true;
-// Verifica se ainda estamos configurando o robo
-boolean configRobo = false;
-// Verifica se é a primeira vez que chamamos millis() no alinhandando
-boolean primeiraVezAlinhandando = true;
 
-boolean andaReto = false;
+boolean calibra = true;  //Flag de controle se deve ou não calibrar as cores
+boolean visao = false;  //Flag de controle para parar o código logo após jogar a imagem no canvas (visão) a visão ou não
+boolean radio = true; //Flag de controle para emitir ou não sinais ao rádio (ultimo passo da checagem)
+boolean gameplay = false;  //Flag de controle que diz se o jogo está no automático ou no manual (apenas do robô 0 por enquanto)
+
+// Verifica se ainda estamos configurando o robo
+//boolean configRobo = false;
+
+
+//boolean andaReto = false; //DENTRO DE INERCIA()
 
 Serial myPort;
 
 // Salvar as cores num txt pra poupar tempo na hora de calibrar (?)
 // Cores
 color cores[] = { color(239, 161, 0), // Laranja
-                  color(0, 140, 102), // Verde
-                  color(210, 0, 0) // Vermelho
-                };               
+  color(0, 140, 102), // Verde
+  color(210, 0, 0) // Vermelho
+};
 
 // id de cada objeto
 // 0 - Bola
@@ -46,28 +43,36 @@ color cores[] = { color(239, 161, 0), // Laranja
 // 0        1
 // 3        2
 
-color trackColor;
-color mouseColor; 
+color trackColor;  //Qual cor estou procurando
+color mouseColor;  //Ultima cor selecionada no clique do mouse
+
 // current color sendo calibrada
 int calColor = -1;
-// Numero de pixels do maior blob da cor vermelha
-int numMaior = 0;
-// Numero de pixels do menor blob da cor verde
-int numMenor = 0;
+
+// Numero de pixels do maior blob da cor vermelha, usado para distinguir o goleiro dos outros dois robôs (robo 0)
+int pxMaiorBlobVermelho = 0;
+
+// Numero de pixels do menor blob da cor verde, usado para distinguir do outro robô com verde (robo 1)
+int pxMenorBlobVerde = 0;
+
 // Conta o tempo de execucao
 double tempo = millis();
 double antes = millis();
+
 // Quantidade de quadros para vencer a inercia no controle alinhandando
-int contagemAlinhandando = 0;
+//int contagemAlinhandando = 0;
 
 
 // Propriedades do campo
 int Y_AREA = 200;
+
 // define o campo como dois pontos
-PVector comecoCampo = new PVector();
-PVector finalCampo = new PVector();
+//PVector shapeCampo.getVertex(0) = new PVector();
+//PVector shapeCampo.getVertex(2) = new PVector();
+
 // define o campo como quatro pontos
-PVector campo[] = {new PVector(), new PVector(), new PVector(), new PVector()};
+//PVector campo[] = {new PVector(), new PVector(), new PVector(), new PVector()};
+
 
 //Movie mov;
 Capture cam;
@@ -87,6 +92,9 @@ ArrayList<PVector> rastro = new ArrayList<PVector>();
 PVector bola;
 
 void setup() {
+
+  shapeCampo = createShape();
+
   printArray(Serial.list());
   myPort = new Serial(this, Serial.list()[3], 115200);
   size(960, 540);  
@@ -107,137 +115,119 @@ void draw() {
   //screenshot();
   image(cam, 0, 0);
   // Mostra o campo na tela
-  line(campo[0].x, campo[0].y, campo[1].x, campo[1].y);
-  line(campo[1].x, campo[1].y, campo[2].x, campo[2].y);
-  line(campo[2].x, campo[2].y, campo[3].x, campo[3].y);
-  line(campo[3].x, campo[3].y, campo[0].x, campo[0].y);
-  
-  rectMode(CORNERS);
-  noFill();
-  rect(comecoCampo.x, comecoCampo.y, finalCampo.x, finalCampo.y);
-  
-  // Armazena as ultimas coordenadas de cada blob
-  oldBlobs.clear();
-  for(Blob b : blobs) oldBlobs.add(new Blob(b.clone()));
-  blobs.clear();
+  if (isCampoDimensionado) {
 
-  if(debug) return;
-  
-  // Confere o numero de ids validos
-  //print("MAIN: ids validos: ");
-  //for(Blob b : oldBlobs) if(b.id >= 0) print(b.id + "  ");
-  //println("");
-  // Busca os objetos
-  if(!track()) return;
-  // debug da visao
-  if(visao) return;
-  if(configRobo) {
-    configRobo(robos.get(0));
-    return;
-  }
-  
-  bola = new PVector(blobs.get(0).center().x, blobs.get(0).center().y);
-  
-  showBola();
-  //velBola();
-  
-  // Inicializa os robos
-  if(robos.size() == 0) {
-    //robos.clear();
-    for(int i=0; i<3; i++) {
-      robos.add(new Robo(i));
+    shape(shapeCampo);
+
+    // Armazena as ultimas coordenadas de cada blob
+    oldBlobs.clear();
+    for (Blob b : blobs) oldBlobs.add(new Blob(b.clone()));
+    blobs.clear();
+
+    if (debug) return;
+
+    // Confere o numero de ids validos
+    //print("MAIN: ids validos: ");
+    //for(Blob b : oldBlobs) if(b.id >= 0) print(b.id + "  ");
+    //println("");
+    // Busca os objetos
+    if (!track()) return;
+
+    // debug da visao
+    if (visao) return;
+
+    //if(configRobo) {
+    //  configRobo(robos.get(0));
+    //  return;
+    //}
+
+    bola = new PVector(blobs.get(0).center().x, blobs.get(0).center().y);
+
+    showBola();
+    //velBola();
+
+    // Inicializa os robos
+    if (robos.size() == 0) {
+      //robos.clear();
+      for (int i=0; i<3; i++) {
+        robos.add(new Robo(i));
+      }
+    } else {
+      // Atualiza os robos
+      for (int i=0; i<robos.size(); i++) {
+        robos.get(i).atualiza();
+      }
+    }
+    // Define as estratégias dos robos
+    robos.get(0).setEstrategia(0);
+    robos.get(0).debugObj();
+
+    robos.get(1).setEstrategia(1);
+    robos.get(1).debugObj();
+
+    //robos.get(0).setEstrategia(3);
+    //robos.get(1).setEstrategia(2);
+    //robos.get(2).setEstrategia(1);
+    //for(Robo r : robos) r.debugObj();
+
+    // Seleciona controle manual ou automatico para o robo 0
+    if (gameplay) gameplay(robos.get(0));
+    else {
+      alinhaGoleiro(robos.get(0));
+      alinhaAnda(robos.get(1));
+      //alinha(robos.get(2));
+    }
+    // Envia os comandos
+    enviar();
+  } else {
+    //desenha as linhas na tela se formando
+    for (int i = 0; i < shapeCampo.getVertexCount() - 1; i++) {
+      line(shapeCampo.getVertex(i).x, shapeCampo.getVertex(i).y, shapeCampo.getVertex(i+1).x, shapeCampo.getVertex(i+1).y);
     }
   }
-  else {
-    // Atualiza os robos
-    for(int i=0; i<robos.size(); i++) {
-      robos.get(i).atualiza();
-    }
-  }
-  // Define as estratégias dos robos
-  robos.get(0).setEstrategia(0);
-  robos.get(0).debugObj();
-  
-  robos.get(1).setEstrategia(1);
-  robos.get(1).debugObj();
-  
-  //robos.get(0).setEstrategia(3);
-  //robos.get(1).setEstrategia(2);
-  //robos.get(2).setEstrategia(1);
-  //for(Robo r : robos) r.debugObj();
-  
-  // Seleciona controle manual ou automatico para o robo 0
-  if(gameplay) gameplay(robos.get(0));
-  else {
-    alinhaGoleiro(robos.get(0));
-    alinhaGoleiro(robos.get(1));
-    //alinha(robos.get(2));
-  }
-  // Envia os comandos
-  enviar();
-  
+
 }
-  
+
 void keyPressed() {
-  if(key == 'd') {
+  if (key == 'd') {
     println("KEY: debug on/off");
     debug = !debug;
   }
-  if(key == 'c') {
+  if (key == 'c') {
     println("KEY: calibra on/off");
     calibra = !calibra;
   }
-  if(key >= '0' && key <= '9') {
+  if (key >= '0' && key <= '9') {
     println("KEY: Cor " + key);
     calColor = key;
   }
-  if(key == 'r') {
+  if (key == 'r') {
     println("KEY: radio on/off");
     radio = !radio;
   }
-  if(key == 'k') {
-    println("KEY: vel viagem increase");
-    velViagem++;
+  if (key == 'C') {
+    println("KEY: redefinir campo");
+    isCampoDimensionado = false;
+    shapeCampo = createShape();
   }
-  if(key == 'l') {
-    println("KEY: vel viagem decrease");
-    velViagem--;
-  }
-  if(key == 'u') {
-    //println("KEY: velE increase");
-    robos.get(0).velE = 10;
-  }
-  if(key == 'i') {
-    //println("KEY: velD increase");
-    robos.get(0).velE = 20;
-    robos.get(0).velD = 20;
-  }
-  if(key == 'o') {
-    println("KEY: velE increase");
-    robos.get(0).velEmin++;
-  }
-  if(key == 'p') {
-    println("KEY: velD increase");
-    robos.get(0).velDmin++;
-  }
-  if(key == 'y') {
-    println("KEY: Config Robo");
-    configEsq = false;
-    configRobo = !configRobo;
-    configRobo(robos.get(0));
-  }
-  if(key == 'v') {
+  //if(key == 'y') {
+  //  println("KEY: Config Robo");
+  //  configEsq = false;
+  //  //configRobo = !configRobo;
+  //  configRobo(robos.get(0));
+  //}
+  if (key == 'v') {
     println("KEY: debug visao on/off");
     visao = !visao;
   }
-  if(key == 'g') {
+  if (key == 'g') {
     println("KEY: gameplay on/off");
     gameplay = !gameplay;
   }
 }
 
 void keyReleased() {
-  if(robos.size() > 0) {
+  if (robos.size() > 0) {
     robos.get(0).velE = 0;
     robos.get(0).velD = 0;
   }
@@ -252,7 +242,7 @@ void mousePressed() {
   print("  G = " + green(mouseColor));
   println("  B = " + blue(mouseColor));
   //println("X: " + mouseX + " Y: " + mouseY);
-  //if(buscandoCor && campoDimensionado) println("Quantidade de pixels = " + qPixels(mouseX, mouseY, cores[2]));
-  if(dimensionaCampo) dimensionaCampo();
-  if(calibra) calibra();
+
+  if (!isCampoDimensionado) dimensionaCampo(mouseX, mouseY);
+  if (calibra) calibra();
 }
