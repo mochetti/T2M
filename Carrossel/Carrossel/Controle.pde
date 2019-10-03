@@ -177,13 +177,13 @@ void alinhandando(Robo r) {
   }
   */
   // Verifica a inercia por contagem de quadros
-  if(contagemAlinhandando < 50) {
-    // Vence a inercia
-    println("CONTROLE: Vencendo a inércia");
-    r.setVel(0, velMax);
-    contagemAlinhandando++;
-    return;
-  }
+  //if(contagemAlinhandando < 50) {
+  //  // Vence a inercia
+  //  println("CONTROLE: Vencendo a inércia");
+  //  r.setVel(0, velMax);
+  //  contagemAlinhandando++;
+  //  return;
+  //}
   
   // Já estamos alinhando
   // PD
@@ -268,7 +268,7 @@ void configRobo(Robo r) {
       r.angAnt = r.getAng();
       println("CONTROLE: Velocidades definidas para o Robo " + r.index);
       println("CONTROLE: vEsq = " + r.velE + "  vDir = " + r.velD);
-      configRobo = false;
+      //configRobo = false;
     }
     else {
       // Incrementa velD

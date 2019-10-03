@@ -92,13 +92,13 @@ boolean track() {
         //println("y = " + prevY);
         // Tenta buscar por perto
         int xi = prevX - raioBusca;
-        if(xi < comecoCampo.x) xi = int(comecoCampo.x);
+        if(xi < shapeCampo.getVertex(0).x) xi = int(shapeCampo.getVertex(0).x);
         int xf = prevX + raioBusca;
-        if(xf > finalCampo.x) xf = int(finalCampo.x);
+        if(xf > shapeCampo.getVertex(2).x) xf = int(shapeCampo.getVertex(2).x);
         int yi = prevY - raioBusca;
-        if(yi < comecoCampo.y) yi = int(comecoCampo.y);
+        if(yi < shapeCampo.getVertex(0).y) yi = int(shapeCampo.getVertex(0).y);
         int yf = prevY + raioBusca;
-        if(yf > finalCampo.y) yf = int(finalCampo.y);
+        if(yf > shapeCampo.getVertex(2).y) yf = int(shapeCampo.getVertex(2).y);
       
         if(!search(xi, xf, yi, yf, b)) println("VISÃO: O objeto não está no campo");
       }
@@ -215,8 +215,8 @@ boolean search (int xi, int xf, int yi, int yf, Blob b) {
 int searchNew (int c) {
   int encontramos = 0;
   // Procura por todo o campo
-  for (int x = int(comecoCampo.x); x < finalCampo.x; x++ ) {
-    for (int y = int(comecoCampo.y); y < finalCampo.y; y++ ) {
+  for (int x = int(shapeCampo.getVertex(0).x); x < shapeCampo.getVertex(2).x; x++ ) {
+    for (int y = int(shapeCampo.getVertex(0).y); y < shapeCampo.getVertex(2).y; y++ ) {
       int loc = x + y * cam.width;
       // What is current color
       color currentColor = cam.pixels[loc];
@@ -563,9 +563,6 @@ void dimensionaCampo(int x, int y) {
   shapeCampo.endShape();
   
   if(shapeCampo.getVertexCount() == 4){
-    shapeCampo.beginShape();
-    shapeCampo.beginContour();
-    shapeCampo.vertex(shapeCampo.getVertex(0).x, shapeCampo.getVertex(0).y);
     isCampoDimensionado = true;
   }
   

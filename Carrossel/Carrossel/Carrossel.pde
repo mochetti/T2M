@@ -67,11 +67,11 @@ double antes = millis();
 int Y_AREA = 200;
 
 // define o campo como dois pontos
-PVector comecoCampo = new PVector();
-PVector finalCampo = new PVector();
+//PVector shapeCampo.getVertex(0) = new PVector();
+//PVector shapeCampo.getVertex(2) = new PVector();
 
 // define o campo como quatro pontos
-PVector campo[] = {new PVector(), new PVector(), new PVector(), new PVector()};
+//PVector campo[] = {new PVector(), new PVector(), new PVector(), new PVector()};
 
 
 //Movie mov;
@@ -116,6 +116,8 @@ void draw() {
   image(cam, 0, 0);
   // Mostra o campo na tela
   if (isCampoDimensionado) {
+
+    shape(shapeCampo);
 
     // Armazena as ultimas coordenadas de cada blob
     oldBlobs.clear();
