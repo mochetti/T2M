@@ -115,12 +115,7 @@ void draw() {
   //screenshot();
   image(cam, 0, 0);
   // Mostra o campo na tela
-  if (!isCampoDimensionado) {
-
-    line(campo[0].x, campo[0].y, campo[1].x, campo[1].y);
-    line(campo[1].x, campo[1].y, campo[2].x, campo[2].y);
-    line(campo[2].x, campo[2].y, campo[3].x, campo[3].y);
-    line(campo[3].x, campo[3].y, campo[0].x, campo[0].y);
+  if (isCampoDimensionado) {
 
     // Armazena as ultimas coordenadas de cada blob
     oldBlobs.clear();

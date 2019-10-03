@@ -563,6 +563,9 @@ void dimensionaCampo(int x, int y) {
   shapeCampo.endShape();
   
   if(shapeCampo.getVertexCount() == 4){
+    shapeCampo.beginShape();
+    shapeCampo.beginContour();
+    shapeCampo.vertex(shapeCampo.getVertex(0).x, shapeCampo.getVertex(0).y);
     isCampoDimensionado = true;
   }
   
