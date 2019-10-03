@@ -4,11 +4,8 @@
  
  */
 
-
 boolean isCampoDimensionado = false;
 PShape shapeCampo;
-
-
 
 void camConfig() {
 
@@ -175,9 +172,11 @@ boolean search (int xi, int xf, int yi, int yf, Blob b) {
   // Procura nas coordenadas dadas
   for (int x = xi; x < xf; x++ ) {
     for (int y = yi; y < yf; y++ ) {
-      int loc = x + y * cam.width;
+      //int loc = x + y * cam.width;
+      int loc = x + y * width;
       // What is current color
-      color currentColor = cam.pixels[loc];
+      //color currentColor = cam.pixels[loc];
+      color currentColor = pixels[loc];
 
       // Compara as cores
       if (filtroCor(currentColor) && msmCor(currentColor, cores[b.cor])) {
@@ -213,9 +212,11 @@ int searchNew (int c) {
   // Procura por todo o campo
   for (int x = int(shapeCampo.getVertex(0).x); x < shapeCampo.getVertex(2).x; x++ ) {
     for (int y = int(shapeCampo.getVertex(0).y); y < shapeCampo.getVertex(2).y; y++ ) {
-      int loc = x + y * cam.width;
+      //int loc = x + y * cam.width;
+      int loc = x + y * width;
       // What is current color
-      color currentColor = cam.pixels[loc];
+      //color currentColor = cam.pixels[loc];
+      color currentColor = pixels[loc];
 
       // Compara as cores
       if (filtroCor(currentColor) && msmCor(currentColor, cores[c])) {
@@ -462,16 +463,16 @@ boolean filtroCor(color c) {
   int bgHValue = 100;
   int difLimit = 50;
   // é fundo se as tres componentes forem menor q bgLimit
-  boolean back = red(c) < bgLimit && green(c) < bgLimit && blue(c) < bgLimit;
+  boolean back = (red(c) < bgLimit && green(c) < bgLimit && blue(c) < bgLimit) || brightness(c) < 100;
   // é cor se pelo menos uma componente for maior q bgHValue
-  boolean highValue = red(c) > bgHValue || green(c) > bgHValue || blue(c) > bgHValue;
+  boolean highValue = red(c) > bgHValue || green(c) > bgHValue || blue(c) > bgHValue || brightness(c) > 100;
   // é cor se a distancia entre pelo menos duas das componentes for maior q difLimit
   boolean dif = (abs(red(c) - green(c)) > difLimit) || (abs(red(c) - blue(c)) > difLimit) || (abs(blue(c) - green(c)) > difLimit);
   if (soma > 100 && soma < 600 && !back && highValue && dif) {
     return true;
   }
   return false;
-} 
+}
 // Funcao para ajustar as medias das cores
 void calibra() {
 
@@ -499,9 +500,11 @@ void calibra() {
 
   for (int x = xi; x < xf; x++) {
     for (int y = yi; y < yf; y++) {
-      int loc = x + y * cam.width;
+      //int loc = x + y * cam.width;
+      int loc = x + y * width;
       // What is current color
-      color currentColor = cam.pixels[loc];
+      //color currentColor = cam.pixels[loc];
+      color currentColor = pixels[loc];
       // Verifica se é colorido
       if (filtroCor(currentColor)) {
         quantidade++;

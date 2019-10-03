@@ -19,9 +19,10 @@ Serial myPort;
 
 // Salvar as cores num txt pra poupar tempo na hora de calibrar (?)
 // Cores
-color cores[] = { color(239, 161, 0), // Laranja
-  color(0, 140, 102), // Verde
-  color(210, 0, 0) // Vermelho
+color cores[] = { 
+  color(199, 128, 45), // Laranja
+  color(67, 141, 86), // Verde
+  color(162, 28, 35) // Vermelho
 };
 
 // id de cada objeto
@@ -74,7 +75,7 @@ int Y_AREA = 200;
 //PVector campo[] = {new PVector(), new PVector(), new PVector(), new PVector()};
 
 
-//Movie mov;
+Movie mov;
 Capture cam;
 //PImage screenshot;
 
@@ -91,16 +92,30 @@ ArrayList<Robo> robos = new ArrayList<Robo>();
 ArrayList<PVector> rastro = new ArrayList<PVector>();
 PVector bola;
 
+void movieEvent(Movie movie) {
+  movie.read();
+  //fill(255, 0, 0);
+  point(512, 360);
+}
+
 void setup() {
 
   shapeCampo = createShape();
 
-  printArray(Serial.list());
-  myPort = new Serial(this, Serial.list()[3], 115200);
-  size(960, 540);  
-  frame.removeNotify();
-  frameRate(30);
-  camConfig();
+  size(640, 480);
+  mov = new Movie(this, "real.mp4");
+  mov.play();
+  mov.loop();
+  mov.frameRate(30);
+
+  //printArray(Serial.list());
+  //myPort = new Serial(this, Serial.list()[3], 115200);
+  //size(960, 540);  
+
+
+  //frame.removeNotify();
+  //frameRate(30);
+  //camConfig();
 }
 
 //void movieEvent(Movie m) {
@@ -111,9 +126,10 @@ void captureEvent(Capture c) {
 }
 
 void draw() {
+  loadPixels();
   tempo = millis();
   //screenshot();
-  image(cam, 0, 0);
+  image(mov, 0, 0);
   // Mostra o campo na tela
   if (isCampoDimensionado) {
 
@@ -178,14 +194,13 @@ void draw() {
       //alinha(robos.get(2));
     }
     // Envia os comandos
-    enviar();
+    //enviar();
   } else {
     //desenha as linhas na tela se formando
     for (int i = 0; i < shapeCampo.getVertexCount() - 1; i++) {
       line(shapeCampo.getVertex(i).x, shapeCampo.getVertex(i).y, shapeCampo.getVertex(i+1).x, shapeCampo.getVertex(i+1).y);
     }
   }
-
 }
 
 void keyPressed() {
@@ -234,8 +249,10 @@ void keyReleased() {
 }
 
 void mousePressed() {
-  int loc = mouseX + mouseY*cam.width;
-  mouseColor = cam.pixels[loc];
+  //int loc = mouseX + mouseY*cam.width;
+  int loc = mouseX + mouseY*width;
+  //mouseColor = cam.pixels[loc];
+  mouseColor = pixels[loc];
   //println("x = " + mouseX);
   //println("y = " + mouseY);
   print("R = " + red(mouseColor));
