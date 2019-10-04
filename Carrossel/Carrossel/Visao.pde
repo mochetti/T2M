@@ -23,7 +23,7 @@ void camConfig() {
 
     // The camera can be initialized directly using an element
     // from the array returned by list():
-    cam = new Capture(this, cameras[18]);
+    cam = new Capture(this, cameras[19]);
     // Or, the settings can be defined based on the text in the list
     //cam = new Capture(this, 640, 480, "Built-in iSight", 30);
 
@@ -172,11 +172,11 @@ boolean search (int xi, int xf, int yi, int yf, Blob b) {
   // Procura nas coordenadas dadas
   for (int x = xi; x < xf; x++ ) {
     for (int y = yi; y < yf; y++ ) {
-      //int loc = x + y * cam.width;
-      int loc = x + y * width;
+      int loc = x + y * cam.width;
+      //int loc = x + y * width;
       // What is current color
-      //color currentColor = cam.pixels[loc];
-      color currentColor = pixels[loc];
+      color currentColor = cam.pixels[loc];
+      //color currentColor = pixels[loc];
 
       // Compara as cores
       if (filtroCor(currentColor) && msmCor(currentColor, cores[b.cor])) {
@@ -212,11 +212,11 @@ int searchNew (int c) {
   // Procura por todo o campo
   for (int x = int(shapeCampo.getVertex(0).x); x < shapeCampo.getVertex(2).x; x++ ) {
     for (int y = int(shapeCampo.getVertex(0).y); y < shapeCampo.getVertex(2).y; y++ ) {
-      //int loc = x + y * cam.width;
-      int loc = x + y * width;
+      int loc = x + y * cam.width;
+      //int loc = x + y * width;
       // What is current color
-      //color currentColor = cam.pixels[loc];
-      color currentColor = pixels[loc];
+      color currentColor = cam.pixels[loc];
+      //color currentColor = pixels[loc];
 
       // Compara as cores
       if (filtroCor(currentColor) && msmCor(currentColor, cores[c])) {
@@ -378,20 +378,6 @@ boolean ordenar() {
   return false;
 }
 
-// Marca a bola com um circulo na tela
-void showBola() {
-  fill(255, 130, 0);
-  // Coordenadas
-  for (Blob b : blobs) {
-    if (b.cor == 0) {
-      PVector bolaAtual = new PVector(b.center().x, b.center().y);
-      // cor laranja
-      fill(255, 150, 0);
-      ellipse(bolaAtual.x, bolaAtual.y, 10, 10);
-    }
-  }
-}
-
 // Retorna o vetor velocidade da bola, originado no centro dela
 PVector velBola() {
   // Remove os rastros mais antigos
@@ -462,6 +448,12 @@ boolean filtroCor(color c) {
   int bgLimit = 100;
   int bgHValue = 100;
   int difLimit = 50;
+
+
+  //É fundo ou não
+
+
+
   // é fundo se as tres componentes forem menor q bgLimit
   boolean back = (red(c) < bgLimit && green(c) < bgLimit && blue(c) < bgLimit) || brightness(c) < 100;
   // é cor se pelo menos uma componente for maior q bgHValue
@@ -498,20 +490,23 @@ void calibra() {
   rectMode(CORNERS);
   rect(xi, yi, xf, yf);
 
+  //BUSCA AO REDOR DO CLIQUE COM RAIO DE 5 pixels
   for (int x = xi; x < xf; x++) {
     for (int y = yi; y < yf; y++) {
-      //int loc = x + y * cam.width;
-      int loc = x + y * width;
+      int loc = x + y * cam.width;
+      //int loc = x + y * width;
       // What is current color
-      //color currentColor = cam.pixels[loc];
-      color currentColor = pixels[loc];
+      color currentColor = cam.pixels[loc];
+      //color currentColor = pixels[loc];
       // Verifica se é colorido
       if (filtroCor(currentColor)) {
         quantidade++;
+        //soma as componentes individualmente
         r += red(currentColor);
         g += green(currentColor);
         b += blue(currentColor);
         //println("R = " + red(currentColor) + "  G = " + green(currentColor) + "  B = " + blue(currentColor));
+        //Atualiza as menores cores e as maiores cores para cada componente
         if (red(currentColor) < menorR) menorR = red(currentColor);
         if (red(currentColor) > maiorR) maiorR = red(currentColor);
         if (green(currentColor) < menorG) menorG = green(currentColor);
@@ -521,8 +516,10 @@ void calibra() {
       }
     }
   }
+  //Depois de rodar a área, se a quantidade de pixels for maior que 10
   if (quantidade > 10) {
     println("Q = " + quantidade);
+    //Tira as médias de cada componente
     r /= quantidade;
     g /= quantidade;
     b /= quantidade;
@@ -534,6 +531,7 @@ void calibra() {
     println("R: " + menorR + " -> " + maiorR);
     println("G: " + menorG + " -> " + maiorG);
     println("B: " + menorB + " -> " + maiorB);
+    //Encontra a cor média
     color mediaColor = color(r, g, b);
     //println("Distancia Sq = " + distColorSq(mediaColor, cores[2]));
     fill(r, g, b);
@@ -541,13 +539,29 @@ void calibra() {
     // Considera o intervalo de 0 a 9 na ASCII
     if (calColor >= 48 && calColor <= 57) {
       cores[calColor - 48] = mediaColor;
-      for (int i = 0; i < cores.length; i++) {
-        print("R = " + red(cores[i]));
-        print("  G = " + green(cores[i]));
-        println("  B = " + blue(cores[i]));
-      }
+      //for (int i = 0; i < cores.length; i++) {
+      //  print("R = " + red(cores[i]));
+      //  print("  G = " + green(cores[i]));
+      //  println("  B = " + blue(cores[i]));
+      //}
     }
   }
+
+  println("LARANJA");
+  println("R = " + red(cores[0]));
+  println("  G = " + green(cores[0]));
+  println("  B = " + blue(cores[0]));
+  println("  Brilho = " + brightness(cores[0]));
+  println("VERDE");
+  println("R = " + red(cores[1]));
+  println("  G = " + green(cores[1]));
+  println("  B = " + blue(cores[1]));
+  println("  Brilho = " + brightness(cores[1]));
+  println("VERMELHO");
+  println("R = " + red(cores[2]));
+  println("  G = " + green(cores[2]));
+  println("  B = " + blue(cores[2]));
+  println("  Brilho = " + brightness(cores[2]));
 }
 
 // Dimensiona o campo
@@ -564,6 +578,27 @@ void dimensionaCampo(int x, int y) {
   shapeCampo.endShape(CLOSE);
 
   if (shapeCampo.getVertexCount() == 4) {   
+    PShape linhaSuperior = createShape();
+    linhaSuperior.setStroke(255);
+    linhaSuperior.beginShape();
+    linhaSuperior.noFill();
+    linhaSuperior.vertex(shapeCampo.getVertex(0).x, shapeCampo.getVertex(0).y);
+    linhaSuperior.vertex(shapeCampo.getVertex(1).x, shapeCampo.getVertex(1).y);
+    linhaSuperior.vertex(shapeCampo.getVertex(1).x, shapeCampo.getVertex(1).y + 50);
+    linhaSuperior.vertex(shapeCampo.getVertex(0).x, shapeCampo.getVertex(0).y + 50);
+    linhaSuperior.endShape(CLOSE);
+    shapeCampo.addChild(linhaSuperior);
+    PShape linhaInferior = createShape();
+    linhaInferior.setStroke(255);
+    linhaInferior.beginShape();
+    linhaInferior.noFill();
+    linhaInferior.vertex(shapeCampo.getVertex(3).x, shapeCampo.getVertex(3).y - 50);
+    linhaInferior.vertex(shapeCampo.getVertex(2).x, shapeCampo.getVertex(2).y - 50);
+    linhaInferior.vertex(shapeCampo.getVertex(2).x, shapeCampo.getVertex(2).y);
+    linhaInferior.vertex(shapeCampo.getVertex(3).x, shapeCampo.getVertex(3).y);
+    linhaInferior.endShape(CLOSE);
+    shapeCampo.addChild(linhaInferior);
+
     isCampoDimensionado = true;
   }
 
@@ -592,11 +627,21 @@ void dimensionaCampo(int x, int y) {
  }
  */
 
+boolean isInside(PVector objeto, PShape forma) {
+  if (objeto.x >= forma.getVertex(0).x && objeto.x <= forma.getVertex(2).x && objeto.y >= forma.getVertex(0).y && objeto.y <= forma.getVertex(2).y) {
+    println("VISAO: ISINSIDE() - TRUE");
+    return true;
+  } 
+  return false;
+}
+
 // Compara duas cores por intervalos em cada componente
 boolean msmCor(color c1, color c2) {
   // limite de diferenca de cor
-  int lim = 20;
+  int lim = 30;
+  float brightnessc1 = brightness(c1);
+  float brightnessc2 = brightness(c2);
   // talvez seja necessario criar um limite diferente p cada componente
-  if (abs(red(c1) - red(c2)) < lim && abs(green(c1) - green(c2)) < lim && abs(blue(c1) - blue(c2)) < lim) return true;
+  if (abs(red(c1) - red(c2)) < lim && abs(green(c1) - green(c2)) < lim && abs(blue(c1) - blue(c2)) < lim && brightnessc1 > brightnessc2 - lim && brightnessc1 < brightnessc2 + lim) return true;
   else return false;
 }

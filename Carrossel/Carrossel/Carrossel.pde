@@ -12,6 +12,7 @@ boolean gameplay = false;  //Flag de controle que diz se o jogo está no automá
 // Verifica se ainda estamos configurando o robo
 //boolean configRobo = false;
 
+boolean pausado = false;
 
 //boolean andaReto = false; //DENTRO DE INERCIA()
 
@@ -20,9 +21,9 @@ Serial myPort;
 // Salvar as cores num txt pra poupar tempo na hora de calibrar (?)
 // Cores
 color cores[] = { 
-  color(199, 128, 45), // Laranja
-  color(67, 141, 86), // Verde
-  color(162, 28, 35) // Vermelho
+  color(240, 164, 58), // Laranja
+  color(104, 165, 141), // Verde
+  color(219, 87, 98) // Vermelho
 };
 
 // id de cada objeto
@@ -75,7 +76,7 @@ int Y_AREA = 200;
 //PVector campo[] = {new PVector(), new PVector(), new PVector(), new PVector()};
 
 
-Movie mov;
+//Movie mov;
 Capture cam;
 //PImage screenshot;
 
@@ -102,20 +103,21 @@ void setup() {
 
   shapeCampo = createShape();
 
-  size(640, 480);
-  mov = new Movie(this, "real.mp4");
-  mov.play();
-  mov.loop();
-  mov.frameRate(30);
+  //size(640, 480);
+  //mov = new Movie(this, "real.mp4");
+  //mov.play();
+  //mov.loop();
 
-  //printArray(Serial.list());
-  //myPort = new Serial(this, Serial.list()[3], 115200);
-  //size(960, 540);  
+  //mov.frameRate(30);
+
+  printArray(Serial.list());
+  myPort = new Serial(this, Serial.list()[0], 115200);
+  size(800, 448);
 
 
-  //frame.removeNotify();
-  //frameRate(30);
-  //camConfig();
+  frame.removeNotify();
+  frameRate(30);
+  camConfig();
 }
 
 //void movieEvent(Movie m) {
@@ -126,14 +128,16 @@ void captureEvent(Capture c) {
 }
 
 void draw() {
-  loadPixels();
+  //loadPixels();
   tempo = millis();
   //screenshot();
-  image(mov, 0, 0);
+  image(cam, 0, 0);
   // Mostra o campo na tela
   if (isCampoDimensionado) {
 
     shape(shapeCampo);
+    shape(shapeCampo.getChild(0));
+    shape(shapeCampo.getChild(1));
 
     // Armazena as ultimas coordenadas de cada blob
     oldBlobs.clear();
@@ -144,7 +148,7 @@ void draw() {
 
     // Confere o numero de ids validos
     //print("MAIN: ids validos: ");
-    //for(Blob b : oldBlobs) if(b.id >= 0) print(b.id + "  ");
+    for (Blob b : oldBlobs) if (b.id >= 0) print(b.id + "  ");
     //println("");
     // Busca os objetos
     if (!track()) return;
@@ -158,8 +162,10 @@ void draw() {
     //}
 
     bola = new PVector(blobs.get(0).center().x, blobs.get(0).center().y);
+    fill(255, 150, 0);
+    ellipse(bola.x, bola.y, 5, 5);
 
-    showBola();
+    //showBola();
     //velBola();
 
     // Inicializa os robos
@@ -175,7 +181,7 @@ void draw() {
       }
     }
     // Define as estratégias dos robos
-    robos.get(0).setEstrategia(0);
+    robos.get(0).setEstrategia(1);
     robos.get(0).debugObj();
 
     robos.get(1).setEstrategia(1);
@@ -189,15 +195,16 @@ void draw() {
     // Seleciona controle manual ou automatico para o robo 0
     if (gameplay) gameplay(robos.get(0));
     else {
-      alinhaGoleiro(robos.get(0));
-      alinhaAnda(robos.get(1));
+      //alinhaGoleiro(robos.get(0));
+      alinhaAnda(robos.get(0));
       //alinha(robos.get(2));
     }
     // Envia os comandos
-    //enviar();
+    enviar();
   } else {
     //desenha as linhas na tela se formando
     for (int i = 0; i < shapeCampo.getVertexCount() - 1; i++) {
+      strokeWeight(2);
       line(shapeCampo.getVertex(i).x, shapeCampo.getVertex(i).y, shapeCampo.getVertex(i+1).x, shapeCampo.getVertex(i+1).y);
     }
   }
@@ -209,8 +216,12 @@ void keyPressed() {
     debug = !debug;
   }
   if (key == 'c') {
-    println("KEY: calibra on/off");
     calibra = !calibra;
+    if (calibra) {
+      println("KEY: calibra on");
+    } else {
+      println("KEY: calibra off");
+    }
   }
   if (key >= '0' && key <= '9') {
     println("KEY: Cor " + key);
@@ -225,6 +236,19 @@ void keyPressed() {
     isCampoDimensionado = false;
     shapeCampo = createShape();
   }
+
+  //MOVIE
+  if (key == ' ') {
+    if (pausado) {
+      //mov.play();
+      pausado = false;
+    } else {
+      //mov.pause();
+      pausado = true;
+    }
+  }
+
+  //
   //if(key == 'y') {
   //  println("KEY: Config Robo");
   //  configEsq = false;
@@ -249,10 +273,10 @@ void keyReleased() {
 }
 
 void mousePressed() {
-  //int loc = mouseX + mouseY*cam.width;
-  int loc = mouseX + mouseY*width;
-  //mouseColor = cam.pixels[loc];
-  mouseColor = pixels[loc];
+  int loc = mouseX + mouseY*cam.width;
+  //int loc = mouseX + mouseY*width;
+  mouseColor = cam.pixels[loc];
+  //mouseColor = pixels[loc];
   //println("x = " + mouseX);
   //println("y = " + mouseY);
   print("R = " + red(mouseColor));
