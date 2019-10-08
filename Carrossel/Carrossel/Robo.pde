@@ -1,7 +1,11 @@
 // Classe que gerencia os robos
 
 class Robo {
+ 
+  //Variáveis para estratégia de goleiro
+  boolean chegouNoPonto = false;
   
+  //Variaveis para estratégia de jogador
   boolean wasNearBola = false;
   boolean atingiuSombra = false;
   boolean proximoDaBola = false;
@@ -104,6 +108,10 @@ class Robo {
     dir.x = cos(ang);
     dir.y = sin(ang);
     return dir;
+  }
+  
+  void inverteFrente(){
+    
   }
 
   // Retorna o angulo do robo

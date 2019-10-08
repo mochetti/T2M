@@ -92,7 +92,7 @@ void alinhaGoleiro(Robo r) {
   float dAng = PVector.angleBetween(robObj, r.getDir());
   //if(dAng > PI) dAng = 2*PI - dAng;
   // Angulo do robo
-  float angRobo = r.getAng();
+  //float angRobo = r.getAng();
   //println("CONTROLE: ang obj = " + degrees(ang));
   //println("CONTROLE: ang robo = " + degrees(r.getAng()));
   //println("CONTROLE: dAng = " + degrees(dAng));

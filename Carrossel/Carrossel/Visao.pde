@@ -23,7 +23,7 @@ void camConfig() {
 
     // The camera can be initialized directly using an element
     // from the array returned by list():
-    cam = new Capture(this, cameras[19]);
+    cam = new Capture(this, cameras[2]);
     // Or, the settings can be defined based on the text in the list
     //cam = new Capture(this, 640, 480, "Built-in iSight", 30);
 
@@ -440,7 +440,27 @@ void arrow(float x1, float y1, float x2, float y2) {
   line(0, 0, -10, -10);
   line(0, 0, 10, -10);
   popMatrix();
-} 
+}
+
+void arrow(PVector vetor, float x, float y) {
+  line(x, y, x+50*cos(atan(vetor.y / vetor.x)), y+50*sin(atan(vetor.y / vetor.x)));
+  pushMatrix();
+  translate(x+50*cos(atan(vetor.y / vetor.x)), y+50*sin(atan(vetor.y / vetor.x)));
+  float a = atan2(-50*cos(atan(vetor.y / vetor.x)), 50*sin(atan(vetor.y / vetor.x)));
+  rotate(a);
+  line(0, 0, -10, -10);
+  line(0, 0, 10, -10);
+  popMatrix();
+}
+
+void arrow(PVector vector1, PVector vector2) {  //V1 - V2
+  
+  PVector v1MenosV2 = vector1.sub(vector2);  //V2 apontando para V1
+  
+  
+  line(vector2.x, vector2.y, v1MenosV2.x, v1MenosV2.y);
+  
+}
 
 // Funcao que checa se o pixel pode ser uma cor real
 boolean filtroCor(color c) {

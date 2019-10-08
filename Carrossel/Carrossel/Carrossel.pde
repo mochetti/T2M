@@ -66,7 +66,7 @@ double antes = millis();
 
 
 // Propriedades do campo
-int Y_AREA = 200;
+int Y_AREA = 100;
 
 // define o campo como dois pontos
 //PVector shapeCampo.getVertex(0) = new PVector();
@@ -112,7 +112,7 @@ void setup() {
 
   printArray(Serial.list());
   myPort = new Serial(this, Serial.list()[0], 115200);
-  size(800, 448);
+  size(640, 480);
 
 
   frame.removeNotify();
@@ -136,8 +136,8 @@ void draw() {
   if (isCampoDimensionado) {
 
     shape(shapeCampo);
-    shape(shapeCampo.getChild(0));
-    shape(shapeCampo.getChild(1));
+    //shape(shapeCampo.getChild(0));
+    //shape(shapeCampo.getChild(1));
 
     // Armazena as ultimas coordenadas de cada blob
     oldBlobs.clear();
@@ -181,7 +181,7 @@ void draw() {
       }
     }
     // Define as estratégias dos robos
-    robos.get(0).setEstrategia(1);
+    robos.get(0).setEstrategia(0);
     robos.get(0).debugObj();
 
     robos.get(1).setEstrategia(1);
@@ -196,7 +196,7 @@ void draw() {
     if (gameplay) gameplay(robos.get(0));
     else {
       //alinhaGoleiro(robos.get(0));
-      alinhaAnda(robos.get(0));
+      alinhaGoleiro(robos.get(0));
       //alinha(robos.get(2));
     }
     // Envia os comandos
