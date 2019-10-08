@@ -63,8 +63,6 @@ void estrategia(Robo r, int n) {
     if (sombra.x > shapeCampo.getVertex(2).x) sombra.x = shapeCampo.getVertex(2).x;
     if (sombra.y > shapeCampo.getVertex(2).y) sombra.y = shapeCampo.getVertex(2).y;
 
-
-
     noFill();
     stroke(255);
     ellipse(sombra.x, sombra.y, 20, 20);
@@ -72,10 +70,12 @@ void estrategia(Robo r, int n) {
     arrow(sombra.x, sombra.y, bola.x, bola.y);
 
     if (r.isNear(bola) && isInside(r.pos, shapeCampo.getChild(0))) {
+      println("ESTRATEGIA: Robo " + r.index + " dentro da faixa superior e perto da bola");
       gira(r, true);
       return;
     }
     if (r.isNear(bola) && isInside(r.pos, shapeCampo.getChild(1))) {
+      println("ESTRATEGIA: Robo " + r.index + " dentro da faixa inferior e perto da bola");
       gira(r, false);
       return;
     }
@@ -85,8 +85,10 @@ void estrategia(Robo r, int n) {
       r.setObj(bola);
     } else if (!r.atingiuSombra) {
       // Ainda precisa chegar ate a sombra
+      println("ESTRATEGIA: Robo " + r.index + " obj = sombra da bola");
       r.setObj(sombra);
     } else {
+      println("ESTRATEGIA: Robo " + r.index + " obj = bola");
       r.setObj(bola);
     }
     break;

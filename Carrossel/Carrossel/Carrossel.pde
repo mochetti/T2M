@@ -96,7 +96,7 @@ PVector bola;
 void movieEvent(Movie movie) {
   movie.read();
   //fill(255, 0, 0);
-  point(512, 360);
+  //point(512, 360);    // ??
 }
 
 void setup() {
@@ -111,8 +111,8 @@ void setup() {
   //mov.frameRate(30);
 
   printArray(Serial.list());
-  myPort = new Serial(this, Serial.list()[0], 115200);
-  size(640, 480);
+  myPort = new Serial(this, Serial.list()[3], 115200);
+  size(960, 540);
 
 
   frame.removeNotify();
@@ -148,7 +148,7 @@ void draw() {
 
     // Confere o numero de ids validos
     //print("MAIN: ids validos: ");
-    for (Blob b : oldBlobs) if (b.id >= 0) print(b.id + "  ");
+    //for (Blob b : oldBlobs) if (b.id >= 0) print(b.id + "  ");
     //println("");
     // Busca os objetos
     if (!track()) return;
@@ -197,7 +197,7 @@ void draw() {
     else {
       //alinhaGoleiro(robos.get(0));
       alinhaGoleiro(robos.get(0));
-      //alinha(robos.get(2));
+      alinhaAnda(robos.get(1));
     }
     // Envia os comandos
     enviar();

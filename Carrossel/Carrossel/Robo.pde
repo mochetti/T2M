@@ -166,8 +166,8 @@ class Robo {
       kP = 0.4;
       break;
     case 1:
-      velEmin = 4;
-      velDmin = 4;
+      velEmin = 3;
+      velDmin = 3;
       kP = 0.22;
       break;
     default:
@@ -191,7 +191,7 @@ class Robo {
 
   boolean isNear(PVector alvo) {
     noFill();
-    ellipse(pos.x, pos.y, 50, 50);
+    //ellipse(pos.x, pos.y, 50, 50);
     if (distSq(pos, alvo) < 50*50){
       println("ROBO: ISNEAR TRUE");
       return true; 
