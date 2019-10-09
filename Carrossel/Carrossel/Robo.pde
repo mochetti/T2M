@@ -44,13 +44,21 @@ class Robo {
     index = n;
     vel = new PVector();
   }
+  
+  // define o angulo do robo
+  // criado para a simulacao - cuidado ao usar
+  void setAng(float income) {
+    ang = income;
+  }
 
+  // define como vetor velocidade
   void setVel(PVector income) {
     vel = income;
   }
+  // define a velocidade das rodas
   void setVel(float vE, float vD) {
     // Verifica se as velocidades estão dentro dos limites estabelecidos
-    // Os ajustes para velocidade negativa é feito direto na serial
+    // O ajuste para velocidade negativa é feito direto na serial
     if (vE > velMax) vE = velMax;
     else if (vE < -velMax) vE = -velMax;
     if (vD > velMax) vD = velMax;
@@ -188,16 +196,17 @@ class Robo {
     fill(255, 0, 0);
     ellipse(obj.x, obj.y, 10, 10);
   }
-  // desneha o robo no simulador
+  
+  // desenha o robo no simulador
   void simula() {
     // lado do robo em pixels
-    int lado = 50;
+    int lado = 35;
     switch(index) {
       // goleiro
     case 0:
       pushMatrix();
       translate(pos.x, pos.y);
-      rotate(ang);
+      rotate(ang + PI/2);
       rectMode(CORNER);
       fill(255, 0, 0);
       rect(-lado/2, -lado/2, lado, lado/2);
@@ -209,12 +218,14 @@ class Robo {
   }
 
   boolean isNear(PVector alvo) {
+    int raio = 50;
     noFill();
-    ellipse(pos.x, pos.y, 50, 50);
-    if (distSq(pos, alvo) < 50*50) {
-      println("ROBO: ISNEAR TRUE");
+    ellipse(pos.x, pos.y, raio, raio);
+    if (distSq(pos, alvo) < raio*raio) {
+      println("ROBO: Robo " + index + " isNear = true");
       return true;
     }
+    println("ROBO: Robo " + index + " isNear = false");
     return false;
   }
 }

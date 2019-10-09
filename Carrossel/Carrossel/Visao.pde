@@ -172,10 +172,13 @@ boolean search (int xi, int xf, int yi, int yf, Blob b) {
   // Procura nas coordenadas dadas
   for (int x = xi; x < xf; x++ ) {
     for (int y = yi; y < yf; y++ ) {
-      int loc = x + y * cam.width;
-      //int loc = x + y * width;
-      // What is current color
-      color currentColor = cam.pixels[loc];
+      int loc = 0;
+      if (inputVideo == 0) loc = x + y * cam.width;
+
+      // cor do pixel atual
+      color currentColor = 0;
+      if (inputVideo == 0) currentColor = cam.pixels[loc];
+      else if(inputVideo == 2) currentColor = get(x, y);
       //color currentColor = pixels[loc];
 
       // Compara as cores
@@ -212,11 +215,14 @@ int searchNew (int c) {
   // Procura por todo o campo
   for (int x = int(shapeCampo.getVertex(0).x); x < shapeCampo.getVertex(2).x; x++ ) {
     for (int y = int(shapeCampo.getVertex(0).y); y < shapeCampo.getVertex(2).y; y++ ) {
-      int loc = x + y * cam.width;
+      int loc = 0;
+      if  (inputVideo == 0) loc = x + y * cam.width;
+      
       //int loc = x + y * width;
       // What is current color
-      color currentColor = cam.pixels[loc];
-      //color currentColor = pixels[loc];
+      color currentColor = 0;
+      if (inputVideo == 0) currentColor = cam.pixels[loc];
+      else if (inputVideo == 2) currentColor = get(x, y);
 
       // Compara as cores
       if (filtroCor(currentColor) && msmCor(currentColor, cores[c])) {
@@ -477,7 +483,6 @@ void calibra() {
   float menorB = 255;
   float maiorB = 0;
 
-  ellipse(mouseX, mouseY, raio, raio);
   int r = 0, g = 0, b = 0;
   int quantidade = 0;
   int xi = mouseX - raio;
@@ -493,11 +498,14 @@ void calibra() {
   //BUSCA AO REDOR DO CLIQUE COM RAIO DE 5 pixels
   for (int x = xi; x < xf; x++) {
     for (int y = yi; y < yf; y++) {
-      int loc = x + y * cam.width;
-      //int loc = x + y * width;
-      // What is current color
-      color currentColor = cam.pixels[loc];
-      //color currentColor = pixels[loc];
+      int loc = 0;
+      if(inputVideo == 0) loc = x + y * cam.width;
+
+      // cor do pixel atual
+      color currentColor = 0;
+      if (inputVideo == 0) currentColor = cam.pixels[loc];
+      else if (inputVideo == 2) currentColor = get(x, y);
+
       // Verifica se é colorido
       if (filtroCor(currentColor)) {
         quantidade++;
@@ -514,6 +522,8 @@ void calibra() {
         if (blue(currentColor) < menorB) menorB = blue(currentColor);
         if (blue(currentColor) > maiorB) maiorB = blue(currentColor);
       }
+      //fill(255);
+      //point(x, y);
     }
   }
   //Depois de rodar a área, se a quantidade de pixels for maior que 10
@@ -566,6 +576,7 @@ void calibra() {
 
 // Dimensiona o campo
 void dimensionaCampo(int x, int y) {
+  
   // dimensiona o campo como quatro pontos
 
   shapeCampo.setStroke(255);

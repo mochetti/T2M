@@ -27,9 +27,9 @@ Serial myPort;
 // Salvar as cores num txt pra poupar tempo na hora de calibrar (?)
 // Cores
 color cores[] = { 
-  color(240, 164, 58), // Laranja
-  color(104, 165, 141), // Verde
-  color(219, 87, 98) // Vermelho
+  color(255, 150, 0), // Laranja
+  color(0, 255, 0), // Verde
+  color(255, 0, 0) // Vermelho
 };
 
 // id de cada objeto
@@ -91,33 +91,32 @@ Capture cam;
 // 0 - Laranja
 // 1 - Verde
 // 2 - Vermelho
-int[] quantCor = {1, 3, 3};
+int[] quantCor = {1, 1, 1};
 
 ArrayList<Blob> blobs = new ArrayList<Blob>();
 ArrayList<Blob> oldBlobs = new ArrayList<Blob>();
 ArrayList<Robo> robos = new ArrayList<Robo>();
 ArrayList<Robo> robosSimulados = new ArrayList<Robo>();
 ArrayList<PVector> rastro = new ArrayList<PVector>();
-PVector bola;
+PVector bola = new PVector();
 
 void setup() {
 
   shapeCampo = createShape();
 
-  //size(640, 480);
   //mov = new Movie(this, "real.mp4");
   //mov.play();
   //mov.loop();
 
   //mov.frameRate(30);
 
-  printArray(Serial.list());
   size(800, 448);
 
 
   frame.removeNotify();
   frameRate(30);
   if (inputVideo == 0) {
+    printArray(Serial.list());
     myPort = new Serial(this, Serial.list()[0], 115200);
     camConfig();
   }
@@ -152,7 +151,7 @@ void draw() {
 
     // Confere o numero de ids validos
     //print("MAIN: ids validos: ");
-    for (Blob b : oldBlobs) if (b.id >= 0) print(b.id + "  ");
+    //for (Blob b : oldBlobs) if (b.id >= 0) print(b.id + "  ");
     //println("");
     // Busca os objetos
     if (!track()) return;
@@ -166,8 +165,8 @@ void draw() {
     //}
 
     bola = new PVector(blobs.get(0).center().x, blobs.get(0).center().y);
-    fill(255, 150, 0);
-    ellipse(bola.x, bola.y, 5, 5);
+    //fill(255, 150, 0);
+    //ellipse(bola.x, bola.y, 5, 5);
 
     //showBola();
     //velBola();
@@ -185,11 +184,11 @@ void draw() {
       }
     }
     // Define as estratégias dos robos
-    robos.get(0).setEstrategia(1);
+    robos.get(0).setEstrategia(0);
     robos.get(0).debugObj();
 
-    robos.get(1).setEstrategia(1);
-    robos.get(1).debugObj();
+    //robos.get(1).setEstrategia(1);
+    //robos.get(1).debugObj();
 
     //robos.get(0).setEstrategia(3);
     //robos.get(1).setEstrategia(2);
@@ -204,8 +203,16 @@ void draw() {
       //alinha(robos.get(2));
     }
     // Envia os comandos
-    if(inputVideo == 0) enviar();
+    if (inputVideo == 0) enviar();
   } else {
+    // no simulador, o campo é o próprio canvas
+    if (inputVideo == 2) {
+      dimensionaCampo(0,0);
+      dimensionaCampo(width,0);
+      dimensionaCampo(width,height);
+      dimensionaCampo(0,height);
+      return;
+    }
     //desenha as linhas na tela se formando
     for (int i = 0; i < shapeCampo.getVertexCount() - 1; i++) {
       strokeWeight(2);
@@ -289,5 +296,5 @@ void mousePressed() {
   //println("X: " + mouseX + " Y: " + mouseY);
 
   if (!isCampoDimensionado) dimensionaCampo(mouseX, mouseY);
-  //if (calibra) calibra();
+  if (calibra) calibra();
 }

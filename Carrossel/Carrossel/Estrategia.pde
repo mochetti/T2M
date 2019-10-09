@@ -29,6 +29,13 @@ void estrategia(Robo r, int n) {
   switch(n) {
 
   case 0:     // Goleiro segue o y da bola
+    // Antes de qualquer coisa, checa se está perto da bola
+    // Se estiver, gira no próprio eixo
+    if(r.isNear(bola)) {
+    
+      return;
+    }
+  
     // Mudar coordenada x para x da linha do gol 
     inter.x = golAmigo.x + distGoleiro;
     inter.y = blobs.get(0).center().y;
