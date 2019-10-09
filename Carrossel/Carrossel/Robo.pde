@@ -1,11 +1,11 @@
 // Classe que gerencia os robos
 
 class Robo {
-  
+
   boolean wasNearBola = false;
   boolean atingiuSombra = false;
   boolean proximoDaBola = false;
-  
+
   PVector pos = new PVector(), posAnt, vel, obj;
   float ang = 0, angAnt = 0, angObj = -1;
   // Armazena o erro no valor do angulo do frame anterior
@@ -35,6 +35,14 @@ class Robo {
     vel = r.vel;
     ang = r.ang;
     index = r.index;
+  }
+
+  // construtor usado pelo simulador
+  Robo(float x, float y, int n) {
+    pos.x = x;
+    pos.y = y;
+    index = n;
+    vel = new PVector();
   }
 
   void setVel(PVector income) {
@@ -141,16 +149,16 @@ class Robo {
     r.getAng();
     r.getPos();
     r.debugAng();
-    
-    if(isNear(bola)){
+
+    if (isNear(bola)) {
       proximoDaBola = true;
       wasNearBola = true;
-    } else{
-      if(wasNearBola) atingiuSombra = false;
+    } else {
+      if (wasNearBola) atingiuSombra = false;
       proximoDaBola = false;
       wasNearBola = false;
     }
-    
+
     switch(r.index) {
     case 0:
       velEmin = 4;
@@ -180,13 +188,32 @@ class Robo {
     fill(255, 0, 0);
     ellipse(obj.x, obj.y, 10, 10);
   }
+  // desneha o robo no simulador
+  void simula() {
+    // lado do robo em pixels
+    int lado = 50;
+    switch(index) {
+      // goleiro
+    case 0:
+      pushMatrix();
+      translate(pos.x, pos.y);
+      rotate(ang);
+      rectMode(CORNER);
+      fill(255, 0, 0);
+      rect(-lado/2, -lado/2, lado, lado/2);
+      fill(0, 255, 0);
+      rect(-lado/2, 0, lado, lado/2);
+      popMatrix();
+    break;
+    }
+  }
 
   boolean isNear(PVector alvo) {
     noFill();
     ellipse(pos.x, pos.y, 50, 50);
-    if (distSq(pos, alvo) < 50*50){
+    if (distSq(pos, alvo) < 50*50) {
       println("ROBO: ISNEAR TRUE");
-      return true; 
+      return true;
     }
     return false;
   }

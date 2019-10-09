@@ -4,6 +4,12 @@ import processing.serial.*;
 // Flags de debug
 boolean debug = true;
 
+// Controla a entrada da imagem
+// 0 - camera
+// 1 - video 
+// 2 - simulador
+int inputVideo = 2;
+
 boolean calibra = true;  //Flag de controle se deve ou não calibrar as cores
 boolean visao = false;  //Flag de controle para parar o código logo após jogar a imagem no canvas (visão) a visão ou não
 boolean radio = true; //Flag de controle para emitir ou não sinais ao rádio (ultimo passo da checagem)
@@ -90,14 +96,9 @@ int[] quantCor = {1, 3, 3};
 ArrayList<Blob> blobs = new ArrayList<Blob>();
 ArrayList<Blob> oldBlobs = new ArrayList<Blob>();
 ArrayList<Robo> robos = new ArrayList<Robo>();
+ArrayList<Robo> robosSimulados = new ArrayList<Robo>();
 ArrayList<PVector> rastro = new ArrayList<PVector>();
 PVector bola;
-
-void movieEvent(Movie movie) {
-  movie.read();
-  //fill(255, 0, 0);
-  point(512, 360);
-}
 
 void setup() {
 
@@ -111,18 +112,20 @@ void setup() {
   //mov.frameRate(30);
 
   printArray(Serial.list());
-  myPort = new Serial(this, Serial.list()[0], 115200);
   size(800, 448);
 
 
   frame.removeNotify();
   frameRate(30);
-  camConfig();
+  if (inputVideo == 0) {
+    myPort = new Serial(this, Serial.list()[0], 115200);
+    camConfig();
+  }
 }
 
-//void movieEvent(Movie m) {
-//  m.read();
-//}
+void movieEvent(Movie m) {
+  m.read();
+}
 void captureEvent(Capture c) {
   c.read();
 }
@@ -131,7 +134,8 @@ void draw() {
   //loadPixels();
   tempo = millis();
   //screenshot();
-  image(cam, 0, 0);
+  if (inputVideo == 0) image(cam, 0, 0);
+  else if  (inputVideo == 2) simulador();
   // Mostra o campo na tela
   if (isCampoDimensionado) {
 
@@ -200,7 +204,7 @@ void draw() {
       //alinha(robos.get(2));
     }
     // Envia os comandos
-    enviar();
+    if(inputVideo == 0) enviar();
   } else {
     //desenha as linhas na tela se formando
     for (int i = 0; i < shapeCampo.getVertexCount() - 1; i++) {
@@ -273,9 +277,9 @@ void keyReleased() {
 }
 
 void mousePressed() {
-  int loc = mouseX + mouseY*cam.width;
+  //int loc = mouseX + mouseY*cam.width;
   //int loc = mouseX + mouseY*width;
-  mouseColor = cam.pixels[loc];
+  //mouseColor = cam.pixels[loc];
   //mouseColor = pixels[loc];
   //println("x = " + mouseX);
   //println("y = " + mouseY);
@@ -285,5 +289,5 @@ void mousePressed() {
   //println("X: " + mouseX + " Y: " + mouseY);
 
   if (!isCampoDimensionado) dimensionaCampo(mouseX, mouseY);
-  if (calibra) calibra();
+  //if (calibra) calibra();
 }
