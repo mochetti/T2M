@@ -61,9 +61,11 @@ class Blob {
     ellipse((minx+maxx)/2, (miny+maxy)/2, 5, 5) ;
   }
   PVector center() {
+    
     PVector centro = new PVector();
     centro.x = (minx+maxx)/2;
     centro.y = (miny+maxy)/2;
+    
     return centro;
   }
 

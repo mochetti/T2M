@@ -32,7 +32,7 @@ void estrategia(Robo r, int n) {
     // Antes de qualquer coisa, checa se está perto da bola
     // Se estiver, gira no próprio eixo
     if(r.isNear(bola)) {
-    
+      // aaaaaaaaaaaa
       return;
     }
   

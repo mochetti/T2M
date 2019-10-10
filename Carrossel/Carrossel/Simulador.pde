@@ -1,9 +1,16 @@
 // Utiliza robos virtuais para testar estratégias especificas do codigo
 
-Robo goleiro = new Robo (100, 100, 0);
+
+// mostra qual robo ta sendo controlado pelas setas (altera o robo usando o TAB)
+int roboControlado = 0;
 
 void simulador() {
   background(0);
+  if (robosSimulados.size() == 0) {
+    robosSimulados.add(new Robo(100, 100, 0));
+    robosSimulados.add(new Robo(100, 200, 1));
+    robosSimulados.add(new Robo(100, 300, 2));
+  }
 
   // simula a bola (estática por enquanto)
   fill(255, 150, 0);
@@ -12,22 +19,24 @@ void simulador() {
   ellipse(bola.x, bola.y, 20, 20);
 
   // atribui o vetor velocidade e angulo (usando o teclado por enquanto)
-  goleiro.setAng(goleiro.ang + simulaAng());
-  goleiro.setVel(simulaVel(goleiro));
+  robosSimulados.get(roboControlado).setAng(robosSimulados.get(roboControlado).ang + simulaAng());
+  robosSimulados.get(roboControlado).setVel(simulaVel(robosSimulados.get(roboControlado)));
 
   // atualiza a posicao
-  goleiro.pos.add(goleiro.vel);
-  println("SIMULADOR: goleiro.vel = " + goleiro.vel);
-  println("SIMULADOR: goleiro.pos = " + goleiro.pos);
+  robosSimulados.get(roboControlado).pos.add(robosSimulados.get(roboControlado).vel);
+  //println("SIMULADOR: goleiro.vel = " + goleiro.vel);
+  //println("SIMULADOR: goleiro.pos = " + goleiro.pos);
 
   // mostra na tela
-  goleiro.simula();
+  robosSimulados.get(0).simula();
+  robosSimulados.get(1).simula();
+  robosSimulados.get(2).simula();
 } 
 
 // devolve o vetor velocidade gerado pelas setas do teclado
 PVector simulaVel (Robo r) {
   PVector vel = new PVector();
-  if (!keyPressed) goleiro.setVel(new PVector(0, 0));
+  if (!keyPressed) r.setVel(new PVector(0, 0));
   else if (key == CODED) {
     if (keyCode == UP) {
       println("SIMULADOR: frente");

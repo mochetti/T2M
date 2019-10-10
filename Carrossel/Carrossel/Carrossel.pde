@@ -91,11 +91,12 @@ Capture cam;
 // 0 - Laranja
 // 1 - Verde
 // 2 - Vermelho
-int[] quantCor = {1, 1, 1};
+int[] quantCor = {1, 3, 3};
 
 ArrayList<Blob> blobs = new ArrayList<Blob>();
 ArrayList<Blob> oldBlobs = new ArrayList<Blob>();
 ArrayList<Robo> robos = new ArrayList<Robo>();
+ArrayList<Robo> oldRobos = new ArrayList<Robo>();
 ArrayList<Robo> robosSimulados = new ArrayList<Robo>();
 ArrayList<PVector> rastro = new ArrayList<PVector>();
 PVector bola = new PVector();
@@ -111,7 +112,6 @@ void setup() {
   //mov.frameRate(30);
 
   size(800, 448);
-
 
   frame.removeNotify();
   frameRate(30);
@@ -132,7 +132,6 @@ void captureEvent(Capture c) {
 void draw() {
   //loadPixels();
   tempo = millis();
-  //screenshot();
   if (inputVideo == 0) image(cam, 0, 0);
   else if  (inputVideo == 2) simulador();
   // Mostra o campo na tela
@@ -141,6 +140,11 @@ void draw() {
     shape(shapeCampo);
     shape(shapeCampo.getChild(0));
     shape(shapeCampo.getChild(1));
+
+    // Armazena as ultimas coordenadas de cada robo
+    oldRobos.clear();
+    for (Robo r : robos) oldRobos.add(new Robo(r.clone()));
+    //robos.clear();
 
     // Armazena as ultimas coordenadas de cada blob
     oldBlobs.clear();
@@ -159,11 +163,6 @@ void draw() {
     // debug da visao
     if (visao) return;
 
-    //if(configRobo) {
-    //  configRobo(robos.get(0));
-    //  return;
-    //}
-
     bola = new PVector(blobs.get(0).center().x, blobs.get(0).center().y);
     //fill(255, 150, 0);
     //ellipse(bola.x, bola.y, 5, 5);
@@ -173,7 +172,6 @@ void draw() {
 
     // Inicializa os robos
     if (robos.size() == 0) {
-      //robos.clear();
       for (int i=0; i<3; i++) {
         robos.add(new Robo(i));
       }
@@ -190,10 +188,6 @@ void draw() {
     //robos.get(1).setEstrategia(1);
     //robos.get(1).debugObj();
 
-    //robos.get(0).setEstrategia(3);
-    //robos.get(1).setEstrategia(2);
-    //robos.get(2).setEstrategia(1);
-    //for(Robo r : robos) r.debugObj();
 
     // Seleciona controle manual ou automatico para o robo 0
     if (gameplay) gameplay(robos.get(0));
@@ -207,10 +201,10 @@ void draw() {
   } else {
     // no simulador, o campo é o próprio canvas
     if (inputVideo == 2) {
-      dimensionaCampo(0,0);
-      dimensionaCampo(width,0);
-      dimensionaCampo(width,height);
-      dimensionaCampo(0,height);
+      dimensionaCampo(0, 0);
+      dimensionaCampo(width, 0);
+      dimensionaCampo(width, height);
+      dimensionaCampo(0, height);
       return;
     }
     //desenha as linhas na tela se formando
@@ -222,6 +216,11 @@ void draw() {
 }
 
 void keyPressed() {
+  if (key == TAB) {
+    roboControlado++;
+    if (roboControlado == 3) roboControlado = 0;
+    println("KEY: Controlando o robo " + roboControlado);
+  }
   if (key == 'd') {
     println("KEY: debug on/off");
     debug = !debug;
