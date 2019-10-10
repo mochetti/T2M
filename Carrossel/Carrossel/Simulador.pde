@@ -16,23 +16,26 @@ void simulador() {
 
   // simula a bola
   // chute inicial
-  if (bolaV.pos.x == 0) {
+  if (bolaV.pos.x == 0 && bolaV.pos.y == 0) {
     println("SIMULADOR: chute inicial");
     bolaV.pos.x = width/2;
     bolaV.pos.y = height/2;
-    bolaV.vel = new PVector(1, 1);
+    bolaV.vel = new PVector(5, 5);
   }
   // atrito
   // direcao do atrito (precisa ser contra o movimento)
-  int kX = 1;
-  int kY = 1;
+  float kX = 1;
+  float kY = 1;
   if (bolaV.vel.x > 0) kX = -1;
   if (bolaV.vel.y > 0) kY = -1;
   
-  bolaV.acc = new PVector(kX/2, kY/2);
+  if(bolaV.vel.mag() == 0) bolaV.acc.set(0, 0);
+  else bolaV.acc = new PVector(kX/20, kY/30);
+  
+  //println("acc = " + bolaV.acc);
+  //println("vel = " + bolaV.vel);
 
   bolaV.atualiza();
-  println(bolaV.vel);
   bolaV.display();
 
   // atribui o vetor velocidade e angulo (usando o teclado por enquanto)
@@ -56,10 +59,10 @@ PVector simulaVel (Robo r) {
   if (!keyPressed) r.setVel(new PVector(0, 0));
   else if (key == CODED) {
     if (keyCode == UP) {
-      println("SIMULADOR: frente");
+      //println("SIMULADOR: frente");
       vel = new PVector(cos(r.ang), sin(r.ang));
     } else if (keyCode == DOWN) {
-      println("SIMULADOR: trás");
+      //println("SIMULADOR: trás");
       vel = new PVector(-cos(r.ang), -sin(r.ang));
     }
   }
@@ -109,6 +112,7 @@ class Bola {
   }
 
   void atualiza() {
+    if(vel.mag() < 0.05) vel.set(0, 0);
     vel.add(acc);
     pos.add(vel);
 
@@ -118,6 +122,7 @@ class Bola {
 
     for (int i=0; i<robos.size(); i++) {
       //if (isInside(bola, robos.get(i).corpo)) ;
+      // rebate e aumenta a velocidade
     }
   }
 

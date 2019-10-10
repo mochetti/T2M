@@ -17,6 +17,10 @@ boolean estrategia = true; // Flag para rodar o bloco de estratégia
 boolean radio = true; //Flag de controle para emitir ou não sinais ao rádio (ultimo passo da checagem)
 boolean gameplay = false;  //Flag de controle que diz se o jogo está no automático ou no manual (apenas do robô 0 por enquanto)
 
+// variaveis pro controle do arrasto do mouse
+PVector clique = new PVector();
+int dragged = 0;
+
 // Verifica se ainda estamos configurando o robo
 //boolean configRobo = false;
 
@@ -170,7 +174,7 @@ void draw() {
 
     // debug da visao
     if (visao) return;
-    
+
     bola = new PVector(blobs.get(0).center().x, blobs.get(0).center().y);
 
     //showBola();
@@ -257,6 +261,7 @@ void keyPressed() {
 
   //MOVIE
   if (key == ' ') {
+    bolaV.vel.set(5, 5);
     if (pausado) {
       //mov.play();
       pausado = false;
@@ -281,6 +286,16 @@ void keyPressed() {
   }
 }
 
+void mouseDragged() {
+}
+
+void mouseReleased() {
+  PVector mouse = new PVector(mouseX, mouseY);
+  PVector tiro = mouse.sub(clique);
+  tiro.setMag(sqrt(distSq(mouse, clique))/40);
+  bolaV.vel = tiro;
+}
+
 void keyReleased() {
   if (robos.size() > 0) {
     robos.get(0).velE = 0;
@@ -289,12 +304,9 @@ void keyReleased() {
 }
 
 void mousePressed() {
-  //int loc = mouseX + mouseY*cam.width;
-  //int loc = mouseX + mouseY*width;
-  //mouseColor = cam.pixels[loc];
-  //mouseColor = pixels[loc];
-  //println("x = " + mouseX);
-  //println("y = " + mouseY);
+  clique.x = mouseX;
+  clique.y = mouseY;
+
   print("R = " + red(mouseColor));
   print("  G = " + green(mouseColor));
   println("  B = " + blue(mouseColor));
