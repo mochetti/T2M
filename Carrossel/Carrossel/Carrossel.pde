@@ -16,6 +16,7 @@ boolean controle = true;  // Flag para rodar o bloco de controle
 boolean estrategia = true; // Flag para rodar o bloco de estratégia
 boolean radio = true; //Flag de controle para emitir ou não sinais ao rádio (ultimo passo da checagem)
 boolean gameplay = false;  //Flag de controle que diz se o jogo está no automático ou no manual (apenas do robô 0 por enquanto)
+boolean simManual = true;
 
 // variaveis pro controle do arrasto do mouse
 PVector clique = new PVector();
@@ -194,6 +195,7 @@ void draw() {
     if (estrategia) {
       // Define as estratégias dos robos
       robos.get(0).setEstrategia(0);
+      robos.get(1).setEstrategia(1);
     }
     // Debug das estrategias
     for (int i=0; i<robos.size(); i++) {
@@ -203,8 +205,8 @@ void draw() {
     // Seleciona controle manual ou automatico para o robo 0
     if (gameplay) gameplay(robos.get(0));
     if (controle) {
-      //alinhaGoleiro(robos.get(0));
-      alinhaAnda(robos.get(0));
+      alinhaGoleiro(robos.get(0));
+      alinhaAnda(robos.get(1));
       //alinha(robos.get(2));
     }
 
@@ -273,6 +275,10 @@ void keyPressed() {
   if (key == 'v') {
     println("KEY: debug visao on/off");
     visao = !visao;
+  }
+  if (key == 'S') {
+    println("KEY: simulador manual/automatico");
+    simManual = !simManual;
   }
   if (key == 'g') {
     println("KEY: gameplay on/off");
