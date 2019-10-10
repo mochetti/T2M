@@ -7,6 +7,7 @@ byte velViagem = 30;
 
 // Alinha e anda
 void alinhaAnda(Robo r) {
+  if(r.obj == r.pos) return;
   // Vetor robo -> obj
   PVector robObj = new PVector();
   robObj = r.obj.sub(r.getPos());

@@ -1,14 +1,10 @@
+PVector golInimigo = new PVector();
+PVector golAmigo = new PVector();
+
 void estrategia(Robo r, int n) {
   // Mudar para as coordenadas do gol inimigo
   noFill();
-
-  //PVector golInimigo = new PVector(shapeCampo.getVertex(2).x, (shapeCampo.getVertex(2).y + shapeCampo.getVertex(0).y)/2);
-  PVector golInimigo = new PVector((shapeCampo.getVertex(1).x + shapeCampo.getVertex(2).x) /2, (shapeCampo.getVertex(1).y+shapeCampo.getVertex(2).y) / 2);
-  ellipse(golInimigo.x, golInimigo.y, 20, 20);
-  //PVector golAmigo = new PVector(shapeCampo.getVertex(0).x, (shapeCampo.getVertex(2).y + shapeCampo.getVertex(0).y)/2);
-  PVector golAmigo = new PVector((shapeCampo.getVertex(0).x + shapeCampo.getVertex(3).x) /2, (shapeCampo.getVertex(0).y+shapeCampo.getVertex(3).y) / 2);
-
-  ellipse(golAmigo.x, golAmigo.y, 20, 20);
+  
   // Distancia que o robo pega pra empurrar a bola
   float distSombra = 50;
   // Distancia entre o X do goleiro e o X do centro do gol
@@ -32,7 +28,18 @@ void estrategia(Robo r, int n) {
     // Antes de qualquer coisa, checa se está perto da bola
     // Se estiver, gira no próprio eixo
     if(r.isNear(bola)) {
-      // aaaaaaaaaaaa
+      // Se estiver no campo inferior, gira anti horário
+      if(r.pos.y > height/2) {
+        println("ESTRATÉGIA: Gira anti horário");
+        gira(r, false);
+      }
+      // Se estiver no campo superior, gira horário
+      else {
+        println("ESTRATÉGIA: Gira horário");
+        gira (r, true);
+      }
+      // Mantém o objetivo anterior
+      r.setObj(r.pos);
       return;
     }
   

@@ -1,22 +1,39 @@
-// Utiliza robos virtuais para testar estratégias especificas do codigo
+// Geras robos virtuais para testar estratégias especificas do codigo
 
-
-// mostra qual robo ta sendo controlado pelas setas (altera o robo usando o TAB)
+// mostra qual robo está sendo controlado pelas setas (altera o robo usando o TAB)
 int roboControlado = 0;
+
+// bola virtual
+Bola bolaV = new Bola();
 
 void simulador() {
   background(0);
   if (robosSimulados.size() == 0) {
-    robosSimulados.add(new Robo(100, 100, 0));
+    robosSimulados.add(new Robo(300, 100, 0));
     robosSimulados.add(new Robo(100, 200, 1));
     robosSimulados.add(new Robo(100, 300, 2));
   }
 
-  // simula a bola (estática por enquanto)
-  fill(255, 150, 0);
-  bola.x = width/2;
-  bola.y = 20;
-  ellipse(bola.x, bola.y, 20, 20);
+  // simula a bola
+  // chute inicial
+  if (bolaV.pos.x == 0) {
+    println("SIMULADOR: chute inicial");
+    bolaV.pos.x = width/2;
+    bolaV.pos.y = height/2;
+    bolaV.vel = new PVector(1, 1);
+  }
+  // atrito
+  // direcao do atrito (precisa ser contra o movimento)
+  int kX = 1;
+  int kY = 1;
+  if (bolaV.vel.x > 0) kX = -1;
+  if (bolaV.vel.y > 0) kY = -1;
+  
+  bolaV.acc = new PVector(kX/2, kY/2);
+
+  bolaV.atualiza();
+  println(bolaV.vel);
+  bolaV.display();
 
   // atribui o vetor velocidade e angulo (usando o teclado por enquanto)
   robosSimulados.get(roboControlado).setAng(robosSimulados.get(roboControlado).ang + simulaAng());
@@ -65,4 +82,47 @@ float simulaAng() {
     }
   }
   return dAng;
+}
+
+// classe que cuida da bola virtual
+class Bola {
+  PVector pos = new PVector();
+  PVector vel = new PVector();
+  PVector acc = new PVector();
+
+  Bola() {
+  }
+
+  Bola(PVector posicao) {
+    pos = posicao;
+  }
+
+  Bola(float x, float y) {
+    pos.x = x;
+    pos.y = y;
+  }
+
+  Bola(PVector posicao, PVector velocidade, PVector aceleracao) {
+    pos = posicao;
+    vel = velocidade;
+    acc = aceleracao;
+  }
+
+  void atualiza() {
+    vel.add(acc);
+    pos.add(vel);
+
+    // rebote
+    if (pos.x < 0 || pos.x > width) vel = new PVector(-vel.x, vel.y);
+    if (pos.y < 0 || pos.y > height) vel = new PVector(vel.x, -vel.y);
+
+    for (int i=0; i<robos.size(); i++) {
+      //if (isInside(bola, robos.get(i).corpo)) ;
+    }
+  }
+
+  void display() {
+    fill(255, 150, 0);
+    ellipse(pos.x, pos.y, 10, 10);
+  }
 }

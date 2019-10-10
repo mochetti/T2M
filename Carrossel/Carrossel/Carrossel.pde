@@ -12,6 +12,8 @@ int inputVideo = 2;
 
 boolean calibra = true;  //Flag de controle se deve ou não calibrar as cores
 boolean visao = false;  //Flag de controle para parar o código logo após jogar a imagem no canvas (visão) a visão ou não
+boolean controle = true;  // Flag para rodar o bloco de controle
+boolean estrategia = true; // Flag para rodar o bloco de estratégia
 boolean radio = true; //Flag de controle para emitir ou não sinais ao rádio (ultimo passo da checagem)
 boolean gameplay = false;  //Flag de controle que diz se o jogo está no automático ou no manual (apenas do robô 0 por enquanto)
 
@@ -110,7 +112,7 @@ void setup() {
   //mov.loop();
 
   //mov.frameRate(30);
-
+  ellipseMode(RADIUS);
   size(800, 448);
 
   frame.removeNotify();
@@ -134,12 +136,18 @@ void draw() {
   tempo = millis();
   if (inputVideo == 0) image(cam, 0, 0);
   else if  (inputVideo == 2) simulador();
-  // Mostra o campo na tela
+  noFill();
+  stroke(255);
   if (isCampoDimensionado) {
-
+    // Mostra o campo na tela
     shape(shapeCampo);
     shape(shapeCampo.getChild(0));
     shape(shapeCampo.getChild(1));
+    // Mostra os gols
+    golInimigo = new PVector((shapeCampo.getVertex(1).x + shapeCampo.getVertex(2).x) /2, (shapeCampo.getVertex(1).y+shapeCampo.getVertex(2).y) / 2);
+    golAmigo = new PVector((shapeCampo.getVertex(0).x + shapeCampo.getVertex(3).x) /2, (shapeCampo.getVertex(0).y+shapeCampo.getVertex(3).y) / 2);
+    ellipse(golAmigo.x, golAmigo.y, 20, 20);
+    ellipse(golInimigo.x, golInimigo.y, 20, 20);
 
     // Armazena as ultimas coordenadas de cada robo
     oldRobos.clear();
@@ -162,10 +170,8 @@ void draw() {
 
     // debug da visao
     if (visao) return;
-
+    
     bola = new PVector(blobs.get(0).center().x, blobs.get(0).center().y);
-    //fill(255, 150, 0);
-    //ellipse(bola.x, bola.y, 5, 5);
 
     //showBola();
     //velBola();
@@ -181,21 +187,23 @@ void draw() {
         robos.get(i).atualiza();
       }
     }
-    // Define as estratégias dos robos
-    robos.get(0).setEstrategia(0);
-    robos.get(0).debugObj();
-
-    //robos.get(1).setEstrategia(1);
-    //robos.get(1).debugObj();
-
+    if (estrategia) {
+      // Define as estratégias dos robos
+      robos.get(0).setEstrategia(0);
+    }
+    // Debug das estrategias
+    for (int i=0; i<robos.size(); i++) {
+      if (robos.get(i).obj.x != 0 || robos.get(i).obj.y != 0) robos.get(i).debugObj();
+    }
 
     // Seleciona controle manual ou automatico para o robo 0
     if (gameplay) gameplay(robos.get(0));
-    else {
+    if (controle) {
       //alinhaGoleiro(robos.get(0));
       alinhaAnda(robos.get(0));
       //alinha(robos.get(2));
     }
+
     // Envia os comandos
     if (inputVideo == 0) enviar();
   } else {
@@ -257,14 +265,6 @@ void keyPressed() {
       pausado = true;
     }
   }
-
-  //
-  //if(key == 'y') {
-  //  println("KEY: Config Robo");
-  //  configEsq = false;
-  //  //configRobo = !configRobo;
-  //  configRobo(robos.get(0));
-  //}
   if (key == 'v') {
     println("KEY: debug visao on/off");
     visao = !visao;
@@ -272,6 +272,12 @@ void keyPressed() {
   if (key == 'g') {
     println("KEY: gameplay on/off");
     gameplay = !gameplay;
+  }
+  // posicao inicial
+  if (key == 'P') {
+    println("KEY: posicao inicial");
+    robos.get(0).setObj(golAmigo.x + 100, golAmigo.y);
+    estrategia = false;
   }
 }
 

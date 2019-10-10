@@ -458,10 +458,7 @@ boolean filtroCor(color c) {
   int bgHValue = 100;
   int difLimit = 50;
 
-
   //É fundo ou não
-
-
 
   // é fundo se as tres componentes forem menor q bgLimit
   boolean back = (red(c) < bgLimit && green(c) < bgLimit && blue(c) < bgLimit) || brightness(c) < 100;
