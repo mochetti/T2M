@@ -51,7 +51,7 @@ class Robo {
     index = n;
     vel = new PVector();
   }
-  
+
   Robo clone() {
     Robo r = new Robo(this);
     return r;
@@ -170,7 +170,7 @@ class Robo {
     getAng();
     getPos();
     debugAng();
-    
+
     objAnt = obj;
 
     if (isNear(bola)) {
@@ -227,32 +227,28 @@ class Robo {
     switch(index) {
       // goleiro
     case 0:
-      fill(255, 0, 0);
       vermelho = createShape(RECT, -lado/2, -lado/2, lado, lado/2);
-      fill(0, 255, 0);
       verde = createShape(RECT, -lado/2, 0, lado, lado/2);
       break;
 
       // zagueiro (xadrez)
     case 1:
-      fill(255, 0, 0);
       vermelho = createShape(RECT, -lado/2, -lado/2, lado/2, lado/2);
-      fill(0, 255, 0);
       verde = createShape(RECT, 0, 0, lado/2, lado/2);
       break;
 
       // atacante (L)
     case 2:
-      fill(255, 0, 0);
       vermelho = createShape(RECT, 0, -lado/2, lado/2, lado/2);
-      fill(0, 255, 0);
       verde = createShape(RECT, -lado/2, 0, lado, lado/2);
       break;
     }
-
+    
+    vermelho.setFill(color(255, 0, 0));
+    verde.setFill(color(0, 255, 0));
     corpo.addChild(verde);
     corpo.addChild(vermelho);
-    
+
     corpo.translate(pos.x, pos.y);
     corpo.rotate(ang + PI/2);
     shape(corpo);
@@ -262,7 +258,7 @@ class Robo {
     int raio = 40;
     noFill();
     ellipse(pos.x, pos.y, raio, raio);
-    
+
     if (distSq(pos, alvo) < raio*raio) {
       println("ROBO: Robo " + index + " isNear = true");
       return true;

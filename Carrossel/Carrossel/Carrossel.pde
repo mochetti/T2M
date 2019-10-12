@@ -124,7 +124,7 @@ void setup() {
   frameRate(30);
   if (inputVideo == 0) {
     printArray(Serial.list());
-    myPort = new Serial(this, Serial.list()[0], 115200);
+    myPort = new Serial(this, Serial.list()[3], 115200);
     camConfig();
   }
 }

@@ -72,10 +72,10 @@ boolean track() {
     //println("VISÃO: size old blobs: " + oldBlobs.size());
     for (Blob b : oldBlobs) {
       if (b.id >= 0) {
-        
+
         // Limpa as coordenadas do blob
         b.reset();
-        
+
         if (!search(b)) println("VISÃO: O objeto não está no campo");
       }
     }
@@ -162,7 +162,7 @@ boolean search (Blob b) {
     offset.x = int(oldRobos.get(relacaoBlobRobo[b.id]).pos.x);
     offset.y = int(oldRobos.get(relacaoBlobRobo[b.id]).pos.y);
     angOff = oldRobos.get(relacaoBlobRobo[b.id]).ang;
-    
+
     //println(offset);
   }
 
@@ -183,7 +183,7 @@ boolean search (Blob b) {
       color currentColor = 0;
       if (inputVideo == 0) currentColor = cam.pixels[loc];
       else if (inputVideo == 2) currentColor = get(x, y);
-      
+
       // Compara as cores
       if (filtroCor(currentColor) && msmCor(currentColor, cores[b.cor])) {
         b.add(x, y);
@@ -191,8 +191,9 @@ boolean search (Blob b) {
       }
     }
   }
-  
+
   noFill();
+  rectMode(CORNER);
   rect(-raioBusca, -raioBusca, 2*raioBusca, 2*raioBusca);
   popMatrix();
 
@@ -394,7 +395,9 @@ PVector velBola() {
   // Espera colher dados o suficiente
   if (rastro.size() < 14) return null;
   // Coordenadas
-  PVector bolaAtual = new PVector(blobs.get(0).center().x, blobs.get(0).center().y);
+  PVector bolaAtual = new PVector();
+  if (inputVideo == 0) bolaAtual = new PVector(blobs.get(0).center().x, blobs.get(0).center().y);
+  else if (inputVideo == 2) bolaAtual = bolaV.pos;
 
   // Mostra o rastro na tela
   //for(int i = 0; i < rastro.size()-1; i++) ellipse(rastro.get(i).x, rastro.get(i).y, 15, 15);
@@ -637,7 +640,21 @@ void dimensionaCampo(int x, int y) {
  return count;
  }
  */
-
+boolean isInsride(PVector pos, PShape input) {
+  int i, j;
+  boolean c = false;
+  PShape forma = createShape();
+  forma.beginShape();
+  forma.vertex(input.getChild(0).getVertex(0).x, input.getChild(0).getVertex(0).y);
+  forma.endShape(CLOSE);
+  int sides = 4;          // descobrir como contar os lados de um PShape do tipo GROUP
+  for (i=0, j=sides-1; i<sides; j=i++) {
+    if (( ((forma.getVertex(i).y <= pos.y) && (pos.y < forma.getVertex(j).y)) || ((forma.getVertex(j).y <= pos.y) && (pos.y < forma.getVertex(i).y))) && (pos.x < (forma.getVertex(j).x - forma.getVertex(i).x) * (pos.y - forma.getVertex(i).y) / (forma.getVertex(j).y - forma.getVertex(i).y) + forma.getVertex(i).x)) {
+      c = !c;
+    }
+  }
+  return c;
+}
 boolean isInside(PVector objeto, PShape forma) {
   if (objeto.x >= forma.getVertex(0).x && objeto.x <= forma.getVertex(2).x && objeto.y >= forma.getVertex(0).y && objeto.y <= forma.getVertex(2).y) {
     println("VISAO: ISINSIDE() - TRUE");

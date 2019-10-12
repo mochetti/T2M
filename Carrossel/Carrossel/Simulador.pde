@@ -144,6 +144,7 @@ class Bola {
   }
 
   void atualiza() {
+    // precisa de um valor minimo, caso contrario ela só "tende" a zero
     if (vel.mag() < 0.05) vel.set(0, 0);
     vel.add(acc);
     pos.add(vel);
@@ -152,10 +153,25 @@ class Bola {
     if (pos.x < 0 || pos.x > width) vel = new PVector(-vel.x, vel.y);
     if (pos.y < 0 || pos.y > height) vel = new PVector(vel.x, -vel.y);
 
-    for (int i=0; i<robos.size(); i++) {
-      //if (isInside(bola, robos.get(i).corpo)) ;
+    // colisoes
+    for (int i=0; i<robosSimulados.size(); i++) {
+      if (isInside(bolaV.pos, robosSimulados.get(i).corpo)) {
+        println("SIMULADOR: choque com o robo " + robosSimulados.get(i).index);
+        float angBola = atan(velBola().y / velBola().x);
+        float dAng = PVector.angleBetween(velBola(), robosSimulados.get(i).pos);
+        dAng *= 2;
+        float magAnt = vel.mag();
+        vel.set(cos(angBola) + cos(dAng), sin(angBola) + sin(dAng));
+        vel.setMag(magAnt);
+      }
       // rebate e aumenta a velocidade
     }
+  }
+
+  // retorna o vetor direçao da bola
+  PVector getDir() {
+    PVector dir = new PVector();
+    return dir;
   }
 
   void display() {
