@@ -141,16 +141,20 @@ void draw() {
   tempo = millis();
   if (inputVideo == 0) image(cam, 0, 0);
   else if  (inputVideo == 2) simulador();
-  noFill();
+  //noFill();
   stroke(255);
   if (isCampoDimensionado) {
     // Mostra o campo na tela
+
     shape(shapeCampo);
     shape(shapeCampo.getChild(0));
     shape(shapeCampo.getChild(1));
     // Mostra os gols
     golInimigo = new PVector((shapeCampo.getVertex(1).x + shapeCampo.getVertex(2).x) /2, (shapeCampo.getVertex(1).y+shapeCampo.getVertex(2).y) / 2);
     golAmigo = new PVector((shapeCampo.getVertex(0).x + shapeCampo.getVertex(3).x) /2, (shapeCampo.getVertex(0).y+shapeCampo.getVertex(3).y) / 2);
+
+    fill(color(0));
+
     ellipse(golAmigo.x, golAmigo.y, 20, 20);
     ellipse(golInimigo.x, golInimigo.y, 20, 20);
 

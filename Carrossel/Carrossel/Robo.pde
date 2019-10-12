@@ -249,13 +249,18 @@ class Robo {
       verde = createShape(RECT, -lado/2, 0, lado, lado/2);
       break;
     }
-    
+
+
+
     vermelho.setFill(color(255, 0, 0));
     verde.setFill(color(0, 255, 0));
     fundo.setFill(color(0));
     corpo.addChild(fundo);
     corpo.addChild(verde);
     corpo.addChild(vermelho);
+  }
+
+  void display() {
 
     corpo.translate(pos.x, pos.y);
     corpo.rotate(ang + PI/2);

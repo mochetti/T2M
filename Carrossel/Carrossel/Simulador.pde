@@ -14,6 +14,15 @@ void simulador() {
     robosSimulados.add(new Robo(100, 300, 2));
   }
 
+  // mostra na tela
+  robosSimulados.get(0).simula();
+  robosSimulados.get(1).simula();
+  robosSimulados.get(2).simula();
+  robosSimulados.get(0).display();
+  robosSimulados.get(1).display();
+  robosSimulados.get(2).display();
+
+
   // simula a bola
   // chute inicial
   if (bolaV.pos.x == 0 && bolaV.pos.y == 0) {
@@ -35,8 +44,10 @@ void simulador() {
   //println("acc = " + bolaV.acc);
   //println("vel = " + bolaV.vel);
 
+  //NAO MEXER
   bolaV.atualiza();
   bolaV.display();
+  //////
 
   // atribui o vetor velocidade e angulo
   if (simManual) {
@@ -56,26 +67,30 @@ void simulador() {
   //println("SIMULADOR: goleiro.vel = " + goleiro.vel);
   //println("SIMULADOR: goleiro.pos = " + goleiro.pos);
 
-  // mostra na tela
-  robosSimulados.get(0).simula();
-  robosSimulados.get(1).simula();
-  robosSimulados.get(2).simula();
-} 
+  //// mostra na tela
+  //robosSimulados.get(0).display();
+  //robosSimulados.get(1).display();
+  //robosSimulados.get(2).display();
+  //bolaV.atualiza();
+  //bolaV.display();
+}
+
+
 
 // devolve o vetor velocidade
 PVector simulaVel (Robo r) {
   PVector vel = new PVector();
-
+  int v = 5;
   // usando como entrada as setas do teclado
   if (simManual) {
     if (!keyPressed) r.setVel(new PVector(0, 0));
     else if (key == CODED) {
       if (keyCode == UP) {
         //println("SIMULADOR: frente");
-        vel = new PVector(cos(r.ang), sin(r.ang));
+        vel = new PVector(cos(r.ang)*v, sin(r.ang)*v);
       } else if (keyCode == DOWN) {
         //println("SIMULADOR: trás");
-        vel = new PVector(-cos(r.ang), -sin(r.ang));
+        vel = new PVector(-cos(r.ang)*v, -sin(r.ang)*v);
       }
     }
   }
