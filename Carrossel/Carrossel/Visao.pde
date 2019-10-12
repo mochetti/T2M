@@ -656,10 +656,10 @@ boolean isInsride(PVector pos, PShape input) {
   return c;
 }
 boolean isInside(PVector objeto, PShape forma) {
-  if (objeto.x >= forma.getVertex(0).x && objeto.x <= forma.getVertex(2).x && objeto.y >= forma.getVertex(0).y && objeto.y <= forma.getVertex(2).y) {
-    println("VISAO: ISINSIDE() - TRUE");
-    return true;
-  } 
+  //if (objeto.x >= forma.getVertex(0).x && objeto.x <= forma.getVertex(2).x && objeto.y >= forma.getVertex(0).y && objeto.y <= forma.getVertex(2).y) {
+  //  println("VISAO: ISINSIDE() - TRUE");
+  //  return true;
+  //} 
   return false;
 }
 

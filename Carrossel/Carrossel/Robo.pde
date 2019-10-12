@@ -214,15 +214,21 @@ class Robo {
 
   // desenha o robo no simulador
   void simula() {
+    // lado do robo em pixels
+    int lado = 35;
+    rectMode(CORNER);
     // PShape
     corpo = createShape(GROUP);
     PShape vermelho = createShape();
     PShape verde = createShape();
+    PShape fundo = createShape();
+    fundo.beginShape();
+    fundo.vertex(-lado/2, -lado/2);
+    fundo.vertex(lado/2, -lado/2);
+    fundo.vertex(lado/2, lado/2);
+    fundo.vertex(-lado/2, lado/2);
+    fundo.endShape(CLOSE);
 
-    // lado do robo em pixels
-    int lado = 35;
-
-    rectMode(CORNER);
 
     switch(index) {
       // goleiro
@@ -246,6 +252,8 @@ class Robo {
     
     vermelho.setFill(color(255, 0, 0));
     verde.setFill(color(0, 255, 0));
+    fundo.setFill(color(0));
+    corpo.addChild(fundo);
     corpo.addChild(verde);
     corpo.addChild(vermelho);
 
