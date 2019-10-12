@@ -139,11 +139,12 @@ void captureEvent(Capture c) {
 void draw() {
   //loadPixels();
   tempo = millis();
-  if (inputVideo == 0) image(cam, 0, 0);
-  else if  (inputVideo == 2) simulador();
+
   //noFill();
   stroke(255);
   if (isCampoDimensionado) {
+    if (inputVideo == 0) image(cam, 0, 0);
+    else if  (inputVideo == 2) simulador();
     // Mostra o campo na tela
 
     shape(shapeCampo);
