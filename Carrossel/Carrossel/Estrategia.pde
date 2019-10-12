@@ -4,7 +4,7 @@ PVector golAmigo = new PVector();
 void estrategia(Robo r, int n) {
   // Mudar para as coordenadas do gol inimigo
   noFill();
-  
+
   // Distancia que o robo pega pra empurrar a bola
   float distSombra = 50;
   // Distancia entre o X do goleiro e o X do centro do gol
@@ -27,9 +27,9 @@ void estrategia(Robo r, int n) {
   case 0:     // Goleiro segue o y da bola
     // Antes de qualquer coisa, checa se está perto da bola
     // Se estiver, gira no próprio eixo
-    if(r.isNear(bola)) {
+    if (r.isNear(bola)) {
       // Se estiver no campo inferior, gira anti horário
-      if(r.pos.y > height/2) {
+      if (r.pos.y > height/2) {
         println("ESTRATÉGIA: Gira anti horário");
         gira(r, false);
       }
@@ -42,7 +42,7 @@ void estrategia(Robo r, int n) {
       r.setObj(r.pos);
       return;
     }
-  
+
     // Mudar coordenada x para x da linha do gol 
     inter.x = golAmigo.x + distGoleiro;
     inter.y = blobs.get(0).center().y;
@@ -70,7 +70,7 @@ void estrategia(Robo r, int n) {
     if (sombra.y < shapeCampo.getVertex(0).y) sombra.y = shapeCampo.getVertex(0).y;
     if (sombra.x > shapeCampo.getVertex(2).x) sombra.x = shapeCampo.getVertex(2).x;
     if (sombra.y > shapeCampo.getVertex(2).y) sombra.y = shapeCampo.getVertex(2).y;
-    
+
 
 
     noFill();

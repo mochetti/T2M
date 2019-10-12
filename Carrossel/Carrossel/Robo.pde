@@ -290,7 +290,7 @@ class Robo {
 
     if (distSq(pos, alvo) < raio*raio) {
       println("ROBO: Robo " + index + " isNear = true");
-      return true;
+      return true;  
     }
     println("ROBO: Robo " + index + " isNear = false");
     return false;

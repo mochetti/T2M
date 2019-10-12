@@ -169,8 +169,11 @@ class Bola {
     if (pos.y < 0 || pos.y > height) vel = new PVector(vel.x, -vel.y);
 
     // colisoes
+    
     for (int i=0; i<robosSimulados.size(); i++) {
-      if (isInside(bolaV.pos, robosSimulados.get(i).corpo)) {
+
+
+      if (isInside(bolaV.pos, robosSimulados.get(i).corpo.getChild(0))) {
         println("SIMULADOR: choque com o robo " + robosSimulados.get(i).index);
         float angBola = atan(velBola().y / velBola().x);
         float dAng = PVector.angleBetween(velBola(), robosSimulados.get(i).pos);
