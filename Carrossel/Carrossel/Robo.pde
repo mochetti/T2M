@@ -22,6 +22,9 @@ class Robo {
   int v = 0;
   int index;
   PShape corpo;
+  // 0 = verde -> vermelho
+  // 1 = verde <- vermelho
+  boolean frente = false;
 
   Robo(int n) {
     index = n;
@@ -77,6 +80,11 @@ class Robo {
     else if (vD < -velMax) vD = -velMax;
     velE = vE;
     velD = vD;
+    if(frente) {
+      float aux = velE;
+      velE = -velD;
+      velD = -aux;
+    }
   }
 
   // Calcula o centro real do robo
@@ -126,6 +134,12 @@ class Robo {
 
   void setEstrategia(int n) {
     estrategia(this, n);
+    // muda a frente do robo se necessário
+    // Vetor robo -> obj
+    PVector robObj = new PVector();
+    robObj = PVector.sub(obj, getPos());
+    float dAng = PVector.angleBetween(robObj, getDir());
+    if(dAng > PI/2) frente = !frente;
   }
 
   // Retorna um vetor correspondente à direçao do robo
@@ -157,6 +171,8 @@ class Robo {
       //line(blobs.get(3).center().x, blobs.get(3).center().y, blobs.get(6).center().x, blobs.get(6).center().y);
       break;
     }
+    if (frente) ang += PI;
+
     while (ang > 2*PI) ang -= 2*PI;
     while (ang < -2*PI) ang += 2*PI;
 
