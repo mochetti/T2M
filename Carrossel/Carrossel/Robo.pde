@@ -6,6 +6,8 @@ class Robo {
   boolean atingiuSombra = false;
   boolean proximoDaBola = false;
 
+  boolean isBolaNoMeio = false;
+
   PVector pos = new PVector(), posAnt, vel, obj, objAnt;
   float ang = 0, angAnt = 0, angObj = -1;
   // Armazena o erro no valor do angulo do frame anterior
@@ -80,7 +82,7 @@ class Robo {
     else if (vD < -velMax) vD = -velMax;
     velE = vE;
     velD = vD;
-    if(frente) {
+    if (frente) {
       float aux = velE;
       velE = -velD;
       velD = -aux;
@@ -139,7 +141,7 @@ class Robo {
     PVector robObj = new PVector();
     robObj = PVector.sub(obj, getPos());
     float dAng = PVector.angleBetween(robObj, getDir());
-    if(dAng > PI/2) frente = !frente;
+    //if (dAng > PI/2) frente = !frente;
   }
 
   // Retorna um vetor correspondente à direçao do robo
@@ -189,7 +191,7 @@ class Robo {
 
     objAnt = obj;
 
-    if (isNear(bola)) {
+    if (isNear(bola, 40)) {
       proximoDaBola = true;
       wasNearBola = true;
     } else {
@@ -200,9 +202,9 @@ class Robo {
 
     switch(index) {
     case 0:
-      velEmin = 4;
-      velDmin = 4;
-      kP = 0.4;
+      velEmin = 3;
+      velDmin = 3;
+      kP = 0.25;
       break;
     case 1:
       velEmin = 4;
@@ -283,16 +285,31 @@ class Robo {
     shape(corpo);
   }
 
-  boolean isNear(PVector alvo) {
-    int raio = 40;
+  boolean isXNoMeio(PVector objetivo) {
+
+    float distRoboObj = distSq(pos, objetivo);
+    float distRoboBola = distSq(pos, bolaV.pos);
+    //println(distRoboObj);
+    //println(distRoboBola);
+
+    if (isNear(bola, 80) && distRoboObj > distRoboBola) {
+      println("ROBO " + index + ": PERTO DA BOLA, CONTORNA");
+      isBolaNoMeio = true;
+      return true;
+    } 
+    return false;
+  }
+
+  boolean isNear(PVector alvo, int tolerancia) {
+    int raio = tolerancia;
     noFill();
     ellipse(pos.x, pos.y, raio, raio);
 
-    if (distSq(pos, alvo) < raio*raio) {
-      println("ROBO: Robo " + index + " isNear = true");
-      return true;  
+    if (distSq(pos, alvo) < tolerancia*tolerancia) {
+      //println("ROBO: Robo " + index + " isNear = true");
+      return true;
     }
-    println("ROBO: Robo " + index + " isNear = false");
+    //println("ROBO: Robo " + index + " isNear = false");
     return false;
   }
 }

@@ -79,7 +79,7 @@ double antes = millis();
 
 
 // Propriedades do campo
-int Y_AREA = 200;
+int Y_AREA = 120;
 
 // define o campo como dois pontos
 //PVector shapeCampo.getVertex(0) = new PVector();
@@ -118,13 +118,13 @@ void setup() {
 
   //mov.frameRate(30);
   ellipseMode(RADIUS);
-  size(800, 448);
+  size(640, 480);
 
   frame.removeNotify();
   frameRate(30);
   if (inputVideo == 0) {
     printArray(Serial.list());
-    myPort = new Serial(this, Serial.list()[3], 115200);
+    myPort = new Serial(this, Serial.list()[0], 115200);
     camConfig();
   }
 }
@@ -139,12 +139,12 @@ void captureEvent(Capture c) {
 void draw() {
   //loadPixels();
   tempo = millis();
-
+  if (inputVideo == 0) image(cam, 0, 0);
   //noFill();
   stroke(255);
   if (isCampoDimensionado) {
-    if (inputVideo == 0) image(cam, 0, 0);
-    else if  (inputVideo == 2) simulador();
+
+    if  (inputVideo == 2) simulador();
     // Mostra o campo na tela
 
     shape(shapeCampo);

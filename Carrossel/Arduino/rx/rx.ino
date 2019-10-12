@@ -3,7 +3,7 @@
 
 /* ------------ Declarações Relacionadas ao Robo que terá este código gravodo ----------- */
 /* Define qual robo é esse (valores possíveis: 0, 1 ou 2) */
-const byte NUM_ROBO = 1;
+const byte NUM_ROBO = 2;
 
 /* Somamos 1 no inicio pois o primeiro elemento do buffer é fixo, nomalmente 0x80. */
 const int INDEX_RODA_ESQ = 1 + 2 * NUM_ROBO; /* index da roda esquerda no array rxBuffer. */

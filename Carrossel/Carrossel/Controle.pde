@@ -38,7 +38,7 @@ void alinha(Robo r, float ang) {
   float angRobo = r.getAng();
 
   if (ang - angRobo > 0 && ang - angRobo < PI) {
-    println("CONTROLE: Gira horário");
+    //println("CONTROLE: Gira horário");
     gira(r, true);
   } else if (ang - angRobo > PI) {
     println("CONTROLE: Gira anti horário");
@@ -82,7 +82,7 @@ void alinhaGoleiro(Robo r) {
     // Verifica se está dentro da tolerancia
     if (abs(r.ang - r.angObj) < radians(tolAng)) r.setVel(0, 0);
     // Se não estiver, alinha
-    else alinhaP(r, r.angObj);
+    //else alinhaP(r, r.angObj);
     return;
   }
   // Vetor robo -> obj

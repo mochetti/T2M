@@ -27,7 +27,7 @@ void estrategia(Robo r, int n) {
   case 0:     // Goleiro segue o y da bola
     // Antes de qualquer coisa, checa se está perto da bola
     // Se estiver, gira no próprio eixo
-    if (r.isNear(bola)) {
+    if (r.isNear(bola, 40)) {
       // Se estiver no campo inferior, gira anti horário
       if (r.pos.y > height/2) {
         println("ESTRATÉGIA: Gira anti horário");
@@ -71,7 +71,10 @@ void estrategia(Robo r, int n) {
     if (sombra.x > shapeCampo.getVertex(2).x) sombra.x = shapeCampo.getVertex(2).x;
     if (sombra.y > shapeCampo.getVertex(2).y) sombra.y = shapeCampo.getVertex(2).y;
 
-
+    if(r.isXNoMeio(sombra)){
+      if(sombra.y > height/2) sombra.y = sombra.y - 60;
+      else sombra.y = sombra.y + 60;
+    }
 
     noFill();
     stroke(255);
@@ -79,7 +82,7 @@ void estrategia(Robo r, int n) {
     //line(sombra.x, sombra.y, golInimigo.x, golInimigo.y);
     arrow(sombra.x, sombra.y, bola.x, bola.y);
 
-    print(shapeCampo.getChild(0));
+
     if (isInside(r.pos, shapeCampo.getChild(0))) {
     }
 
@@ -93,6 +96,7 @@ void estrategia(Robo r, int n) {
     //}
     // Verifica se o robo esta perto o suficiente da sombra
     if (distSq(r.pos.x, r.pos.y, sombra.x, sombra.y) < 15*15) {
+      r.isBolaNoMeio = false;
       r.atingiuSombra = true;
       r.setObj(bola);
     } else if (!r.atingiuSombra) {
