@@ -60,6 +60,10 @@ void simulador() {
   robosSimulados.get(0).simula();
   robosSimulados.get(1).simula();
   robosSimulados.get(2).simula();
+  
+  //bolaV.atualiza();
+  //bolaV.display();
+  
 } 
 
 // devolve o vetor velocidade

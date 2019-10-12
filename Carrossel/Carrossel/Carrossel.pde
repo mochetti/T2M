@@ -263,7 +263,8 @@ void keyPressed() {
 
   //MOVIE
   if (key == ' ') {
-    bolaV.vel.set(5, 5);
+    // chute aleatorio na bola
+    bolaV.vel.set(random(10)-5, random(10)-5);
     if (pausado) {
       //mov.play();
       pausado = false;
