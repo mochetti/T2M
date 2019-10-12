@@ -79,14 +79,8 @@ void estrategia(Robo r, int n) {
     //line(sombra.x, sombra.y, golInimigo.x, golInimigo.y);
     arrow(sombra.x, sombra.y, bola.x, bola.y);
 
-    if (r.isNear(bola) && isInside(r.pos, shapeCampo.getChild(0))) {
-      gira(r, true);
-      return;
-    }
-    if (r.isNear(bola) && isInside(r.pos, shapeCampo.getChild(1))) {
-      gira(r, false);
-      return;
-    }
+    
+    
     // Verifica se o robo esta perto o suficiente da sombra
     if (distSq(r.pos.x, r.pos.y, sombra.x, sombra.y) < 15*15) {
       r.atingiuSombra = true;
