@@ -58,8 +58,6 @@ int[] corAchada = {0, 0, 0};
 boolean track() {
   // limpa as cores encontradas
   for (int i=0; i<corAchada.length; i++) corAchada[i] = 0;
-  // raio de busca em relacao à ultima posicao de cada blob
-  int raioBusca = 10;
 
   // Verifica se há blobs salvos
   if (oldBlobs.size() == 0) {
@@ -74,28 +72,11 @@ boolean track() {
     //println("VISÃO: size old blobs: " + oldBlobs.size());
     for (Blob b : oldBlobs) {
       if (b.id >= 0) {
-        //println("VISÃO: Buscando blob " + b.id);
-        // Salva as coordenadas anteriores do blob
-        //println("id = " + b.id);
-        //println("x = " + b.center().x);
-        //println("y = " + b.center().y);
-        int prevX = int(b.center().x);
-        int prevY = int(b.center().y);
+
         // Limpa as coordenadas do blob
         b.reset();
-        //println("x = " + prevX);
-        //println("y = " + prevY);
-        // Tenta buscar por perto
-        int xi = prevX - raioBusca;
-        if (xi < shapeCampo.getVertex(0).x) xi = int(shapeCampo.getVertex(0).x);
-        int xf = prevX + raioBusca;
-        if (xf > shapeCampo.getVertex(2).x) xf = int(shapeCampo.getVertex(2).x);
-        int yi = prevY - raioBusca;
-        if (yi < shapeCampo.getVertex(0).y) yi = int(shapeCampo.getVertex(0).y);
-        int yf = prevY + raioBusca;
-        if (yf > shapeCampo.getVertex(2).y) yf = int(shapeCampo.getVertex(2).y);
 
-        if (!search(xi, xf, yi, yf, b)) println("VISÃO: O objeto não está no campo");
+        if (!search(b)) println("VISÃO: O objeto não está no campo");
       }
     }
   }
@@ -166,29 +147,55 @@ float distColorSq(color c1, color c2) {
 }
 
 // Checa se o blob está na área desejada
-boolean search (int xi, int xf, int yi, int yf, Blob b) {
+boolean search (Blob b) {
+  // raio de busca em relacao à ultima posicao de cada blob
+  int raioBusca = 20;
   // Contagem de pixels por blob
   int count = 0;
+  // offset 
+  PVector offset = new PVector();
+  float angOff = 0;
+  // relacao blob - robo
+  int[] relacaoBlobRobo = {-1, 0, 1, 2, 0, 1, 2};
+  if (b.id == 0) offset = bola;
+  else {
+    offset.x = int(oldRobos.get(relacaoBlobRobo[b.id]).pos.x);
+    offset.y = int(oldRobos.get(relacaoBlobRobo[b.id]).pos.y);
+    angOff = oldRobos.get(relacaoBlobRobo[b.id]).ang;
+
+    //println(offset);
+  }
+
+  // nao precisa dar popMatrix() agora pq nao afeta o array cam.pixels[]
+  pushMatrix();
+  translate(offset.x, offset.y);
+  rotate(angOff);
+
+  //println("VISAO: buscando blob " + b.id + " em " + offset);
+
   // Procura nas coordenadas dadas
-  for (int x = xi; x < xf; x++ ) {
-    for (int y = yi; y < yf; y++ ) {
-      int loc = x + y * cam.width;
-      //int loc = x + y * width;
-      // What is current color
-      color currentColor = cam.pixels[loc];
-      //color currentColor = pixels[loc];
+  for (int x = int(offset.x) - raioBusca; x < int(offset.x) + raioBusca; x++ ) {
+    for (int y = int(offset.y) -raioBusca; y < int(offset.y) + raioBusca; y++ ) {
+      // posicao no array de pixels da camera
+      int loc = 0;
+      if (inputVideo == 0) loc = int( x + y * cam.width);
+      // cor do pixel atual
+      color currentColor = 0;
+      if (inputVideo == 0) currentColor = cam.pixels[loc];
+      else if (inputVideo == 2) currentColor = get(x, y);
 
       // Compara as cores
       if (filtroCor(currentColor) && msmCor(currentColor, cores[b.cor])) {
         b.add(x, y);
         count++;
-        // Debug
-        //stroke(255);
-        //strokeWeight(1);
-        //point(x, y);
       }
     }
   }
+
+  noFill();
+  rectMode(CORNER);
+  rect(-raioBusca, -raioBusca, 2*raioBusca, 2*raioBusca);
+  popMatrix();
 
   // Projeta a area de busca
   //stroke(0);
@@ -212,11 +219,14 @@ int searchNew (int c) {
   // Procura por todo o campo
   for (int x = int(shapeCampo.getVertex(0).x); x < shapeCampo.getVertex(2).x; x++ ) {
     for (int y = int(shapeCampo.getVertex(0).y); y < shapeCampo.getVertex(2).y; y++ ) {
-      int loc = x + y * cam.width;
+      int loc = 0;
+      if  (inputVideo == 0) loc = x + y * cam.width;
+
       //int loc = x + y * width;
       // What is current color
-      color currentColor = cam.pixels[loc];
-      //color currentColor = pixels[loc];
+      color currentColor = 0;
+      if (inputVideo == 0) currentColor = cam.pixels[loc];
+      else if (inputVideo == 2) currentColor = get(x, y);
 
       // Compara as cores
       if (filtroCor(currentColor) && msmCor(currentColor, cores[c])) {
@@ -385,7 +395,9 @@ PVector velBola() {
   // Espera colher dados o suficiente
   if (rastro.size() < 14) return null;
   // Coordenadas
-  PVector bolaAtual = new PVector(blobs.get(0).center().x, blobs.get(0).center().y);
+  PVector bolaAtual = new PVector();
+  if (inputVideo == 0) bolaAtual = new PVector(blobs.get(0).center().x, blobs.get(0).center().y);
+  else if (inputVideo == 2) bolaAtual = bolaV.pos;
 
   // Mostra o rastro na tela
   //for(int i = 0; i < rastro.size()-1; i++) ellipse(rastro.get(i).x, rastro.get(i).y, 15, 15);
@@ -449,10 +461,7 @@ boolean filtroCor(color c) {
   int bgHValue = 100;
   int difLimit = 50;
 
-
   //É fundo ou não
-
-
 
   // é fundo se as tres componentes forem menor q bgLimit
   boolean back = (red(c) < bgLimit && green(c) < bgLimit && blue(c) < bgLimit) || brightness(c) < 100;
@@ -477,7 +486,6 @@ void calibra() {
   float menorB = 255;
   float maiorB = 0;
 
-  ellipse(mouseX, mouseY, raio, raio);
   int r = 0, g = 0, b = 0;
   int quantidade = 0;
   int xi = mouseX - raio;
@@ -493,11 +501,14 @@ void calibra() {
   //BUSCA AO REDOR DO CLIQUE COM RAIO DE 5 pixels
   for (int x = xi; x < xf; x++) {
     for (int y = yi; y < yf; y++) {
-      int loc = x + y * cam.width;
-      //int loc = x + y * width;
-      // What is current color
-      color currentColor = cam.pixels[loc];
-      //color currentColor = pixels[loc];
+      int loc = 0;
+      if (inputVideo == 0) loc = x + y * cam.width;
+
+      // cor do pixel atual
+      color currentColor = 0;
+      if (inputVideo == 0) currentColor = cam.pixels[loc];
+      else if (inputVideo == 2) currentColor = get(x, y);
+
       // Verifica se é colorido
       if (filtroCor(currentColor)) {
         quantidade++;
@@ -514,6 +525,8 @@ void calibra() {
         if (blue(currentColor) < menorB) menorB = blue(currentColor);
         if (blue(currentColor) > maiorB) maiorB = blue(currentColor);
       }
+      //fill(255);
+      //point(x, y);
     }
   }
   //Depois de rodar a área, se a quantidade de pixels for maior que 10
@@ -566,6 +579,7 @@ void calibra() {
 
 // Dimensiona o campo
 void dimensionaCampo(int x, int y) {
+
   // dimensiona o campo como quatro pontos
 
   shapeCampo.setStroke(255);
@@ -626,9 +640,23 @@ void dimensionaCampo(int x, int y) {
  return count;
  }
  */
-
+boolean isInsride(PVector pos, PShape input) {
+  int i, j;
+  boolean c = false;
+  PShape forma = createShape();
+  forma.beginShape();
+  forma.vertex(input.getChild(0).getVertex(0).x, input.getChild(0).getVertex(0).y);
+  forma.endShape(CLOSE);
+  int sides = 4;          // descobrir como contar os lados de um PShape do tipo GROUP
+  for (i=0, j=sides-1; i<sides; j=i++) {
+    if (( ((forma.getVertex(i).y <= pos.y) && (pos.y < forma.getVertex(j).y)) || ((forma.getVertex(j).y <= pos.y) && (pos.y < forma.getVertex(i).y))) && (pos.x < (forma.getVertex(j).x - forma.getVertex(i).x) * (pos.y - forma.getVertex(i).y) / (forma.getVertex(j).y - forma.getVertex(i).y) + forma.getVertex(i).x)) {
+      c = !c;
+    }
+  }
+  return c;
+}
 boolean isInside(PVector objeto, PShape forma) {
-  if (objeto.x >= forma.getVertex(0).x && objeto.x <= forma.getVertex(2).x && objeto.y >= forma.getVertex(0).y && objeto.y <= forma.getVertex(2).y) {
+  if (objeto.x >= forma.getChild(0).getVertex(0).x && objeto.x <= forma.getChild(0).getVertex(2).x && objeto.y >= forma.getChild(0).getVertex(0).y && objeto.y <= forma.getChild(0).getVertex(2).y) {
     println("VISAO: ISINSIDE() - TRUE");
     return true;
   } 

@@ -7,6 +7,7 @@ byte velViagem = 30;
 
 // Alinha e anda
 void alinhaAnda(Robo r) {
+  if(r.obj == r.pos) return;
   // Vetor robo -> obj
   PVector robObj = new PVector();
   robObj = r.obj.sub(r.getPos());
@@ -23,8 +24,7 @@ void alinhaAnda(Robo r) {
     println("CONTROLE: Anda reto");
     //r.velE = r.velEmin;
     //r.velD = r.velDmin;
-    r.velE = r.velMax;
-    r.velD = r.velMax;
+    r.setVel(r.velMax, r.velMax);
   } else {
     // Alinha
     alinhaP(r, ang);
@@ -100,8 +100,7 @@ void alinhaGoleiro(Robo r) {
   if (dAng < radians(tolAng)) {
     // Anda reto
     println("CONTROLE: Anda reto");
-    r.velE = r.velMax;
-    r.velD = r.velMax;
+    r.setVel(r.velMax, r.velMax);
   } else {
     // Alinha
     alinhaP(r, ang);
@@ -130,11 +129,9 @@ void alinhaGoleiro(Robo r) {
 // sentido false : gira anti horário
 void gira(Robo r, boolean sentido) {
   if (sentido) {
-    r.velD = -r.velMax;
-    r.velE = r.velMax;
+    r.setVel(r.velMax, -r.velMax);
   } else {
-    r.velD = r.velMax;
-    r.velE = -r.velMax;
+    r.setVel(-r.velMax, r.velMax);
   }
 }
 

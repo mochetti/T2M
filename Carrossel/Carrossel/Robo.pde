@@ -1,12 +1,12 @@
 // Classe que gerencia os robos
 
 class Robo {
-  
+
   boolean wasNearBola = false;
   boolean atingiuSombra = false;
   boolean proximoDaBola = false;
-  
-  PVector pos = new PVector(), posAnt, vel, obj;
+
+  PVector pos = new PVector(), posAnt, vel, obj, objAnt;
   float ang = 0, angAnt = 0, angObj = -1;
   // Armazena o erro no valor do angulo do frame anterior
   // É propriedade da classe robo para evitar multiplas variaveis globais
@@ -21,6 +21,10 @@ class Robo {
   float kP;
   int v = 0;
   int index;
+  PShape corpo;
+  // 0 = verde -> vermelho
+  // 1 = verde <- vermelho
+  boolean frente = false;
 
   Robo(int n) {
     index = n;
@@ -35,20 +39,52 @@ class Robo {
     vel = r.vel;
     ang = r.ang;
     index = r.index;
+    wasNearBola = r.wasNearBola;
+    atingiuSombra = r.atingiuSombra;
+    proximoDaBola = r.proximoDaBola;
+    angAnt = r.angAnt;
+    obj = r.obj;
+    objAnt = r.objAnt;
   }
 
+  // construtor usado pelo simulador
+  Robo(float x, float y, int n) {
+    pos.x = x;
+    pos.y = y;
+    index = n;
+    vel = new PVector();
+  }
+
+  Robo clone() {
+    Robo r = new Robo(this);
+    return r;
+  }
+
+  // define o angulo do robo
+  // criado para a simulacao - cuidado ao usar
+  void setAng(float income) {
+    ang = income;
+  }
+
+  // define como vetor velocidade
   void setVel(PVector income) {
     vel = income;
   }
+  // define a velocidade das rodas
   void setVel(float vE, float vD) {
     // Verifica se as velocidades estão dentro dos limites estabelecidos
-    // Os ajustes para velocidade negativa é feito direto na serial
+    // O ajuste para velocidade negativa é feito direto na serial
     if (vE > velMax) vE = velMax;
     else if (vE < -velMax) vE = -velMax;
     if (vD > velMax) vD = velMax;
     else if (vD < -velMax) vD = -velMax;
     velE = vE;
     velD = vD;
+    if(frente) {
+      float aux = velE;
+      velE = -velD;
+      velD = -aux;
+    }
   }
 
   // Calcula o centro real do robo
@@ -57,7 +93,7 @@ class Robo {
     PVector posVerde = new PVector(blobs.get(index+1).center().x, blobs.get(index+1).center().y);
     PVector posVermelho = new PVector(blobs.get(index+4).center().x, blobs.get(index+4).center().y);
     switch(index) {
-    case 0:  // o centro é media aritmetica dos centros dos blobs
+    case 0:  // o centro é a media aritmética dos centros dos blobs
       centro.x = (posVerde.x + posVermelho.x) / 2;
       centro.y = (posVerde.y + posVermelho.y) / 2;
       break;
@@ -67,9 +103,11 @@ class Robo {
       centro.y = (posVerde.y + posVermelho.y) / 2;
       break;
 
-    case 2:  // o centro é deslocado
-      centro.x = (posVerde.x + posVermelho.x) / 2;
-      centro.y = (posVerde.y + posVermelho.y) / 2;
+    case 2:  // o centro é deslocado (esse cálculo é aproximado mas muito bom)
+      float distCentros = dist(posVerde.x, posVerde.y, posVermelho.x, posVermelho.y);
+      distCentros /= 2;
+      centro.x = (posVerde.x + cos(ang)*distCentros);
+      centro.y = (posVerde.y + sin(ang)*distCentros);
       break;
     }
 
@@ -96,6 +134,12 @@ class Robo {
 
   void setEstrategia(int n) {
     estrategia(this, n);
+    // muda a frente do robo se necessário
+    // Vetor robo -> obj
+    PVector robObj = new PVector();
+    robObj = PVector.sub(obj, getPos());
+    float dAng = PVector.angleBetween(robObj, getDir());
+    if(dAng > PI/2) frente = !frente;
   }
 
   // Retorna um vetor correspondente à direçao do robo
@@ -123,10 +167,12 @@ class Robo {
 
     case 2:    // vermelho na direita
       ang = atan2(- blobs.get(3).center().y + blobs.get(6).center().y, - blobs.get(3).center().x + blobs.get(6).center().x);
-      ang += atan(2) - PI/2;
+      ang -= atan(0.5);
       //line(blobs.get(3).center().x, blobs.get(3).center().y, blobs.get(6).center().x, blobs.get(6).center().y);
       break;
     }
+    if (frente) ang += PI;
+
     while (ang > 2*PI) ang -= 2*PI;
     while (ang < -2*PI) ang += 2*PI;
 
@@ -137,21 +183,22 @@ class Robo {
 
   // atualiza alguns parametros do robo
   void atualiza() {
-    Robo r = new Robo(this);
-    r.getAng();
-    r.getPos();
-    r.debugAng();
-    
-    if(isNear(bola)){
+    getAng();
+    getPos();
+    debugAng();
+
+    objAnt = obj;
+
+    if (isNear(bola)) {
       proximoDaBola = true;
       wasNearBola = true;
-    } else{
-      if(wasNearBola) atingiuSombra = false;
+    } else {
+      if (wasNearBola) atingiuSombra = false;
       proximoDaBola = false;
       wasNearBola = false;
     }
-    
-    switch(r.index) {
+
+    switch(index) {
     case 0:
       velEmin = 4;
       velDmin = 4;
@@ -178,16 +225,74 @@ class Robo {
   void debugObj() {
     arrow(pos.x, pos.y, obj.x, obj.y);
     fill(255, 0, 0);
-    ellipse(obj.x, obj.y, 10, 10);
+    ellipse(obj.x, obj.y, 5, 5);
+  }
+
+  // desenha o robo no simulador
+  void simula() {
+    // lado do robo em pixels
+    int lado = 35;
+    rectMode(CORNER);
+    // PShape
+    corpo = createShape(GROUP);
+    PShape vermelho = createShape();
+    PShape verde = createShape();
+    PShape fundo = createShape();
+    fundo.beginShape();
+    fundo.vertex(-lado/2, -lado/2);
+    fundo.vertex(lado/2, -lado/2);
+    fundo.vertex(lado/2, lado/2);
+    fundo.vertex(-lado/2, lado/2);
+    fundo.endShape(CLOSE);
+
+
+    switch(index) {
+      // goleiro
+    case 0:
+      vermelho = createShape(RECT, -lado/2, -lado/2, lado, lado/2);
+      verde = createShape(RECT, -lado/2, 0, lado, lado/2);
+      break;
+
+      // zagueiro (xadrez)
+    case 1:
+      vermelho = createShape(RECT, -lado/2, -lado/2, lado/2, lado/2);
+      verde = createShape(RECT, 0, 0, lado/2, lado/2);
+      break;
+
+      // atacante (L)
+    case 2:
+      vermelho = createShape(RECT, 0, -lado/2, lado/2, lado/2);
+      verde = createShape(RECT, -lado/2, 0, lado, lado/2);
+      break;
+    }
+
+
+
+    vermelho.setFill(color(255, 0, 0));
+    verde.setFill(color(0, 255, 0));
+    fundo.setFill(color(0));
+    corpo.addChild(fundo);
+    corpo.addChild(verde);
+    corpo.addChild(vermelho);
+  }
+
+  void display() {
+
+    corpo.translate(pos.x, pos.y);
+    corpo.rotate(ang + PI/2);
+    shape(corpo);
   }
 
   boolean isNear(PVector alvo) {
+    int raio = 40;
     noFill();
-    ellipse(pos.x, pos.y, 50, 50);
-    if (distSq(pos, alvo) < 50*50){
-      println("ROBO: ISNEAR TRUE");
-      return true; 
+    ellipse(pos.x, pos.y, raio, raio);
+
+    if (distSq(pos, alvo) < raio*raio) {
+      println("ROBO: Robo " + index + " isNear = true");
+      return true;
     }
+    println("ROBO: Robo " + index + " isNear = false");
     return false;
   }
 }

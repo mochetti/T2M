@@ -61,9 +61,11 @@ class Blob {
     ellipse((minx+maxx)/2, (miny+maxy)/2, 5, 5) ;
   }
   PVector center() {
+    
     PVector centro = new PVector();
     centro.x = (minx+maxx)/2;
     centro.y = (miny+maxy)/2;
+    
     return centro;
   }
 
@@ -85,7 +87,7 @@ class Blob {
  
   // Verifica se um ponto (x, y) está perto do blob
   boolean isNear(float px, float py) {
-    int distancia = 15;
+    int distancia = 25;
     // Coordenadas do centro
     float cx = (minx+maxx)/2;
     float cy = (miny+maxy)/2;
