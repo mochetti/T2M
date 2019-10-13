@@ -118,13 +118,13 @@ void setup() {
 
   //mov.frameRate(30);
   ellipseMode(RADIUS);
-  size(640, 480);
+  size(960, 540);
 
   frame.removeNotify();
   frameRate(30);
   if (inputVideo == 0) {
     printArray(Serial.list());
-    myPort = new Serial(this, Serial.list()[0], 115200);
+    myPort = new Serial(this, Serial.list()[3], 115200);
     camConfig();
   }
 }
@@ -143,7 +143,6 @@ void draw() {
   //noFill();
   stroke(255);
   if (isCampoDimensionado) {
-
     if  (inputVideo == 2) simulador();
     // Mostra o campo na tela
 
@@ -154,14 +153,16 @@ void draw() {
     golInimigo = new PVector((shapeCampo.getVertex(1).x + shapeCampo.getVertex(2).x) /2, (shapeCampo.getVertex(1).y+shapeCampo.getVertex(2).y) / 2);
     golAmigo = new PVector((shapeCampo.getVertex(0).x + shapeCampo.getVertex(3).x) /2, (shapeCampo.getVertex(0).y+shapeCampo.getVertex(3).y) / 2);
 
-    fill(color(0));
-
+    fill(0, 0);
     ellipse(golAmigo.x, golAmigo.y, 20, 20);
     ellipse(golInimigo.x, golInimigo.y, 20, 20);
 
     // Armazena as ultimas coordenadas de cada robo
     oldRobos.clear();
-    for (Robo r : robos) oldRobos.add(new Robo(r.clone()));
+    for (Robo r : robos) {
+      oldRobos.add(new Robo(r.clone()));
+      if(inputVideo == 2) robosSimulados.get(r.index).frente = r.frente;
+    }
     //robos.clear();
 
     // Armazena as ultimas coordenadas de cada blob
@@ -199,8 +200,9 @@ void draw() {
     }
     if (estrategia) {
       // Define as estratégias dos robos
-      robos.get(0).setEstrategia(0);
-      robos.get(1).setEstrategia(1);
+      //robos.get(0).setEstrategia(0);
+      //robos.get(1).setEstrategia(1);
+      robos.get(2).setEstrategia(0);
     }
     // Debug das estrategias
     for (int i=0; i<robos.size(); i++) {
@@ -210,8 +212,9 @@ void draw() {
     // Seleciona controle manual ou automatico para o robo 0
     if (gameplay) gameplay(robos.get(0));
     if (controle) {
-      alinhaGoleiro(robos.get(0));
-      alinhaAnda(robos.get(1));
+      alinhaGoleiro(robos.get(2));
+      //alinhaGoleiro(robos.get(2));
+      //alinhaAnda(robos.get(1));
       //alinha(robos.get(2));
     }
 

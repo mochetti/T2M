@@ -81,16 +81,18 @@ void simulador() {
 PVector simulaVel (Robo r) {
   PVector vel = new PVector();
   int v = 5;
+  int k = 1;
+  if(r.frente) k = -1;
   // usando como entrada as setas do teclado
   if (simManual) {
     if (!keyPressed) r.setVel(new PVector(0, 0));
     else if (key == CODED) {
       if (keyCode == UP) {
         //println("SIMULADOR: frente");
-        vel = new PVector(cos(r.ang)*v, sin(r.ang)*v);
+        vel = new PVector(k*cos(r.ang)*v, k*sin(r.ang)*v);
       } else if (keyCode == DOWN) {
         //println("SIMULADOR: trás");
-        vel = new PVector(-cos(r.ang)*v, -sin(r.ang)*v);
+        vel = new PVector(k*-cos(r.ang)*v, k*-sin(r.ang)*v);
       }
     }
   }
@@ -100,7 +102,7 @@ PVector simulaVel (Robo r) {
     if (robos.get(r.index).velE > 0 && robos.get(r.index).velD > 0) vel = new PVector(cos(r.ang), sin(r.ang));
     else if (robos.get(r.index).velE < 0 && robos.get(r.index).velD < 0) vel = new PVector(-cos(r.ang), -sin(r.ang));
   }
-
+  //println(vel);
   return vel;
 }
 

@@ -45,21 +45,25 @@ void estrategia(Robo r, int n) {
 
     // Mudar coordenada x para x da linha do gol 
     inter.x = golAmigo.x + distGoleiro;
-    inter.y = blobs.get(0).center().y;
+    inter.y = bola.y;
     if (inter.y > golAmigo.y + Y_AREA/2) inter.y = golAmigo.y + Y_AREA/2;
     if (inter.y < golAmigo.y - Y_AREA/2) inter.y = golAmigo.y - Y_AREA/2;
     //ellipse(inter.x, inter.y, 15, 15);
 
     // Checa se o goleiro já está perto do objetivo
-    if (distSq(r.pos, inter) < limiteDistGoleiro*limiteDistGoleiro) r.angObj = radians(90);
-    else r.angObj = -1;
+    if (distSq(r.pos, inter) < limiteDistGoleiro*limiteDistGoleiro) {
+
+      r.angObj = PI/2;
+      if (abs(r.ang - PI/2) > PI/2) r.angObj = PI;
+      println(degrees(r.ang - PI/2));
+    } else r.angObj = -1;
     r.setObj(inter);
 
     break;
 
   case 1:    // Empurra a bola pro gol através da sombra
     // Calcula a sombra da bola
-    float ang = atan2(golAmigo.y - blobs.get(0).center().y, golAmigo.x - blobs.get(0).center().x);
+    float ang = atan2(golAmigo.y - bola.y, golAmigo.x - bola.x);
     ang += PI;
     PVector sombra = new PVector();
     sombra.x = bola.x + distSombra * cos(ang);
@@ -71,8 +75,8 @@ void estrategia(Robo r, int n) {
     if (sombra.x > shapeCampo.getVertex(2).x) sombra.x = shapeCampo.getVertex(2).x;
     if (sombra.y > shapeCampo.getVertex(2).y) sombra.y = shapeCampo.getVertex(2).y;
 
-    if(r.isXNoMeio(sombra)){
-      if(sombra.y > height/2) sombra.y = sombra.y - 60;
+    if (r.isXNoMeio(sombra)) {
+      if (sombra.y > height/2) sombra.y = sombra.y - 60;
       else sombra.y = sombra.y + 60;
     }
 

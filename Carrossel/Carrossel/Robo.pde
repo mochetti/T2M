@@ -106,10 +106,12 @@ class Robo {
       break;
 
     case 2:  // o centro é deslocado (esse cálculo é aproximado mas muito bom)
+      float angulo = ang;
+      if(frente) angulo -= PI;
       float distCentros = dist(posVerde.x, posVerde.y, posVermelho.x, posVermelho.y);
       distCentros /= 2;
-      centro.x = (posVerde.x + cos(ang)*distCentros);
-      centro.y = (posVerde.y + sin(ang)*distCentros);
+      centro.x = (posVerde.x + cos(angulo)*distCentros);
+      centro.y = (posVerde.y + sin(angulo)*distCentros);
       break;
     }
 
@@ -141,7 +143,7 @@ class Robo {
     PVector robObj = new PVector();
     robObj = PVector.sub(obj, getPos());
     float dAng = PVector.angleBetween(robObj, getDir());
-    //if (dAng > PI/2) frente = !frente;
+    if (dAng > 6*PI/10) frente = !frente;
   }
 
   // Retorna um vetor correspondente à direçao do robo
@@ -207,9 +209,9 @@ class Robo {
       kP = 0.25;
       break;
     case 1:
-      velEmin = 4;
-      velDmin = 4;
-      kP = 0.22;
+      velEmin = 3;
+      velDmin = 3;
+      kP = 0.2;
       break;
     default:
       velEmin = 4;
@@ -268,8 +270,6 @@ class Robo {
       break;
     }
 
-
-
     vermelho.setFill(color(255, 0, 0));
     verde.setFill(color(0, 255, 0));
     fundo.setFill(color(0));
@@ -279,7 +279,6 @@ class Robo {
   }
 
   void display() {
-
     corpo.translate(pos.x, pos.y);
     corpo.rotate(ang + PI/2);
     shape(corpo);

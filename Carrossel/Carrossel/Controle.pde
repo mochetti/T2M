@@ -82,7 +82,7 @@ void alinhaGoleiro(Robo r) {
     // Verifica se está dentro da tolerancia
     if (abs(r.ang - r.angObj) < radians(tolAng)) r.setVel(0, 0);
     // Se não estiver, alinha
-    //else alinhaP(r, r.angObj);
+    else alinhaP(r, r.angObj);
     return;
   }
   // Vetor robo -> obj
