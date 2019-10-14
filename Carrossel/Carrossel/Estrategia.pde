@@ -13,8 +13,8 @@ void estrategia(Robo r, int n) {
   float aBola, bBola;
   // Raio de tolerancia para colisao
   int distColisao = 100;
-  // Raio de tolerancia pro goleiro alinhar quando estiver próximo ao objetivo
-  int limiteDistGoleiro = 20;
+  // Raio de tolerancia pra considerar que o robo chegou
+  int tolDist = 20;
 
   PVector velBola = velBola();
 
@@ -51,11 +51,11 @@ void estrategia(Robo r, int n) {
     //ellipse(inter.x, inter.y, 15, 15);
 
     // Checa se o goleiro já está perto do objetivo
-    if (distSq(r.pos, inter) < limiteDistGoleiro*limiteDistGoleiro) {
+    if (distSq(r.pos, inter) < tolDist*tolDist) {
 
       r.angObj = PI/2;
-      if (abs(r.ang - PI/2) > PI/2) r.angObj = PI;
-      println(degrees(r.ang - PI/2));
+      if (abs(r.ang - PI/2) > PI/2) r.angObj = 3*PI/2;
+      //println(degrees(r.ang - PI/2));
     } else r.angObj = -1;
     r.setObj(inter);
 
@@ -274,5 +274,16 @@ void estrategia(Robo r, int n) {
   case 5:
     r.setObj(mouseX, mouseY);
     break;
+
+  case 6:
+    if (r.index == 0) r.setObj(golAmigo.x + 100, golAmigo.y);
+    else if (r.index == 1) r.setObj(golAmigo.x + 100, golAmigo.y - 100);
+    else if (r.index == 2) r.setObj(golAmigo.x + 100, golAmigo.y + 100);  
+    // Checa se já está perto do objetivo
+    if (distSq(r.pos, r.obj) < tolDist*tolDist) {
+      r.angObj = 0;
+      if (abs(r.ang - PI/2) > PI/2) r.angObj = PI;
+      //println(degrees(r.ang - PI/2));
+    } else r.angObj = -1;
   }
 }

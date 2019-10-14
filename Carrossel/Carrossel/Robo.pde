@@ -107,7 +107,8 @@ class Robo {
 
     case 2:  // o centro é deslocado (esse cálculo é aproximado mas muito bom)
       float angulo = ang;
-      if(frente) angulo -= PI;
+      if (frente) angulo -= PI;
+      println("ROBO: angulo = " + degrees(angulo));
       float distCentros = dist(posVerde.x, posVerde.y, posVermelho.x, posVermelho.y);
       distCentros /= 2;
       centro.x = (posVerde.x + cos(angulo)*distCentros);
@@ -138,12 +139,6 @@ class Robo {
 
   void setEstrategia(int n) {
     estrategia(this, n);
-    // muda a frente do robo se necessário
-    // Vetor robo -> obj
-    PVector robObj = new PVector();
-    robObj = PVector.sub(obj, getPos());
-    float dAng = PVector.angleBetween(robObj, getDir());
-    if (dAng > 6*PI/10) frente = !frente;
   }
 
   // Retorna um vetor correspondente à direçao do robo
@@ -178,7 +173,7 @@ class Robo {
     if (frente) ang += PI;
 
     while (ang > 2*PI) ang -= 2*PI;
-    while (ang < -2*PI) ang += 2*PI;
+    while (ang < 0) ang += 2*PI;
 
     //println("ROBO: " + index + " ang = " + degrees(ang));
 
@@ -187,11 +182,22 @@ class Robo {
 
   // atualiza alguns parametros do robo
   void atualiza() {
+
+    objAnt = obj;
+
+    // muda a frente do robo se necessário
+    // Vetor robo -> obj
+    if (obj.mag() != 0) {
+      PVector robObj = new PVector();
+      robObj = PVector.sub(obj, pos);
+      float dAng = PVector.angleBetween(robObj, getDir());
+      if (dAng > 6*PI/10) frente = !frente;
+      //println("ROBO: robo " + index + " esta com a frente trocada");
+    }
+    
     getAng();
     getPos();
     debugAng();
-
-    objAnt = obj;
 
     if (isNear(bola, 40)) {
       proximoDaBola = true;
@@ -279,9 +285,11 @@ class Robo {
   }
 
   void display() {
+    pushMatrix();
     corpo.translate(pos.x, pos.y);
     corpo.rotate(ang + PI/2);
     shape(corpo);
+    popMatrix();
   }
 
   boolean isXNoMeio(PVector objetivo) {

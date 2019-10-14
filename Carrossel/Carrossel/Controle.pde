@@ -1,5 +1,5 @@
 // Tolerancia de diferença entre os angulos em graus
-float tolAng = 20;
+float tolAng = 10;
 // Velocidade inicial de giro
 //byte velGiro = 30;
 // Velocidade inicial para andar reto
@@ -7,10 +7,24 @@ byte velViagem = 30;
 
 // Alinha e anda
 void alinhaAnda(Robo r) {
+  
+  // Verifica se a bola está perto
+  //if (distSq(r.getPos(), bola) < 15*15) {
+  //  gira(r, true);
+  //  return;
+  //}
+
+  if (r.angObj != -1) {
+    // Verifica se está dentro da tolerancia
+    if (abs(r.ang - r.angObj) < radians(tolAng)) r.setVel(0, 0);
+    // Se não estiver, alinha
+    else alinhaP(r, r.angObj);
+    return;
+  }
   if(r.obj == r.pos) return;
   // Vetor robo -> obj
   PVector robObj = new PVector();
-  robObj = r.obj.sub(r.getPos());
+  robObj = PVector.sub(r.obj, r.pos);
   float ang = atan2(robObj.y, robObj.x);
   float dAng = PVector.angleBetween(robObj, r.getDir());
   //if(dAng > PI) dAng = 2*PI - dAng;
@@ -31,7 +45,7 @@ void alinhaAnda(Robo r) {
   }
 }
 
-// Alinha
+// Alinha em velocidades constantes
 void alinha(Robo r, float ang) {
 
   // Angulo do robo
@@ -73,7 +87,7 @@ void alinhaP(Robo r, float ang) {
 // Alinha e anda e alinha
 void alinhaGoleiro(Robo r) {
   // Verifica se a bola está perto
-  if (distSq(r.getPos(), bola) < 15*15) {
+  if (distSq(r.pos, bola) < 15*15) {
     gira(r, true);
     return;
   }
@@ -87,7 +101,7 @@ void alinhaGoleiro(Robo r) {
   }
   // Vetor robo -> obj
   PVector robObj = new PVector();
-  robObj = r.obj.sub(r.getPos());
+  robObj = PVector.sub(r.obj, r.pos);
   float ang = atan2(robObj.y, robObj.x);
   float dAng = PVector.angleBetween(robObj, r.getDir());
   //if(dAng > PI) dAng = 2*PI - dAng;
@@ -153,8 +167,6 @@ void alinhandando(Robo r) {
 
   // Angulo do objetivo
   float angObj = atan2(r.obj.y, r.obj.x) - PI;
-  //PVector robObj = r.obj.sub(r.pos);
-  //PVector robObj = r.getPos().sub(r.obj);
   float dAng = r.getAng() - angObj;
 
   println("CONTROLE: Angulo robObj = " + degrees(angObj));

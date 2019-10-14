@@ -18,6 +18,9 @@ boolean radio = true; //Flag de controle para emitir ou não sinais ao rádio (u
 boolean gameplay = false;  //Flag de controle que diz se o jogo está no automático ou no manual (apenas do robô 0 por enquanto)
 boolean simManual = true;
 
+// estretagia usada quando estrategia = false;
+  int estFixa = 0;
+
 // variaveis pro controle do arrasto do mouse
 PVector clique = new PVector();
 int dragged = 0;
@@ -138,12 +141,12 @@ void captureEvent(Capture c) {
 
 void draw() {
   //loadPixels();
+  background(0);
   tempo = millis();
   if (inputVideo == 0) image(cam, 0, 0);
   //noFill();
   stroke(255);
   if (isCampoDimensionado) {
-    if  (inputVideo == 2) simulador();
     // Mostra o campo na tela
 
     shape(shapeCampo);
@@ -157,11 +160,14 @@ void draw() {
     ellipse(golAmigo.x, golAmigo.y, 20, 20);
     ellipse(golInimigo.x, golInimigo.y, 20, 20);
 
+    if  (inputVideo == 2) simulador();
+
     // Armazena as ultimas coordenadas de cada robo
     oldRobos.clear();
     for (Robo r : robos) {
       oldRobos.add(new Robo(r.clone()));
-      if(inputVideo == 2) robosSimulados.get(r.index).frente = r.frente;
+      // atualiza a frente dos robos simulados
+      if (inputVideo == 2) robosSimulados.get(r.index).frente = r.frente;
     }
     //robos.clear();
 
@@ -198,25 +204,34 @@ void draw() {
         robos.get(i).atualiza();
       }
     }
+    // posicoes variaveis
     if (estrategia) {
       // Define as estratégias dos robos
-      //robos.get(0).setEstrategia(0);
+      robos.get(0).setEstrategia(0);
       //robos.get(1).setEstrategia(1);
-      robos.get(2).setEstrategia(0);
+      //robos.get(2).setEstrategia(0);
+    }
+    // posicoes fixas
+    else {
+      for(Robo r : robos) r.setEstrategia(estFixa);
     }
     // Debug das estrategias
     for (int i=0; i<robos.size(); i++) {
-      if (robos.get(i).obj.x != 0 || robos.get(i).obj.y != 0) robos.get(i).debugObj();
+      //if (robos.get(i).obj.x != 0 || robos.get(i).obj.y != 0) robos.get(i).debugObj();
+      robos.get(i).debugObj();
     }
 
     // Seleciona controle manual ou automatico para o robo 0
     if (gameplay) gameplay(robos.get(0));
     if (controle) {
-      alinhaGoleiro(robos.get(2));
+      alinhaGoleiro(robos.get(0));
       //alinhaGoleiro(robos.get(2));
-      //alinhaAnda(robos.get(1));
+      alinhaAnda(robos.get(1));
+      alinhaAnda(robos.get(2));
       //alinha(robos.get(2));
     }
+    
+    for(Robo r : robos) ellipse(r.pos.x, r.pos.y, 10, 10);
 
     // Envia os comandos
     if (inputVideo == 0) enviar();
@@ -296,8 +311,8 @@ void keyPressed() {
   // posicao inicial
   if (key == 'P') {
     println("KEY: posicao inicial");
-    robos.get(0).setObj(golAmigo.x + 100, golAmigo.y);
-    estrategia = false;
+    estFixa = 6;
+    estrategia = !estrategia;
   }
 }
 
@@ -306,7 +321,7 @@ void mouseDragged() {
 
 void mouseReleased() {
   PVector mouse = new PVector(mouseX, mouseY);
-  PVector tiro = mouse.sub(clique);
+  PVector tiro = PVector.sub(mouse, clique);
   tiro.setMag(sqrt(distSq(mouse, clique))/40);
   bolaV.vel = tiro;
 }

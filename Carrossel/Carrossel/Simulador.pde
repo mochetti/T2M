@@ -7,7 +7,6 @@ int roboControlado = 0;
 Bola bolaV = new Bola();
 
 void simulador() {
-  background(0);
   if (robosSimulados.size() == 0) {
     robosSimulados.add(new Robo(300, 100, 0));
     robosSimulados.add(new Robo(100, 200, 1));

@@ -72,11 +72,9 @@ boolean track() {
     //println("VISÃO: size old blobs: " + oldBlobs.size());
     for (Blob b : oldBlobs) {
       if (b.id >= 0) {
-
         // Limpa as coordenadas do blob
         b.reset();
-
-        if (!search(b)) println("VISÃO: O objeto não está no campo");
+        if (!search(b)) searchNew(b.cor);
       }
     }
   }
@@ -146,10 +144,10 @@ float distColorSq(color c1, color c2) {
   return distSq(r1, g1, b1, r2, g2, b2);
 }
 
-// Checa se o blob está na área desejada
+// Checa se o blob está próximo ao do frame anterior
 boolean search (Blob b) {
   // raio de busca em relacao à ultima posicao de cada blob
-  int raioBusca = 20;
+  int raioBusca = 25;
   // Contagem de pixels por blob
   int count = 0;
   // offset 
@@ -163,7 +161,7 @@ boolean search (Blob b) {
     offset.y = int(oldRobos.get(relacaoBlobRobo[b.id]).pos.y);
     angOff = oldRobos.get(relacaoBlobRobo[b.id]).ang;
 
-    //println(offset);
+    println(angOff);
   }
 
   // nao precisa dar popMatrix() agora pq nao afeta o array cam.pixels[]
@@ -171,11 +169,11 @@ boolean search (Blob b) {
   translate(offset.x, offset.y);
   rotate(angOff);
 
-  //println("VISAO: buscando blob " + b.id + " em " + offset);
+  println("VISAO: buscando blob " + b.id + " em " + offset);
 
   // Procura nas coordenadas dadas
   for (int x = int(offset.x) - raioBusca; x < int(offset.x) + raioBusca; x++ ) {
-    for (int y = int(offset.y) -raioBusca; y < int(offset.y) + raioBusca; y++ ) {
+    for (int y = int(offset.y) - raioBusca; y < int(offset.y) + raioBusca; y++ ) {
       // posicao no array de pixels da camera
       int loc = 0;
       if (inputVideo == 0) loc = int( x + y * cam.width);
