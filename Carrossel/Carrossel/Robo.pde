@@ -108,7 +108,7 @@ class Robo {
     case 2:  // o centro é deslocado (esse cálculo é aproximado mas muito bom)
       float angulo = ang;
       if (frente) angulo -= PI;
-      println("ROBO: angulo = " + degrees(angulo));
+      //println("ROBO: angulo = " + degrees(angulo));
       float distCentros = dist(posVerde.x, posVerde.y, posVermelho.x, posVermelho.y);
       distCentros /= 2;
       centro.x = (posVerde.x + cos(angulo)*distCentros);

@@ -6,7 +6,7 @@ void estrategia(Robo r, int n) {
   noFill();
 
   // Distancia que o robo pega pra empurrar a bola
-  float distSombra = 50;
+  float distSombra = 100;
   // Distancia entre o X do goleiro e o X do centro do gol
   float distGoleiro = 30;
   // Parametros da reta da bola
@@ -75,16 +75,14 @@ void estrategia(Robo r, int n) {
     if (sombra.x > shapeCampo.getVertex(2).x) sombra.x = shapeCampo.getVertex(2).x;
     if (sombra.y > shapeCampo.getVertex(2).y) sombra.y = shapeCampo.getVertex(2).y;
 
+    // Verifica se a bola é um obstáculo
     if (r.isXNoMeio(sombra)) {
+      r.isBolaNoMeio = true;
       if (sombra.y > height/2) sombra.y = sombra.y - 60;
       else sombra.y = sombra.y + 60;
     }
 
-    noFill();
-    stroke(255);
-    ellipse(sombra.x, sombra.y, 20, 20);
-    //line(sombra.x, sombra.y, golInimigo.x, golInimigo.y);
-    arrow(sombra.x, sombra.y, bola.x, bola.y);
+
 
 
     if (isInside(r.pos, shapeCampo.getChild(0))) {
@@ -98,15 +96,25 @@ void estrategia(Robo r, int n) {
     //  gira(r, false);
     //  return;
     //}
+
     // Verifica se o robo esta perto o suficiente da sombra
     if (distSq(r.pos.x, r.pos.y, sombra.x, sombra.y) < 15*15) {
+      println("ESTRATEGIA: chegou em algum lugar");
+      if (!r.isBolaNoMeio) r.atingiuSombra = true;
+      else println("ESTRATEGIA: chegou na sombra intermediaria");
       r.isBolaNoMeio = false;
-      r.atingiuSombra = true;
-      r.setObj(bola);
-    } else if (!r.atingiuSombra) {
+    } 
+    if (!r.atingiuSombra) {
       // Ainda precisa chegar ate a sombra
+      println("ESTRATEGIA: indo pra sombra real");
       r.setObj(sombra);
+      noFill();
+      stroke(255);
+      ellipse(sombra.x, sombra.y, 20, 20);
+      //line(sombra.x, sombra.y, golInimigo.x, golInimigo.y);
+      arrow(sombra.x, sombra.y, bola.x, bola.y);
     } else {
+      println("ESTRATEGIA: indo pra bola");
       r.setObj(bola);
     }
     break;

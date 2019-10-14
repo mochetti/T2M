@@ -35,7 +35,7 @@ void alinhaAnda(Robo r) {
   //println("CONTROLE: dAng = " + degrees(dAng));
   if (abs(dAng) < radians(tolAng)) {
     // Anda reto
-    println("CONTROLE: Anda reto");
+    println("CONTROLE: Robo " + r.index + " Anda reto");
     //r.velE = r.velEmin;
     //r.velD = r.velDmin;
     r.setVel(r.velMax, r.velMax);
@@ -52,16 +52,16 @@ void alinha(Robo r, float ang) {
   float angRobo = r.getAng();
 
   if (ang - angRobo > 0 && ang - angRobo < PI) {
-    //println("CONTROLE: Gira horário");
+    //println("CONTROLE: Robo " + r.index + " Gira horário");
     gira(r, true);
   } else if (ang - angRobo > PI) {
-    println("CONTROLE: Gira anti horário");
+    println("CONTROLE: Robo " + r.index + " Gira anti horário");
     gira(r, false);
   } else if (angRobo - ang > 0 && angRobo - ang < PI) {
-    println("CONTROLE: Gira anti horário");
+    println("CONTROLE: Robo " + r.index + " Gira anti horário");
     gira(r, false);
   } else if (angRobo - ang > PI) {
-    println("CONTROLE: Gira horário");
+    println("CONTROLE: Robo " + r.index + " Gira horário");
     gira(r, true);
   }
 }
@@ -74,11 +74,11 @@ void alinhaP(Robo r, float ang) {
   float dAng = ang - angRobo;
 
   if (sin(dAng) > 0) {
-    println("CONTROLE: Gira horário");
+    println("CONTROLE: Robo " + r.index + " Gira horário");
     r.setVel(r.velEmin+r.kP*abs(dAng)*r.velEmin, -r.velDmin+r.kP*-abs(dAng)*r.velDmin);
     //r.setVel(r.kP*abs(dAng)*r.velEmin, r.kP*-abs(dAng)*r.velDmin);
   } else if (sin(dAng) < 0) {
-    println("CONTROLE: Gira anti horário");
+    println("CONTROLE: Robo " + r.index + " Gira anti horário");
     r.setVel(-r.velEmin+r.kP*-abs(dAng)*r.velEmin, r.velDmin+r.kP*abs(dAng)*r.velDmin);
     //r.setVel(r.kP*abs(dAng)*r.velEmin, r.kP*-abs(dAng)*r.velDmin);
   }
@@ -113,7 +113,7 @@ void alinhaGoleiro(Robo r) {
   
   if (dAng < radians(tolAng)) {
     // Anda reto
-    println("CONTROLE: Anda reto");
+    println("CONTROLE: Robo " + r.index + " Anda reto");
     r.setVel(r.velMax, r.velMax);
   } else {
     // Alinha

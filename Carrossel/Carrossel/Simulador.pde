@@ -9,7 +9,7 @@ Bola bolaV = new Bola();
 void simulador() {
   if (robosSimulados.size() == 0) {
     robosSimulados.add(new Robo(300, 100, 0));
-    robosSimulados.add(new Robo(100, 200, 1));
+    robosSimulados.add(new Robo(400, 200, 1));
     robosSimulados.add(new Robo(100, 300, 2));
   }
 

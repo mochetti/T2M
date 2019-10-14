@@ -161,7 +161,7 @@ boolean search (Blob b) {
     offset.y = int(oldRobos.get(relacaoBlobRobo[b.id]).pos.y);
     angOff = oldRobos.get(relacaoBlobRobo[b.id]).ang;
 
-    println(angOff);
+    //println(angOff);
   }
 
   // nao precisa dar popMatrix() agora pq nao afeta o array cam.pixels[]
@@ -169,7 +169,7 @@ boolean search (Blob b) {
   translate(offset.x, offset.y);
   rotate(angOff);
 
-  println("VISAO: buscando blob " + b.id + " em " + offset);
+  //println("VISAO: buscando blob " + b.id + " em " + offset);
 
   // Procura nas coordenadas dadas
   for (int x = int(offset.x) - raioBusca; x < int(offset.x) + raioBusca; x++ ) {
