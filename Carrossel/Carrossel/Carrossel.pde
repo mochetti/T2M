@@ -21,6 +21,9 @@ boolean simManual = true;
 // estretagia usada quando estrategia = false;
   int estFixa = 0;
 
+//Variavel para contar frames
+  int qtdFrames = 0;
+
 // variaveis pro controle do arrasto do mouse
 PVector clique = new PVector();
 int dragged = 0;
@@ -208,7 +211,7 @@ void draw() {
     if (estrategia) {
       // Define as estratégias dos robos
       robos.get(0).setEstrategia(0);
-      robos.get(1).setEstrategia(1);
+      robos.get(1).setEstrategia(6);
       robos.get(2).setEstrategia(6);
     }
     // posicoes fixas

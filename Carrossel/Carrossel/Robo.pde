@@ -2,11 +2,26 @@
 
 class Robo {
 
-  boolean wasNearBola = false;
-  boolean atingiuSombra = false;
-  boolean proximoDaBola = false;
-
-  boolean isBolaNoMeio = false;
+  //Variaveis de controle de estado para cada estratégia:
+  int estagio = 0;  //Variável que para cada estratégia vai ditar o que no estágio atual deveria acontecer
+  //Estratégia 0:
+  /*
+    estagio:
+    -0 vai até o y da bola (limitando limites superior e inferior)
+    -1 se a bola estiver próxima, gira até a bola distanciar
+  */
+  //Estratégia 1: com seus estados iniciais já setados
+  /*
+   estagio:
+   -0: vai até a sombra da bola
+   -1 vai até a posição projetada da sombra
+   -2´ir até a sombra da bola, tendo passado pelo estágio 1
+   -3: Vai até a bola
+   Aqui percebemos que existem 2 caminhos lógicos que o robô poderá seguir:
+   0 -> 3; OU  Nesta o robô chega direto na sombra da bola e vai direto até ela
+   0 -> 1 -> 2 -> 3;  Enquanto nesta o robô vai até a sombra original, encontra a bola no caminho e passa a percorrer atrás da sombra projetada. Chega na projetada e vai até
+   a original. Chega na original e vai até a bola.
+  */
 
   PVector pos = new PVector(), posAnt, vel, obj, objAnt;
   float ang = 0, angAnt = 0, angObj = -1;
@@ -41,9 +56,7 @@ class Robo {
     vel = r.vel;
     ang = r.ang;
     index = r.index;
-    wasNearBola = r.wasNearBola;
-    atingiuSombra = r.atingiuSombra;
-    proximoDaBola = r.proximoDaBola;
+
     angAnt = r.angAnt;
     obj = r.obj;
     objAnt = r.objAnt;
@@ -194,19 +207,12 @@ class Robo {
       if (dAng > 6*PI/10) frente = !frente;
       //println("ROBO: robo " + index + " esta com a frente trocada");
     }
-    
+
     getAng();
     getPos();
     debugAng();
 
-    if (isNear(bola, 40)) {
-      proximoDaBola = true;
-      wasNearBola = true;
-    } else {
-      if (wasNearBola) atingiuSombra = false;
-      proximoDaBola = false;
-      wasNearBola = false;
-    }
+
 
     switch(index) {
     case 0:
@@ -292,7 +298,7 @@ class Robo {
     popMatrix();
   }
 
-  boolean isXNoMeio(PVector objetivo) {
+  boolean isBolaEntre(PVector objetivo) {  
 
     float distRoboObj = distSq(pos, objetivo);
     float distRoboBola = distSq(pos, bolaV.pos);
@@ -300,8 +306,8 @@ class Robo {
     //println(distRoboBola);
 
     if (isNear(bola, 80) && distRoboObj > distRoboBola) {
-      println("ROBO " + index + ": PERTO DA BOLA, CONTORNA");
-      isBolaNoMeio = true;
+
+
       return true;
     } 
     return false;
@@ -319,4 +325,5 @@ class Robo {
     //println("ROBO: Robo " + index + " isNear = false");
     return false;
   }
+
 }
