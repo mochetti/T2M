@@ -74,8 +74,8 @@ void estrategia(Robo r, int n) {
         } while (qtdFrames < 45);
         println("ESTRATÉGIA: Gira anti horário");
       }
-      
-      if(qtdFrames == 45){
+
+      if (qtdFrames == 45) {
         qtdFrames = 0;
         r.estagio = 0;
       }
@@ -121,7 +121,7 @@ void estrategia(Robo r, int n) {
     if (sombra.y < shapeCampo.getVertex(0).y) sombra.y = shapeCampo.getVertex(0).y;
     if (sombra.x > shapeCampo.getVertex(2).x) sombra.x = shapeCampo.getVertex(2).x;
     if (sombra.y > shapeCampo.getVertex(2).y) sombra.y = shapeCampo.getVertex(2).y;
-
+    println("ESTRATÉGIA: Estágio " + r.estagio);
     if (r.estagio == 0) {
 
       //Set de funções para sempre definir qual o ponto do objetivo
@@ -276,15 +276,12 @@ void estrategia(Robo r, int n) {
         Aqui, antes de mandarmos ele seguir a bola devemos checar se faz sentido correr atrás dela ou não. Isso checaremos
        através da distância entre o robô e a bola
        */
-      if (inputVideo == 0 || inputVideo == 1) {  //Se for a câmera
-      } else {
-        float distTol = 200;
-        //Significa que tá muito longe, reseta tudo
-        if (distSq(r.pos, bola) > distTol*distTol) {
-          println("ESTRATÉGIA: robô se afastou demais da bola. Resetando os estágios");
-          r.estagio = 0;
-          break;
-        }
+      float distTol = 130;
+      //Significa que tá muito longe, reseta tudo
+      if (distSq(r.pos, bola) > distTol*distTol) {
+        println("ESTRATÉGIA: robô se afastou demais da bola. Resetando os estágios");
+        r.estagio = 0;
+        break;
       }
 
       //Caso não esteja muito longe, segue o baile.

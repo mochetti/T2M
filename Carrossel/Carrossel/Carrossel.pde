@@ -8,7 +8,7 @@ boolean debug = true;
 // 0 - camera
 // 1 - video 
 // 2 - simulador
-int inputVideo = 2;
+int inputVideo = 0;
 
 boolean calibra = true;  //Flag de controle se deve ou não calibrar as cores
 boolean visao = false;  //Flag de controle para parar o código logo após jogar a imagem no canvas (visão) a visão ou não
@@ -124,13 +124,13 @@ void setup() {
 
   //mov.frameRate(30);
   ellipseMode(RADIUS);
-  size(960, 540);
+  size(800, 448);
 
   frame.removeNotify();
   frameRate(30);
   if (inputVideo == 0) {
     printArray(Serial.list());
-    myPort = new Serial(this, Serial.list()[3], 115200);
+    myPort = new Serial(this, Serial.list()[0], 115200);
     camConfig();
   }
 }
@@ -210,7 +210,7 @@ void draw() {
     // posicoes variaveis
     if (estrategia) {
       // Define as estratégias dos robos
-      robos.get(0).setEstrategia(0);
+      robos.get(0).setEstrategia(1);
       robos.get(1).setEstrategia(6);
       robos.get(2).setEstrategia(6);
     }

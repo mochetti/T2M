@@ -38,7 +38,7 @@ void alinhaAnda(Robo r) {
     println("CONTROLE: Robo " + r.index + " Anda reto");
     //r.velE = r.velEmin;
     //r.velD = r.velDmin;
-    r.setVel(r.velMax, r.velMax);
+    r.setVel(r.velMax - r.velMax*r.kP, r.velMax - r.velMax*r.kP);
   } else {
     // Alinha
     alinhaP(r, ang);
@@ -74,11 +74,11 @@ void alinhaP(Robo r, float ang) {
   float dAng = ang - angRobo;
 
   if (sin(dAng) > 0) {
-    println("CONTROLE: Robo " + r.index + " Gira horário");
+    //println("CONTROLE: Robo " + r.index + " Gira horário");
     r.setVel(r.velEmin+r.kP*abs(dAng)*r.velEmin, -r.velDmin+r.kP*-abs(dAng)*r.velDmin);
     //r.setVel(r.kP*abs(dAng)*r.velEmin, r.kP*-abs(dAng)*r.velDmin);
   } else if (sin(dAng) < 0) {
-    println("CONTROLE: Robo " + r.index + " Gira anti horário");
+    //println("CONTROLE: Robo " + r.index + " Gira anti horário");
     r.setVel(-r.velEmin+r.kP*-abs(dAng)*r.velEmin, r.velDmin+r.kP*abs(dAng)*r.velDmin);
     //r.setVel(r.kP*abs(dAng)*r.velEmin, r.kP*-abs(dAng)*r.velDmin);
   }

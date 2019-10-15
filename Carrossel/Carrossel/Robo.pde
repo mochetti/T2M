@@ -32,8 +32,8 @@ class Robo {
   // Velocidades limite do robo (0 - 64)
   int velMax = 20;
   int velMin = -10;
-  float velEmin = 4;
-  float velDmin = 4;
+  float velEmin = 2.5;
+  float velDmin = 2.5;
   // coeficiente proporcional para o controle
   float kP;
   int v = 0;
@@ -221,14 +221,14 @@ class Robo {
       kP = 0.25;
       break;
     case 1:
-      velEmin = 3;
-      velDmin = 3;
-      kP = 0.2;
+      velEmin = 1.5;
+      velDmin = 1.5;
+      kP = 0.5;
       break;
     default:
-      velEmin = 4;
-      velDmin = 4;
-      kP = 0.4;
+      velEmin = 2.5;
+      velDmin = 2.5;
+      kP = 0;
       break;
     }
   }
@@ -301,7 +301,7 @@ class Robo {
   boolean isBolaEntre(PVector objetivo) {  
 
     float distRoboObj = distSq(pos, objetivo);
-    float distRoboBola = distSq(pos, bolaV.pos);
+    float distRoboBola = distSq(pos, bola);
     //println(distRoboObj);
     //println(distRoboBola);
 
