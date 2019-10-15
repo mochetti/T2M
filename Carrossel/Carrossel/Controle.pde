@@ -35,7 +35,7 @@ void alinhaAnda(Robo r) {
   //println("CONTROLE: dAng = " + degrees(dAng));
   if (abs(dAng) < radians(tolAng)) {
     // Anda reto
-    println("CONTROLE: Robo " + r.index + " Anda reto");
+    //println("CONTROLE: Robo " + r.index + " Anda reto");
     //r.velE = r.velEmin;
     //r.velD = r.velDmin;
     r.setVel(r.velMax - r.velMax*r.kP, r.velMax - r.velMax*r.kP);
@@ -55,13 +55,13 @@ void alinha(Robo r, float ang) {
     //println("CONTROLE: Robo " + r.index + " Gira horário");
     gira(r, true);
   } else if (ang - angRobo > PI) {
-    println("CONTROLE: Robo " + r.index + " Gira anti horário");
+    //println("CONTROLE: Robo " + r.index + " Gira anti horário");
     gira(r, false);
   } else if (angRobo - ang > 0 && angRobo - ang < PI) {
-    println("CONTROLE: Robo " + r.index + " Gira anti horário");
+    //println("CONTROLE: Robo " + r.index + " Gira anti horário");
     gira(r, false);
   } else if (angRobo - ang > PI) {
-    println("CONTROLE: Robo " + r.index + " Gira horário");
+    //println("CONTROLE: Robo " + r.index + " Gira horário");
     gira(r, true);
   }
 }
@@ -113,7 +113,7 @@ void alinhaGoleiro(Robo r) {
   
   if (dAng < radians(tolAng)) {
     // Anda reto
-    println("CONTROLE: Robo " + r.index + " Anda reto");
+    //println("CONTROLE: Robo " + r.index + " Anda reto");
     r.setVel(r.velMax, r.velMax);
   } else {
     // Alinha
@@ -169,9 +169,9 @@ void alinhandando(Robo r) {
   float angObj = atan2(r.obj.y, r.obj.x) - PI;
   float dAng = r.getAng() - angObj;
 
-  println("CONTROLE: Angulo robObj = " + degrees(angObj));
-  println("CONTROLE: Angulo robo = " + degrees(r.getAng()));
-  println("CONTROLE: dAng = " + degrees(dAng));
+  //println("CONTROLE: Angulo robObj = " + degrees(angObj));
+  //println("CONTROLE: Angulo robo = " + degrees(r.getAng()));
+  //println("CONTROLE: dAng = " + degrees(dAng));
 
   /*// Verifica a inercia por distancia
    //if((velE == 0 && velD == 0) || (velE == 0 && velD == 0)) {

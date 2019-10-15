@@ -19,10 +19,10 @@ boolean gameplay = false;  //Flag de controle que diz se o jogo está no automá
 boolean simManual = true;
 
 // estretagia usada quando estrategia = false;
-  int estFixa = 0;
+int estFixa = 0;
 
 //Variavel para contar frames
-  int qtdFrames = 0;
+int qtdFrames = 0;
 
 // variaveis pro controle do arrasto do mouse
 PVector clique = new PVector();
@@ -172,7 +172,7 @@ void draw() {
       // atualiza a frente dos robos simulados
       if (inputVideo == 2) robosSimulados.get(r.index).frente = r.frente;
     }
-    //robos.clear();
+    robos.clear();
 
     // Armazena as ultimas coordenadas de cada blob
     oldBlobs.clear();
@@ -186,7 +186,11 @@ void draw() {
     //for (Blob b : oldBlobs) if (b.id >= 0) print(b.id + "  ");
     //println("");
     // Busca os objetos
+    //Aqui atualizo blobs
+
     if (!track()) return;
+
+
 
     // debug da visao
     if (visao) return;
@@ -200,23 +204,33 @@ void draw() {
     if (robos.size() == 0) {
       for (int i=0; i<3; i++) {
         robos.add(new Robo(i));
+        //if (blobs.get(1).id != -1) robos.set(0, new Robo(0));
+        //else robos.set(0, new Robo(-1));
+        //if (blobs.get(2).id != -1) robos.set(1, new Robo(1));
+        //else robos.set(1, new Robo(-1));
+        //if (blobs.get(3).id != -1) robos.set(2, new Robo(2));
+        //else robos.set(2, new Robo(-1));
       }
     } else {
       // Atualiza os robos
-      for (int i=0; i<robos.size(); i++) {
+      for (int i=0; i < robos.size(); i++) {
         robos.get(i).atualiza();
+        println(robos.get(i).pos.x);
       }
     }
     // posicoes variaveis
     if (estrategia) {
       // Define as estratégias dos robos
+
+      for (Blob b : blobs) println(b.id);
+      //for (Robo r : robos) println(r);
       robos.get(0).setEstrategia(1);
-      robos.get(1).setEstrategia(6);
-      robos.get(2).setEstrategia(6);
+      robos.get(1).setEstrategia(1);
+      robos.get(2).setEstrategia(0);
     }
     // posicoes fixas
     else {
-      for(Robo r : robos) r.setEstrategia(estFixa);
+      for (Robo r : robos) r.setEstrategia(estFixa);
     }
     // Debug das estrategias
     for (int i=0; i<robos.size(); i++) {
@@ -227,13 +241,22 @@ void draw() {
     // Seleciona controle manual ou automatico para o robo 0
     if (gameplay) gameplay(robos.get(0));
     if (controle) {
+      //println("OldBlobs:");
+      //for (int i = 0; i < oldBlobs.size(); i++) {
+      //  if (oldBlobs.size() != 0)
+      //    println(oldBlobs.get(i).id);
+      //}
+      //println("Blobs:");
+      //for (int i = 0; i < blobs.size(); i++) {
+      //  println(blobs.get(i).id);
+      //}
       alinhaGoleiro(robos.get(0));
       //alinhaGoleiro(robos.get(2));
       alinhaAnda(robos.get(1));
       alinhaAnda(robos.get(2));
       //alinha(robos.get(2));
     }
-    
+
     //for(Robo r : robos) ellipse(r.pos.x, r.pos.y, 10, 10);
 
     // Envia os comandos

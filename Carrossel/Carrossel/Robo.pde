@@ -7,9 +7,9 @@ class Robo {
   //Estratégia 0:
   /*
     estagio:
-    -0 vai até o y da bola (limitando limites superior e inferior)
-    -1 se a bola estiver próxima, gira até a bola distanciar
-  */
+   -0 vai até o y da bola (limitando limites superior e inferior)
+   -1 se a bola estiver próxima, gira até a bola distanciar
+   */
   //Estratégia 1: com seus estados iniciais já setados
   /*
    estagio:
@@ -21,7 +21,7 @@ class Robo {
    0 -> 3; OU  Nesta o robô chega direto na sombra da bola e vai direto até ela
    0 -> 1 -> 2 -> 3;  Enquanto nesta o robô vai até a sombra original, encontra a bola no caminho e passa a percorrer atrás da sombra projetada. Chega na projetada e vai até
    a original. Chega na original e vai até a bola.
-  */
+   */
 
   PVector pos = new PVector(), posAnt, vel, obj, objAnt;
   float ang = 0, angAnt = 0, angObj = -1;
@@ -49,6 +49,7 @@ class Robo {
     pos = getPos();
     vel = new PVector();
     obj = new PVector();
+    atualiza();
   }
 
   Robo(Robo r) {
@@ -151,7 +152,13 @@ class Robo {
   }
 
   void setEstrategia(int n) {
-    estrategia(this, n);
+    if (pos.x > 0) {
+      estrategia(this, n);
+    } else {
+      //Valores arbitrários apenas para identificar que o robô não está em campo e não traçar nenhum objetivo no canvas que não seja verdadeiro.
+      //Assim que o robô voltar a ter posição X > 0 significa que foi reencontrado, e a partir daí o novo setObj dentro da estrategia dará o local certo que ele deve ir
+      setObj(new PVector());
+    }
   }
 
   // Retorna um vetor correspondente à direçao do robo
@@ -325,5 +332,4 @@ class Robo {
     //println("ROBO: Robo " + index + " isNear = false");
     return false;
   }
-
 }

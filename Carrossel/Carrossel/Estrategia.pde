@@ -464,5 +464,9 @@ void estrategia(Robo r, int n) {
       if (abs(r.ang - PI/2) > PI/2) r.angObj = PI;
       //println(degrees(r.ang - PI/2));
     } else r.angObj = -1;
+    break;
+  ////Fica parado, perdeu o robô
+  //case 7:
+  //  r.
   }
 }
