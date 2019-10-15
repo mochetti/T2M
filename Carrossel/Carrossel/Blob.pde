@@ -83,6 +83,7 @@ class Blob {
     miny = height;
     maxx = 0;
     maxy = 0;
+    numPixels = 0;
   }
  
   // Verifica se um ponto (x, y) está perto do blob

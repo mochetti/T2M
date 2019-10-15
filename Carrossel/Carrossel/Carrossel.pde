@@ -222,7 +222,7 @@ void draw() {
     if (estrategia) {
       // Define as estratégias dos robos
 
-      for (Blob b : blobs) println(b.id);
+      for (Blob b : blobs) println(b.numPixels);
       //for (Robo r : robos) println(r);
       robos.get(0).setEstrategia(1);
       robos.get(1).setEstrategia(1);

@@ -75,8 +75,10 @@ boolean track() {
     }
   } else if (oldBlobs.size() > 0) {  //vem aqui na próxima iteração, com valores de -1 na posição onde não achar
     //println("VISÃO: size old blobs: " + oldBlobs.size());
+    boolean todosEncontrados = true;
+    for (Blob b : oldBlobs) if (b.id == -1) todosEncontrados = false;
     for (Blob b : oldBlobs) {
-      if (b.id >= 0) {
+      if (todosEncontrados) {
         // Limpa as coordenadas do blob
         b.reset();
         if (!search(b)) searchNew(b.cor);
@@ -376,20 +378,22 @@ void id() {
         //então significa que é o mesmo robô
         if (v.cor == 2 && (distSq(b.center(), v.center()) < (raioBusca*raioBusca))) {
 
-          // Verifica se é o vermelho comprido
-          //println("VISÃO: numPixels = " + v.numPixels);
+
           //Se for o vermelho comprido, significa que são is ids 1 e 4 para o verde e para o vermelho
-          if (v.numPixels == pxMaiorBlobVermelho) {
+          //Nesse caso testamos: Se o numero de pixels vermelhos for mais ou menos a mesma qtd de pixels verde:
+          //é o robo 0: metade verde e metade vermelho
+          if (abs(v.numPixels/~b.numPixels) > 0.85 && abs(v.numPixels/~b.numPixels) < 1.15) {
             b.id = 1;
             v.id = 4;
             continue;
           }
 
-          // Verifica se é o xadrez
-          //println("VISÃO: pxMenorBlobVerde = " + pxMenorBlobVerde);
-          //println("VISÃO: numPixels = " + b.numPixels);
+
+
           //Se for o menor são os blobs verde e vermelho de id 2 e 5 respectivamente
-          if (b.numPixels == pxMenorBlobVerde) {
+          //Nesse caso testamos: Se o nmero de pixels de vermelho for mais ou menos 2x o numero de pixels de verde:
+          //é o robô 1: Metade vermelho e 1/4 verde
+          if (abs(v.numPixels/~b.numPixels) > 1.8 && abs(v.numPixels/~b.numPixels) < 2.2) {
             b.id = 2;
             v.id = 5;
             continue;

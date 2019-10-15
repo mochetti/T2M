@@ -109,24 +109,30 @@ class Robo {
     PVector posVerde = new PVector(blobs.get(index+1).center().x, blobs.get(index+1).center().y);
     PVector posVermelho = new PVector(blobs.get(index+4).center().x, blobs.get(index+4).center().y);
     switch(index) {
+      //Tamanhos iguais
     case 0:  // o centro é a media aritmética dos centros dos blobs
       centro.x = (posVerde.x + posVermelho.x) / 2;
       centro.y = (posVerde.y + posVermelho.y) / 2;
       break;
-
+      //Vermelho Maior
     case 1: 
-      centro.x = (posVerde.x + posVermelho.x) / 2;
-      centro.y = (posVerde.y + posVermelho.y) / 2;
-      break;
-
-    case 2:  // o centro é deslocado (esse cálculo é aproximado mas muito bom)
-      float angulo = ang;
-      if (frente) angulo -= PI;
+      float angulo1 = ang;
+      if (frente) angulo1 -= PI;
       //println("ROBO: angulo = " + degrees(angulo));
-      float distCentros = dist(posVerde.x, posVerde.y, posVermelho.x, posVermelho.y);
-      distCentros /= 2;
-      centro.x = (posVerde.x + cos(angulo)*distCentros);
-      centro.y = (posVerde.y + sin(angulo)*distCentros);
+      float distCentros1 = dist(posVerde.x, posVerde.y, posVermelho.x, posVermelho.y);
+      distCentros1 /= 2;
+      centro.x = (posVermelho.x + cos(angulo1)*distCentros1);
+      centro.y = (posVermelho.y + sin(angulo1)*distCentros1);
+      break;
+      //Verde Maior
+    case 2:  // o centro é deslocado (esse cálculo é aproximado mas muito bom)
+      float angulo2 = ang;
+      if (frente) angulo2 -= PI;
+      //println("ROBO: angulo = " + degrees(angulo));
+      float distCentros2 = dist(posVerde.x, posVerde.y, posVermelho.x, posVermelho.y);
+      distCentros2 /= 2;
+      centro.x = (posVerde.x + cos(angulo2)*distCentros2);
+      centro.y = (posVerde.y + sin(angulo2)*distCentros2);
       break;
     }
 
@@ -173,18 +179,18 @@ class Robo {
   float getAng() {
 
     switch(index) {
-    case 0:    // vermelho maior
+    case 0:    // Cores iguais
       ang = atan2(- blobs.get(1).center().y + blobs.get(4).center().y, - blobs.get(1).center().x + blobs.get(4).center().x);
       //line(blobs.get(1).center().x, blobs.get(1).center().y, blobs.get(4).center().x, blobs.get(4).center().y);
       break;
 
-    case 1:    // robo xadrez
+    case 1:    // Vermelho maior
       ang = atan2(- blobs.get(2).center().y + blobs.get(5).center().y, - blobs.get(2).center().x + blobs.get(5).center().x);
-      ang += PI/4;
+      ang -= atan(0.5) + PI;
       //line(blobs.get(2).center().x, blobs.get(2).center().y, blobs.get(5).center().x, blobs.get(5).center().y);
       break;
 
-    case 2:    // vermelho na direita
+    case 2:    // Verde maior
       ang = atan2(- blobs.get(3).center().y + blobs.get(6).center().y, - blobs.get(3).center().x + blobs.get(6).center().x);
       ang -= atan(0.5);
       //line(blobs.get(3).center().x, blobs.get(3).center().y, blobs.get(6).center().x, blobs.get(6).center().y);
