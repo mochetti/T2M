@@ -140,6 +140,7 @@ class Bola {
   PVector pos = new PVector();
   PVector vel = new PVector();
   PVector acc = new PVector();
+  PShape b = new PShape();
 
   Bola() {
   }
@@ -170,11 +171,9 @@ class Bola {
     if (pos.y < 0 || pos.y > height) vel = new PVector(vel.x, -vel.y);
 
     // colisoes
-    
-    for (int i=0; i<robosSimulados.size(); i++) {
-
-
-      if (isInside(bolaV.pos, robosSimulados.get(i).corpo.getChild(0))) {
+    println(velBola());
+    for (int i=0; i<robosSimulados.size(); i++){
+      if(isInside(b, robosSimulados.get(i).corpo.getChild(0), robosSimulados.get(i).pos)){
         println("SIMULADOR: choque com o robo " + robosSimulados.get(i).index);
         float angBola = atan(velBola().y / velBola().x);
         float dAng = PVector.angleBetween(velBola(), robosSimulados.get(i).pos);
@@ -182,8 +181,7 @@ class Bola {
         float magAnt = vel.mag();
         vel.set(cos(angBola) + cos(dAng), sin(angBola) + sin(dAng));
         vel.setMag(magAnt);
-      }
-      // rebate e aumenta a velocidade
+      };      // rebate e aumenta a velocidade
     }
   }
 
@@ -194,6 +192,14 @@ class Bola {
   }
 
   void display() {
+    b = createShape();
+    b.beginShape();
+    for (int i = 0; i <= 12; i++){
+      b.vertex(pos.x + 10 * cos(2*PI * i / 12), pos.y + 10 * sin(2*PI * i / 12));
+    }
+    bolaShape.endShape();
+    
+    shape(b);
     fill(255, 150, 0);
     ellipse(pos.x, pos.y, 10, 10);
   }

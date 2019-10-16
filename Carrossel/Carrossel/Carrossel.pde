@@ -8,7 +8,7 @@ boolean debug = true;
 // 0 - camera
 // 1 - video 
 // 2 - simulador
-int inputVideo = 0;
+int inputVideo = 2;
 
 boolean calibra = true;  //Flag de controle se deve ou não calibrar as cores
 boolean visao = false;  //Flag de controle para parar o código logo após jogar a imagem no canvas (visão) a visão ou não
@@ -113,6 +113,7 @@ ArrayList<Robo> oldRobos = new ArrayList<Robo>();
 ArrayList<Robo> robosSimulados = new ArrayList<Robo>();
 ArrayList<PVector> rastro = new ArrayList<PVector>();
 PVector bola = new PVector();
+PShape bolaShape = new PShape();
 
 void setup() {
 
@@ -192,9 +193,17 @@ void draw() {
     if (visao) return;
 
     bola = new PVector(blobs.get(0).center().x, blobs.get(0).center().y);
+    //bolaShape = createShape(ELLIPSE, bola.x, bola.y, blobs.get(0).maxx - blobs.get(0).minx, blobs.get(0).maxy - blobs.get(0).miny);
+    bolaShape = createShape();
+    bolaShape.beginShape();
+    for (int i = 0; i <= 12; i++){
+      bolaShape.vertex(bola.x + (bola.x - blobs.get(0).maxx) * cos(2*PI * i / 12), bola.y + (bola.y - blobs.get(0).maxy) * sin(2*PI * i / 12));
+    }
+    bolaShape.endShape();
 
     //showBola();
     //velBola();
+    shape(bolaShape);
 
     // Inicializa os robos
     if (robos.size() == 0) {

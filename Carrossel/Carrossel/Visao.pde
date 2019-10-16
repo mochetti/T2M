@@ -672,3 +672,52 @@ boolean msmCor(color c1, color c2) {
   if (abs(red(c1) - red(c2)) < lim && abs(green(c1) - green(c2)) < lim && abs(blue(c1) - blue(c2)) < lim && brightnessc1 > brightnessc2 - lim && brightnessc1 < brightnessc2 + lim) return true;
   else return false;
 }
+
+// Verifica se um objeto esta em contato com outro
+boolean isInside(PShape objeto1, PShape objeto2, PVector pos2){
+  int proximo;
+  // Passa por cada vertice de um dos objetos
+  for (int i = 0; i < objeto1.getVertexCount(); i++){
+    proximo = i+1;
+    if (proximo == objeto1.getVertexCount()) proximo = 0;
+    PVector vc = new PVector(objeto1.getVertex(i).x, objeto1.getVertex(i).y);
+    PVector vn = new PVector(objeto1.getVertex(proximo).x, objeto1.getVertex(proximo).y);
+    
+    // Usa os dois pontos (uma linha) para comparar com os vertices do outro poligono
+    boolean colidiu = linhaPoli(objeto2, pos2, vc.x, vc.y,  vn.x, vn.y);
+    if (colidiu) return true;
+  }
+  
+  return false;
+  
+}
+
+// Verifica se um poligono esta em contato com uma linha
+boolean linhaPoli(PShape objeto, PVector posObjeto, float x1, float y1, float x2, float y2){
+  int proximo;
+  // Passa por cada vertice do outro objeto
+  for (int i = 0; i < objeto.getVertexCount(); i++){
+    proximo = i+1;
+    if (proximo == objeto.getVertexCount()) proximo = 0;
+    PVector vc = new PVector(objeto.getVertex(i).x + posObjeto.x, objeto.getVertex(i).y + posObjeto.y);
+    PVector vn = new PVector(objeto.getVertex(proximo).x + posObjeto.x, objeto.getVertex(proximo).y + posObjeto.y);
+    
+    // Faz uma comparacao de linha a linha
+    boolean colidiu = linhaLinha(x1, y1,  x2, y2,  vc.x, vc.y,  vn.x, vn.y);
+    if (colidiu) return true;
+  }
+  return false;
+}
+
+// Verifica se uma linha esta em contato com outra linha
+boolean linhaLinha(float x1, float y1, float x2, float y2, float x3, float y3, float x4, float y4){
+  float uA = ((x4-x3)*(y1-y3) - (y4-y3)*(x1-x3)) / ((y4-y3)*(x2-x1) - (x4-x3)*(y2-y1));
+  float uB = ((x2-x1)*(y1-y3) - (y2-y1)*(x1-x3)) / ((y4-y3)*(x2-x1) - (x4-x3)*(y2-y1));
+  
+  // Se uA e uB estiverem entre 0 e 1, as linhas colidem
+  if (uA >= 0 && uA <= 1 && uB >= 0 && uB <= 1) {
+    return true;
+  }
+  return false;
+
+}
