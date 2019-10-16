@@ -1,6 +1,15 @@
 import processing.video.*;
 import processing.serial.*;
 
+
+/*
+  
+ Por algum motivo os blobs não tão reconhecendo. Não to entendendo o porque o b.show() tá mostrando os blobs. Debugar a visão inteira e debugar a parte dos id's.
+ Printar os id's e colocar robô por robô no campo e tentar separadamente para depois juntá-los. Garantir que estão na posição certa da array
+ 
+ */
+
+
 // Flags de debug
 boolean debug = true;
 
@@ -8,7 +17,7 @@ boolean debug = true;
 // 0 - camera
 // 1 - video 
 // 2 - simulador
-int inputVideo = 0;
+int inputVideo = 2;
 
 boolean calibra = true;  //Flag de controle se deve ou não calibrar as cores
 boolean visao = false;  //Flag de controle para parar o código logo após jogar a imagem no canvas (visão) a visão ou não
@@ -147,6 +156,7 @@ void draw() {
   background(0);
   tempo = millis();
   if (inputVideo == 0) image(cam, 0, 0);
+
   //noFill();
   stroke(255);
   if (isCampoDimensionado) {
@@ -165,101 +175,92 @@ void draw() {
 
     if  (inputVideo == 2) simulador();
 
-    // Armazena as ultimas coordenadas de cada robo
-    oldRobos.clear();
-    for (Robo r : robos) {
-      oldRobos.add(new Robo(r.clone()));
-      // atualiza a frente dos robos simulados
-      if (inputVideo == 2) robosSimulados.get(r.index).frente = r.frente;
-    }
-    robos.clear();
+    /*
+    OBSERVAÇÕES RELACIONADAS A VISÃO PERTINENTES:
+     Antes de chamar a função track(), a array blobs precisa ser resetada para se buscar novos pontos na tela. Assim não deixa o negócio "lento"
+     */
 
-    // Armazena as ultimas coordenadas de cada blob
+    //oldBlobs.clear();
+    //blobs.clear();
+    //for(Robo r : robos) oldBlobs.add(new Robo(r.clone()));
     oldBlobs.clear();
-    for (Blob b : blobs) oldBlobs.add(new Blob(b.clone()));
+    if (blobs.size() > 0)
+      for (Blob b : blobs) oldBlobs.add(new Blob(b.clone()));
     blobs.clear();
 
-    if (debug) return;
+    oldRobos.clear();
+    if (robos.size() > 0)
+      for (Robo r : robos) oldRobos.add(new Robo(r.clone()));
+    robos.clear();
 
-    // Confere o numero de ids validos
-    //print("MAIN: ids validos: ");
-    //for (Blob b : oldBlobs) if (b.id >= 0) print(b.id + "  ");
-    //println("");
-    // Busca os objetos
-    //Aqui atualizo blobs
-
-    if (!track()) return;
+    if (debug) 
+      return;
 
 
+    //Atualiza blobs
+    //for (Blob b : blobs) println(b.cor);
 
-    // debug da visao
-    if (visao) return;
+    track();
+    //noLoop();
+    //Atualiza blobs
+    //for (Blob b : blobs) println(b.id);
+    //for(Blob b : blobs) println(b.id);
+    //Organiza os id's dos blobs
+    //id();
+    //Atualiza robos e ordena id's dos blobs na array
+    //ordenar();
 
+    //A partir daqui pode definir os objetivos.
+    
+    for(Blob b: blobs) println(b.id);
+
+    //Defino a bola
     bola = new PVector(blobs.get(0).center().x, blobs.get(0).center().y);
 
-    //showBola();
-    //velBola();
 
-    // Inicializa os robos
-    if (robos.size() == 0) {
-      for (int i=0; i<3; i++) {
-        robos.add(new Robo(i));
-        //if (blobs.get(1).id != -1) robos.set(0, new Robo(0));
-        //else robos.set(0, new Robo(-1));
-        //if (blobs.get(2).id != -1) robos.set(1, new Robo(1));
-        //else robos.set(1, new Robo(-1));
-        //if (blobs.get(3).id != -1) robos.set(2, new Robo(2));
-        //else robos.set(2, new Robo(-1));
-      }
-    } else {
-      // Atualiza os robos
-      for (int i=0; i < robos.size(); i++) {
-        robos.get(i).atualiza();
-        println(robos.get(i).pos.x);
-      }
-    }
-    // posicoes variaveis
+
+    //Defino as estratégias
     if (estrategia) {
       // Define as estratégias dos robos
 
-      for (Blob b : blobs) println(b.numPixels);
-      //for (Robo r : robos) println(r);
-      robos.get(0).setEstrategia(1);
-      robos.get(1).setEstrategia(1);
-      robos.get(2).setEstrategia(0);
+
+      //if (robos.get(0).pos.x > 0)
+      //  robos.get(0).setEstrategia(1);
+
+      //if (robos.get(1).pos.x > 0)
+      //  robos.get(1).setEstrategia(1);
+      //if (robos.get(2).pos.x > 0)
+      //  robos.get(2).setEstrategia(1);
     }
     // posicoes fixas
     else {
       for (Robo r : robos) r.setEstrategia(estFixa);
     }
-    // Debug das estrategias
+
+    // Debugo as estrategias (mostra na tela)
     for (int i=0; i<robos.size(); i++) {
       //if (robos.get(i).obj.x != 0 || robos.get(i).obj.y != 0) robos.get(i).debugObj();
       robos.get(i).debugObj();
     }
 
-    // Seleciona controle manual ou automatico para o robo 0
+
+    //A partir daqui controle assume
+
     if (gameplay) gameplay(robos.get(0));
     if (controle) {
-      //println("OldBlobs:");
-      //for (int i = 0; i < oldBlobs.size(); i++) {
-      //  if (oldBlobs.size() != 0)
-      //    println(oldBlobs.get(i).id);
-      //}
-      //println("Blobs:");
-      //for (int i = 0; i < blobs.size(); i++) {
-      //  println(blobs.get(i).id);
-      //}
-      alinhaGoleiro(robos.get(0));
+
+      //alinhaGoleiro(robos.get(0));
+
+
+      //alinhaAnda(robos.get(0));
       //alinhaGoleiro(robos.get(2));
-      alinhaAnda(robos.get(1));
-      alinhaAnda(robos.get(2));
+      //alinhaAnda(robos.get(1));
+      //alinhaAnda(robos.get(2));
+
       //alinha(robos.get(2));
     }
 
-    //for(Robo r : robos) ellipse(r.pos.x, r.pos.y, 10, 10);
-
-    // Envia os comandos
+    //A partir daqui envia dados
     if (inputVideo == 0) enviar();
   } else {
     // no simulador, o campo é o próprio canvas
@@ -270,6 +271,7 @@ void draw() {
       dimensionaCampo(0, height);
       return;
     }
+
     //desenha as linhas na tela se formando
     for (int i = 0; i < shapeCampo.getVertexCount() - 1; i++) {
       strokeWeight(2);

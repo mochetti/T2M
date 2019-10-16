@@ -115,13 +115,14 @@ void estrategia(Robo r, int n) {
     PVector sombra = new PVector();
     sombra.x = bola.x + distSombra * cos(ang);
     sombra.y = bola.y + distSombra * sin(ang);
-
+    
     // Condiciona a sombra dentro do campo
     if (sombra.x < shapeCampo.getVertex(0).x) sombra.x = shapeCampo.getVertex(0).x;
     if (sombra.y < shapeCampo.getVertex(0).y) sombra.y = shapeCampo.getVertex(0).y;
     if (sombra.x > shapeCampo.getVertex(2).x) sombra.x = shapeCampo.getVertex(2).x;
     if (sombra.y > shapeCampo.getVertex(2).y) sombra.y = shapeCampo.getVertex(2).y;
-    println("ESTRATÉGIA: Estágio " + r.estagio);
+    //println("ESTRATÉGIA: Estágio " + r.estagio);
+
     if (r.estagio == 0) {
 
       //Set de funções para sempre definir qual o ponto do objetivo
@@ -146,7 +147,7 @@ void estrategia(Robo r, int n) {
          */
         if (sombra.y > height/2) r.setObj(new PVector(sombra.x, sombra.y - 60));  
         else r.setObj(new PVector(sombra.x, sombra.y + 60));
-        println("ESTRATÉGIA: Encontrou a bola no caminho. Indo para a projeção da sombra");
+        //println("ESTRATÉGIA: Encontrou a bola no caminho. Indo para a projeção da sombra");
         r.estagio = 1;
         break;
       }

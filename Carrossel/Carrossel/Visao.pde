@@ -23,7 +23,7 @@ void camConfig() {
 
     // The camera can be initialized directly using an element
     // from the array returned by list():
-    cam = new Capture(this, cameras[20]);
+    cam = new Capture(this, cameras[19]);
     // Or, the settings can be defined based on the text in the list
     //cam = new Capture(this, 640, 480, "Built-in iSight", 30);
 
@@ -55,7 +55,8 @@ void camConfig() {
 int[] corAchada = {0, 0, 0};
 
 // Funcao que atribui coordenadas para os objetos
-boolean track() {
+void track() {
+
   // limpa as cores encontradas
   for (int i=0; i<corAchada.length; i++) corAchada[i] = 0;
 
@@ -64,70 +65,78 @@ boolean track() {
     //Itera a princípio 3x (numero de cores diferentes no jogo - laranja, verde, vermelho)
     for (int index = 0; index < quantCor.length; index++) {
       if (quantCor[index] > 0) {  //Se a qtd de blobs da cor selecionada pelo index for maior que 0, busca no campo pelo numero de cores que quantCor contem
-        print("VISÃO: Buscando novos blobs na cor ");
-        println(index);
+        //println("VISÃO: Buscando novos blobs na cor " + index);
+        //println(index);
         //Aqui busca o campo inteiro pela cor
         //0 - laranja, 1 - verde, 2 - vermelho. O valor do index contem a cor que está sendo procurada
         //Joga o resultado dentro de 'blobs' automaticamente
         //na proxima iteração oldBlobs.size() será diferente de 0
         searchNew(index);
+
+        for (Blob b : blobs) b.show(color(255));
+
+
+        //for (Blob b : blobs) println(index + " - "+ b.id);        
+        //println(blobs.size());
       }
     }
   } else if (oldBlobs.size() > 0) {  //vem aqui na próxima iteração, com valores de -1 na posição onde não achar
     //println("VISÃO: size old blobs: " + oldBlobs.size());
     boolean todosEncontrados = true;
-    for (Blob b : oldBlobs) if (b.id == -1) todosEncontrados = false;
-    for (Blob b : oldBlobs) {
-      if (todosEncontrados) {
-        // Limpa as coordenadas do blob
-        b.reset();
-        if (!search(b)) searchNew(b.cor);
-      } else {
-        //Reseta as cores achadas
-        //E busca por todas as cores novamente
-        corAchada[0] = 0;
-        corAchada[1] = 0;
-        corAchada[2] = 0;
-        searchNew(0);
-        searchNew(1);
-        searchNew(2);
+    IntList coresNaoEncontradas = new IntList();
+    ArrayList<Blob> coresEncontradas = new ArrayList<Blob>();
+    //Descobre quais cores não foram encontradas
+    for (int i = 0; i <= 4; i++) {
+      if (i == 0 || i == 1 || i == 4) {
+        if (oldBlobs.get(i).id == -1) {
+          todosEncontrados = false;
+          coresNaoEncontradas.append(oldBlobs.get(i).cor);
+        } else {
+          coresEncontradas.add(oldBlobs.get(i));
+        }
+      }
+    }
+
+    //for (Blob b : coresEncontradas) println("Encontrado: " + b.cor);
+    //for (int cor : coresNaoEncontradas) println("Nao encontrado: " + cor);
+
+    if (!todosEncontrados) {
+
+      for (Blob blob : coresEncontradas) {
+        //println("Buscando blob já encontrado: " + blob.cor);
+        blob.reset();
+        search(blob);
+      }
+
+      for (int cor : coresNaoEncontradas) {
+        //println("Buscando novo blob: " + cor);
+        searchNew(cor);
+      }
+    } else {
+      //println("Todos blobs encontrados");
+      for (Blob b : oldBlobs) {
+        //println(b.id);
+        if (b.id >= 0) {
+          //println("FUNCAO SEARCH");
+          // Limpa as coordenadas do blob
+          b.reset();
+          //corAchada[b.cor] = 0;
+          if (!search(b)) {
+            //corAchada[b.cor] = 0;
+            searchNew(b.cor);
+          }
+        }
       }
     }
   }
 
-  // Verifica se todos os elementos foram encontrados
-  boolean erro = false;
-  for (int i = 0; i < quantCor.length; i++) {
-    if (corAchada[i] < quantCor[i]) {
-      println("VISÃO: Achamos " + corAchada[i] + " elementos na cor " + i);
-    } else if (corAchada[i] > quantCor[i]) {
-      corAchada[i] = 0;
-      println("VISÃO: Nos excedemos na cor " + i);
-      if (searchNew(i) != quantCor[i]) erro = true;
-    }
-  }
-
-  // Distingue o vermelho maior dos outros
-  pxMaiorBlobVermelho = 0;
-  for (Blob b : blobs) if (b.cor == 2) if (b.numPixels > pxMaiorBlobVermelho) pxMaiorBlobVermelho = b.numPixels;
-  // Distingue o verde maior dos outros
-  pxMenorBlobVerde = pxMaiorBlobVermelho;
-  for (Blob b : blobs) if (b.cor == 1) if (b.numPixels < pxMenorBlobVerde) pxMenorBlobVerde = b.numPixels;
-  //println("VISÃO: pxMaiorBlobVermelho = " + pxMaiorBlobVermelho);
-
-  // Se encontrar algum elemento a mais na cor, erro
-  if (erro) {
-    println("VISÃO: Foram encontrados Blobs A MAIS!");
-
-    return false;
-    // Confere identidade aos objetos
-  }
-  //ID define os ID's pros blobs
   id();
   ordenar();
 
-
-  return true;
+  //while (true) {
+  //  if (blobs.size() < 7) blobs.add(new Blob());
+  //  else break;
+  //}
 }
 
 float distSq(PVector v, PVector u) {
@@ -171,8 +180,10 @@ boolean search (Blob b) {
   float angOff = 0;
   // relacao blob - robo
   int[] relacaoBlobRobo = {-1, 0, 1, 2, 0, 1, 2};
+
   if (b.id == 0) offset = bola;
-  else {
+  else if (b.id > 0) {
+
     offset.x = int(oldRobos.get(relacaoBlobRobo[b.id]).pos.x);
     offset.y = int(oldRobos.get(relacaoBlobRobo[b.id]).pos.y);
     angOff = oldRobos.get(relacaoBlobRobo[b.id]).ang;
@@ -193,6 +204,7 @@ boolean search (Blob b) {
       // posicao no array de pixels da camera
       int loc = 0;
       if (inputVideo == 0) loc = int( x + y * cam.width);
+      if (loc < 0) loc = 0;
       // cor do pixel atual
       color currentColor = 0;
       if (inputVideo == 0) currentColor = cam.pixels[loc];
@@ -222,14 +234,15 @@ boolean search (Blob b) {
     corAchada[b.cor]++;
     return true;
   } else {
-    println("VISÃO: Não encontramos o objeto nessa região");
+    //println("VISÃO: Não encontramos o objeto nessa região");
     return false;
   }
 }
 
 // Acha novos blobs
-int searchNew (int c) {
+void searchNew (int c) {
 
+  ArrayList<Blob> blobAux = new ArrayList<Blob>();
   //Variavel de quantidade de blobs encontrados da cor que está sendo buscada
   int encontramos = 0;
   // Procura por todo o campo
@@ -253,11 +266,15 @@ int searchNew (int c) {
       if (filtroCor(currentColor) && msmCor(currentColor, cores[c])) {
         // Verifica se algum elemento dessa cor já foi encontrado aqui perto
         //Caso seja, veja se o tamanho da array blobs é maior que 0 (já contém algum blob salvo).
-        if (blobs.size() > 0) {
+        if (blobAux.size() > 0) {
           //Booleana que testa se encontrou um blob no campo da cor c
           boolean found = false;
 
-          for (Blob b : blobs) {
+
+          /*
+            Checo dentro dos blobs já existentes se o blob tá perto da posição x, y e se tem a mesma cor. Se tiver perto e tiver a mesma cor, adiciona como mesmo elemento de blob
+           */
+          for (Blob b : blobAux) {
             /*
               Caso o ponto x, y (loc)/pixel que está sendo avaliado no momento esteja próximo do blob em questão
              e a cor do blob é igual à cor que está sendo procurada, a função add() do elemento blob define novos limites
@@ -276,11 +293,13 @@ int searchNew (int c) {
            com a cor c em questão. Atualiza também o valor do encontramos++ para sabermos que encontramos um novo blob.
            Na próxima iterada provavelmente iremos entrar no bloco de cima, buscanndo os pontos próximos
            */
+
+          //Caso seja uma cor, mas não estava próximo de nenhum blob existente de mesma cor, é um novo elemento de blob
           if (!found) {
             // É o pioneiro na região
-            println("VISÃO: Novo blob encontrado");
+            //println("VISÃO: Novo blob encontrado");
             Blob b = new Blob(x, y, c);
-            blobs.add(b);
+            blobAux.add(b);
             encontramos++;
             //ellipse(x, y, 30, 30);
           }
@@ -289,9 +308,9 @@ int searchNew (int c) {
         else {
           // Primeiro blob no campo todo
           //faz a mesma coisa que os outros. Gera novo elemento de blob, na posição x, y, com a cor c em questão e add na array
-          println("VISÃO: Primeiro blob encontrado");
+          //println("VISÃO: Primeiro blob encontrado");
           Blob b = new Blob(x, y, c);
-          blobs.add(b);
+          blobAux.add(b);
           encontramos++;
           //fill(255);
           //point(x, y);
@@ -306,7 +325,7 @@ int searchNew (int c) {
   }
 
   /*
-    Daqui pra baixo no código, já paramos de buscar todo o campo. A principio, a variável blobs agora está populada com os blobs de 0 a 6
+    Daqui pra baixo no código, já paramos de buscar todo o campo. A principio, a variável blobAux agora contem todos os blobs encontrados. Ainda estão sem ID, apenas possuem cor e coordenada
    0 - blob da bola
    1 - centro do verde robo 0
    2 - centro do verde robo 1
@@ -315,51 +334,48 @@ int searchNew (int c) {
    5 - centro do vermelho robo 1
    6 - centro do vermelho robo 2
    */
+  //println(blobAux.size());
 
   //print("VISÃO: Quantidade de blobs: ");
   //println(blobs.size());
 
   // Confere se os blobs tem um numero minimo de pixels
   //Caso tenha algum com menos q o numero minimo de pixel, foi impostor e subtrai um nos blobs encontrados
-  ArrayList<Blob> pixelsBlobs = new ArrayList<Blob>();
-  for (Blob b : blobs) {
-    if (b.numPixels > 15) pixelsBlobs.add(new Blob(b.clone()));
-    else {
-      println("VISÃO: Achamos um impostor com " + b.numPixels + " pixels !");
-      encontramos--;
-    }
+
+  for (int i = 0; i < blobAux.size(); i++) {
+    //Elimina impostores
+    if (blobAux.get(i).numPixels < 15)
+      blobAux.remove(i);
+    //println(blobAux.get(i).cor);
   }
-  blobs.clear();
-  // Copia de volta
-  if (pixelsBlobs.size() > 0) {
-    // Adiciona no array master
-    for (Blob b : pixelsBlobs) blobs.add(new Blob(b.clone()));
-    // Mostra os blobs na tela
-    //São os pontinhos brancos no centro de cada objeto. (Aqui apenas fazemos para saber quais foram detectados e quais não foram
-    //Mas isso não significa que os que ainda estão sendo detectados irão parar de funcionar
-    for (Blob b : blobs) {
-      b.show(color(255));
-    }
-  }
+
   // Verifica se esse searchNew encontrou alguem novo
   //Se encontrou, na posicao de cor da variavel corAchada soma o tanto que encontrou, agora temos dentro de
   //
   if (encontramos > 0) {
     corAchada[c] += encontramos;
-    return encontramos;
+    //return encontramos;
   }
-  return -1;
+
+
+  for (int i = 0; i < blobAux.size(); i++) blobs.add(blobAux.get(i).clone());
 }
 
 // Funcao que atribui identidade aos objetos
 void id() {
   // raio de busca com o vermelho no centro
   int raioBusca = 55;
+
+  //Itera em cima de blobs, função ID é chamada após track. Portanto, track() tem que criar a array blobs e popular mesmo que seja com -1.
   for (Blob b : blobs) {
+    //println(b.id);
+    //println(b.cor);
     // Laranja
     if (b.cor == 0) {
       // O objeto só pode ser a bola
+      //println("SETOU A BOLA");
       b.id = 0;
+
       continue;
     }
 
@@ -370,21 +386,37 @@ void id() {
       if (b.id >= 0) continue;
 
       for (Blob v : blobs) {
+
         noFill();
         stroke(255);
         //ellipse(b.center().x, b.center().y, raioBusca, raioBusca);
         //Estou no primeiro blob verde e pego os proximos blobs vermelhos para este verde.
         //Se o blob for vermelho e a distancia entre os centros do blob verde e vermelho for menor que o raio de busca
         //então significa que é o mesmo robô
+
+
+        //println(distSq(b.center(), v.center()));
+        //println(raioBusca*raioBusca);
         if (v.cor == 2 && (distSq(b.center(), v.center()) < (raioBusca*raioBusca))) {
 
 
-          //Se for o vermelho comprido, significa que são is ids 1 e 4 para o verde e para o vermelho
+          float vermelho = float(v.numPixels);
+          float verde = float(b.numPixels);
+
+          //println("pixels Vermelho: " + vermelho);
+          //println("pixels verde: " + verde);
+          //println("Vermelho/Verde: " + vermelho/verde);
+          //println("Verde/Vermelho: " + verde/vermelho);
+          //println(float(v.numPixels/~b.numPixels));
+          //println(b.numPixels);
+          //Se for o vermelho comprido, significa que são os ids 1 e 4 para o verde e para o vermelho
           //Nesse caso testamos: Se o numero de pixels vermelhos for mais ou menos a mesma qtd de pixels verde:
           //é o robo 0: metade verde e metade vermelho
-          if (abs(v.numPixels/~b.numPixels) > 0.85 && abs(v.numPixels/~b.numPixels) < 1.15) {
+          if (abs(vermelho/verde) > 0.80 && abs(vermelho/verde) < 1.2) {
+            //println("Achou CORES MESMA PROPORCAO");
             b.id = 1;
             v.id = 4;
+            //println(blobs.get(1).id);
             continue;
           }
 
@@ -393,51 +425,56 @@ void id() {
           //Se for o menor são os blobs verde e vermelho de id 2 e 5 respectivamente
           //Nesse caso testamos: Se o nmero de pixels de vermelho for mais ou menos 2x o numero de pixels de verde:
           //é o robô 1: Metade vermelho e 1/4 verde
-          if (abs(v.numPixels/~b.numPixels) > 1.8 && abs(v.numPixels/~b.numPixels) < 2.2) {
+          if (abs(vermelho/verde) > 1.5) {
+            //println("Metade vermelho 1/4 verde");
             b.id = 2;
             v.id = 5;
             continue;
           }
 
-          // Só pode ser o vermelho na direita
-          //Só pode ser o que sobrou, verde e vermelho igual 3 e 6 respectivamente
-          b.id = 3;
-          v.id = 6;
+          if (abs(verde/vermelho) > 1.5) {
+            //println("Metade verde 1/4 vermelho");
+            b.id = 3;
+            v.id = 6;
+            continue;
+          }
         }
       }
     }
   }
+  //for(Blob b: blobs) println(b.id);
 }
 
 // Funcao para fazer coincidir o id do blob com o index dele dentro do array
-boolean ordenar() {
+void ordenar() {
   // Ainda que nem todo mundo esteja em campo, inicializa o array todo
   ArrayList<Blob> newBlobs = new ArrayList<Blob>();
   for (int i = 0; i < quantCor[0] + quantCor[1] + quantCor[2]; i++) {
     newBlobs.add(new Blob());
   }
+
   for (Blob b : blobs) {
     if (b.id >= 0) newBlobs.set(b.id, b.clone());
   }
+  for (Blob b : newBlobs) println(b.id);
   // Copia de volta
   //print("VISÃO: ids: ");
-  blobs.clear();
-  for (Blob b : newBlobs) blobs.add(b.clone());
-  //for(Blob b : blobs) {
-  //  if(b.id >= 0) println(b.id + " com " + b.numPixels + " pixels");
-  //}
-  //println("");
-  // Confere
-  boolean correto = true;
+
+  while (blobs.size() < quantCor[0]+quantCor[1]+quantCor[2]) {
+    blobs.add(new Blob());
+  }
+
+  for (int i = 0; i < newBlobs.size(); i++) blobs.set(i, newBlobs.get(i).clone());
+
   //Serve pra checar se as ordens estão realmente corretas
   for (Blob b : blobs) {
-    if (b.id >= 0 && b.id != blobs.get(b.id).id) {
-      correto = false;
-    }
     if (b.id == 0) rastro.add(new PVector(b.center().x, b.center().y));
   }
-  if (correto) return true;
-  return false;
+
+
+  //Robô 0 foi encontrado
+  //for (int i = 0; i < 3; i++) robos.add(new Robo(i));
+  //if(blobs.get(1).id != -1 && blobs.get(4).id != -1) aux.add(new Robo(0));
 }
 
 // Retorna o vetor velocidade da bola, originado no centro dela

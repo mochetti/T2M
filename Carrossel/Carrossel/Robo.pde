@@ -159,8 +159,10 @@ class Robo {
 
   void setEstrategia(int n) {
     if (pos.x > 0) {
+      //println("Robô: " + index);
       estrategia(this, n);
     } else {
+      //println("Robô perdido: " + index);
       //Valores arbitrários apenas para identificar que o robô não está em campo e não traçar nenhum objetivo no canvas que não seja verdadeiro.
       //Assim que o robô voltar a ter posição X > 0 significa que foi reencontrado, e a partir daí o novo setObj dentro da estrategia dará o local certo que ele deve ir
       setObj(new PVector());
@@ -252,6 +254,7 @@ class Robo {
     arrow(pos.x, pos.y, pos.x + 50*cos(ang), pos.y + 50*sin(ang));
   }
   void debugObj() {
+
     arrow(pos.x, pos.y, obj.x, obj.y);
     fill(255, 0, 0);
     ellipse(obj.x, obj.y, 5, 5);
@@ -282,13 +285,13 @@ class Robo {
       verde = createShape(RECT, -lado/2, 0, lado, lado/2);
       break;
 
-      // zagueiro (xadrez)
+      // zagueiro (metade vermelho 1/4 verde)
     case 1:
-      vermelho = createShape(RECT, -lado/2, -lado/2, lado/2, lado/2);
+      vermelho = createShape(RECT, -lado/2, -lado/2, lado, lado/2);
       verde = createShape(RECT, 0, 0, lado/2, lado/2);
       break;
 
-      // atacante (L)
+      // atacante (metade verde 1/4 vermelho)
     case 2:
       vermelho = createShape(RECT, 0, -lado/2, lado/2, lado/2);
       verde = createShape(RECT, -lado/2, 0, lado, lado/2);
