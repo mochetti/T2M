@@ -114,6 +114,7 @@ Capture cam;
 // 1 - Verde
 // 2 - Vermelho
 int[] quantCor = {1, 3, 3};
+int elementos = 0;
 
 ArrayList<Blob> blobs = new ArrayList<Blob>();
 ArrayList<Blob> oldBlobs = new ArrayList<Blob>();
@@ -126,6 +127,9 @@ PVector bola = new PVector();
 void setup() {
 
   shapeCampo = createShape();
+
+  for (int i : quantCor) elementos += i;
+
 
   //mov = new Movie(this, "real.mp4");
   //mov.play();
@@ -193,71 +197,52 @@ void draw() {
       for (Robo r : robos) oldRobos.add(new Robo(r.clone()));
     robos.clear();
 
-    if (debug) 
-      return;
-
+    if (debug) return;
 
     //Atualiza blobs
-    //for (Blob b : blobs) println(b.cor);
 
     track();
-    //noLoop();
-    //Atualiza blobs
-    //for (Blob b : blobs) println(b.id);
-    //for(Blob b : blobs) println(b.id);
-    //Organiza os id's dos blobs
-    //id();
-    //Atualiza robos e ordena id's dos blobs na array
-    //ordenar();
+    id();
 
-    //A partir daqui pode definir os objetivos.
-    
-    for(Blob b: blobs) println(b.id);
+    //for (Blob b : blobs) print(b.id);
+
+    for (int i = 1; i < 4; i++) {
+      if (blobs.get(i).numPixels > 0 || blobs.get(i+3).numPixels > 0) robos.add(new Robo(i-1));
+      else robos.add(new Robo(-1));
+    }
 
     //Defino a bola
     bola = new PVector(blobs.get(0).center().x, blobs.get(0).center().y);
 
-
+    //A partir daqui pode definir os objetivos.
 
     //Defino as estratégias
     if (estrategia) {
       // Define as estratégias dos robos
+      if (robos.get(0).index >= 0) robos.get(0).setEstrategia(1);
 
+      if (robos.get(1).index >= 0) robos.get(1).setEstrategia(0);
 
-      //if (robos.get(0).pos.x > 0)
-      //  robos.get(0).setEstrategia(1);
+      if (robos.get(2).index >= 0) robos.get(2).setEstrategia(0);
+    } // posicoes fixas
+    else for (Robo r : robos) if (r.index >= 0) r.setEstrategia(estFixa);
 
-      //if (robos.get(1).pos.x > 0)
-      //  robos.get(1).setEstrategia(1);
-      //if (robos.get(2).pos.x > 0)
-      //  robos.get(2).setEstrategia(1);
-    }
-    // posicoes fixas
-    else {
-      for (Robo r : robos) r.setEstrategia(estFixa);
-    }
+    for(Robo r : robos) r.frente();
 
     // Debugo as estrategias (mostra na tela)
-    for (int i=0; i<robos.size(); i++) {
-      //if (robos.get(i).obj.x != 0 || robos.get(i).obj.y != 0) robos.get(i).debugObj();
-      robos.get(i).debugObj();
-    }
-
+    for (Robo r : robos) if (r.index >= 0) r.debugObj();
 
     //A partir daqui controle assume
 
-    if (gameplay) gameplay(robos.get(0));
+
     if (controle) {
+      
+      
+      if(robos.get(0).index >= 0) alinhaAnda(robos.get(0));
+      if(robos.get(1).index >= 0) alinhaAnda(robos.get(1));
+      if(robos.get(2).index >= 0) alinhaAnda(robos.get(2));
 
-      //alinhaGoleiro(robos.get(0));
-
-
-      //alinhaAnda(robos.get(0));
-      //alinhaGoleiro(robos.get(2));
-      //alinhaAnda(robos.get(1));
-      //alinhaAnda(robos.get(2));
-
-      //alinha(robos.get(2));
+      if (gameplay) gameplay(robos.get(0));
     }
 
     //A partir daqui envia dados

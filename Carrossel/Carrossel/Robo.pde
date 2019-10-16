@@ -45,11 +45,13 @@ class Robo {
 
   Robo(int n) {
     index = n;
-    ang = getAng();
-    pos = getPos();
-    vel = new PVector();
-    obj = new PVector();
-    atualiza();
+    if (n >= 0) {
+      ang = getAng();
+      pos = getPos();
+      vel = new PVector();
+      obj = new PVector();
+      atualiza();
+    }
   }
 
   Robo(Robo r) {
@@ -203,31 +205,34 @@ class Robo {
     while (ang > 2*PI) ang -= 2*PI;
     while (ang < 0) ang += 2*PI;
 
-    //println("ROBO: " + index + " ang = " + degrees(ang));
+    println("ROBO: " + index + " ang = " + degrees(ang));
 
     return ang;
+  }
+
+  void frente() {
+    if (obj.mag() != 0) {
+      PVector robObj = new PVector();
+      robObj = PVector.sub(obj, pos);
+      float dAng = PVector.angleBetween(robObj, getDir());
+      if (dAng > 6*PI/10) {
+
+        frente = !frente;
+        if (inputVideo == 2) robosSimulados.get(index).frente = frente;
+      }
+
+
+      getAng();
+      debugAng();
+
+      //println("ROBO: robo " + index + " esta com a frente trocada");
+    }
   }
 
   // atualiza alguns parametros do robo
   void atualiza() {
 
     objAnt = obj;
-
-    // muda a frente do robo se necessário
-    // Vetor robo -> obj
-    if (obj.mag() != 0) {
-      PVector robObj = new PVector();
-      robObj = PVector.sub(obj, pos);
-      float dAng = PVector.angleBetween(robObj, getDir());
-      if (dAng > 6*PI/10) frente = !frente;
-      //println("ROBO: robo " + index + " esta com a frente trocada");
-    }
-
-    getAng();
-    getPos();
-    debugAng();
-
-
 
     switch(index) {
     case 0:
@@ -253,6 +258,7 @@ class Robo {
     //println("ROBO: " + index + "  ang = " + degrees(ang));
     arrow(pos.x, pos.y, pos.x + 50*cos(ang), pos.y + 50*sin(ang));
   }
+
   void debugObj() {
 
     arrow(pos.x, pos.y, obj.x, obj.y);
@@ -287,8 +293,8 @@ class Robo {
 
       // zagueiro (metade vermelho 1/4 verde)
     case 1:
-      vermelho = createShape(RECT, -lado/2, -lado/2, lado, lado/2);
-      verde = createShape(RECT, 0, 0, lado/2, lado/2);
+      vermelho = createShape(RECT, -lado/2, 0, lado, lado/2);
+      verde = createShape(RECT, 0, -lado/2, lado/2, lado/2);
       break;
 
       // atacante (metade verde 1/4 vermelho)

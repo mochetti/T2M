@@ -86,14 +86,13 @@ void track() {
     IntList coresNaoEncontradas = new IntList();
     ArrayList<Blob> coresEncontradas = new ArrayList<Blob>();
     //Descobre quais cores não foram encontradas
-    for (int i = 0; i <= 4; i++) {
-      if (i == 0 || i == 1 || i == 4) {
-        if (oldBlobs.get(i).id == -1) {
-          todosEncontrados = false;
-          coresNaoEncontradas.append(oldBlobs.get(i).cor);
-        } else {
-          coresEncontradas.add(oldBlobs.get(i));
-        }
+    for (int i = 0; i < oldBlobs.size(); i++) {
+
+      if (oldBlobs.get(i).id == -1) {
+        todosEncontrados = false;
+        coresNaoEncontradas.append(oldBlobs.get(i).cor);
+      } else {
+        coresEncontradas.add(oldBlobs.get(i));
       }
     }
 
@@ -129,14 +128,6 @@ void track() {
       }
     }
   }
-
-  id();
-  ordenar();
-
-  //while (true) {
-  //  if (blobs.size() < 7) blobs.add(new Blob());
-  //  else break;
-  //}
 }
 
 float distSq(PVector v, PVector u) {
@@ -183,6 +174,8 @@ boolean search (Blob b) {
 
   if (b.id == 0) offset = bola;
   else if (b.id > 0) {
+
+    //println(oldRobos.size());
 
     offset.x = int(oldRobos.get(relacaoBlobRobo[b.id]).pos.x);
     offset.y = int(oldRobos.get(relacaoBlobRobo[b.id]).pos.y);
@@ -438,43 +431,36 @@ void id() {
             v.id = 6;
             continue;
           }
+        } else {
+          
         }
       }
     }
   }
-  //for(Blob b: blobs) println(b.id);
+
+  while (blobs.size() < elementos) blobs.add(new Blob());
+
+  ordenar();
 }
 
 // Funcao para fazer coincidir o id do blob com o index dele dentro do array
 void ordenar() {
   // Ainda que nem todo mundo esteja em campo, inicializa o array todo
   ArrayList<Blob> newBlobs = new ArrayList<Blob>();
-  for (int i = 0; i < quantCor[0] + quantCor[1] + quantCor[2]; i++) {
-    newBlobs.add(new Blob());
-  }
 
-  for (Blob b : blobs) {
-    if (b.id >= 0) newBlobs.set(b.id, b.clone());
-  }
-  for (Blob b : newBlobs) println(b.id);
+  for (int i = 0; i < elementos; i++) newBlobs.add(new Blob());
+
+  for (Blob b : blobs) if (b.id >= 0) newBlobs.set(b.id, b.clone());
+
   // Copia de volta
-  //print("VISÃO: ids: ");
 
-  while (blobs.size() < quantCor[0]+quantCor[1]+quantCor[2]) {
-    blobs.add(new Blob());
-  }
+  blobs.clear();
+  for (Blob b : newBlobs) blobs.add(b.clone());
 
-  for (int i = 0; i < newBlobs.size(); i++) blobs.set(i, newBlobs.get(i).clone());
 
-  //Serve pra checar se as ordens estão realmente corretas
   for (Blob b : blobs) {
     if (b.id == 0) rastro.add(new PVector(b.center().x, b.center().y));
   }
-
-
-  //Robô 0 foi encontrado
-  //for (int i = 0; i < 3; i++) robos.add(new Robo(i));
-  //if(blobs.get(1).id != -1 && blobs.get(4).id != -1) aux.add(new Robo(0));
 }
 
 // Retorna o vetor velocidade da bola, originado no centro dela
