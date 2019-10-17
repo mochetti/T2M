@@ -465,12 +465,10 @@ void ordenar() {
     if (todosEncontrados) {  //Virou true
       println("VISAO: Novo elemento encontrado!");
 
-      oldRobos.set(0, new Robo(oldRobos.get(0).clone()));
-      oldRobos.get(0).index = 0;
-      oldRobos.set(1, new Robo(oldRobos.get(1).clone()));
-      oldRobos.get(1).index = 1;
-      oldRobos.set(2, new Robo(oldRobos.get(2).clone()));
-      oldRobos.get(2).index = 2;
+      for (int i = 0; i < oldRobos.size(); i++) {
+        oldRobos.set(i, new Robo(oldRobos.get(i).clone()));
+        oldRobos.get(i).index = i;
+      }
     }
   }
 }
