@@ -3,7 +3,7 @@
  Variáveis 
  
  */
-
+boolean todosEncontrados = false;
 boolean isCampoDimensionado = false;
 PShape shapeCampo;
 
@@ -61,12 +61,12 @@ void track() {
   for (int i=0; i<corAchada.length; i++) corAchada[i] = 0;
 
   // Verifica se há blobs salvos no frame anterior, se não houver:
-  if (oldBlobs.size() == 0) {
+  if (!todosEncontrados) {
     //Itera a princípio 3x (numero de cores diferentes no jogo - laranja, verde, vermelho)
     for (int index = 0; index < quantCor.length; index++) {
       if (quantCor[index] > 0) {  //Se a qtd de blobs da cor selecionada pelo index for maior que 0, busca no campo pelo numero de cores que quantCor contem
         //println("VISÃO: Buscando novos blobs na cor " + index);
-        //println(index);
+
         //Aqui busca o campo inteiro pela cor
         //0 - laranja, 1 - verde, 2 - vermelho. O valor do index contem a cor que está sendo procurada
         //Joga o resultado dentro de 'blobs' automaticamente
@@ -75,57 +75,42 @@ void track() {
 
         for (Blob b : blobs) b.show(color(255));
 
-
         //for (Blob b : blobs) println(index + " - "+ b.id);        
         //println(blobs.size());
       }
     }
-  } else if (oldBlobs.size() > 0) {  //vem aqui na próxima iteração, com valores de -1 na posição onde não achar
+  } else {  //vem aqui na próxima iteração, com valores de -1 na posição onde não achar
     //println("VISÃO: size old blobs: " + oldBlobs.size());
-    boolean todosEncontrados = true;
-    IntList coresNaoEncontradas = new IntList();
-    ArrayList<Blob> coresEncontradas = new ArrayList<Blob>();
-    //Descobre quais cores não foram encontradas
-    for (int i = 0; i < oldBlobs.size(); i++) {
 
-      if (oldBlobs.get(i).id == -1) {
-        todosEncontrados = false;
-        coresNaoEncontradas.append(oldBlobs.get(i).cor);
-      } else {
-        coresEncontradas.add(oldBlobs.get(i));
-      }
-    }
-
-    //for (Blob b : coresEncontradas) println("Encontrado: " + b.cor);
-    //for (int cor : coresNaoEncontradas) println("Nao encontrado: " + cor);
-
-    if (!todosEncontrados) {
-
-      for (Blob blob : coresEncontradas) {
-        //println("Buscando blob já encontrado: " + blob.cor);
-        blob.reset();
-        search(blob);
-      }
-
-      for (int cor : coresNaoEncontradas) {
-        //println("Buscando novo blob: " + cor);
-        searchNew(cor);
-      }
-    } else {
-      //println("Todos blobs encontrados");
-      for (Blob b : oldBlobs) {
-        //println(b.id);
-        if (b.id >= 0) {
-          //println("FUNCAO SEARCH");
-          // Limpa as coordenadas do blob
-          b.reset();
+    //println("Todos blobs encontrados");
+    for (Blob b : oldBlobs) {
+      //println(b.id);
+      if (b.id >= 0) {
+        //println("FUNCAO SEARCH");
+        // Limpa as coordenadas do blob
+        b.reset();
+        //corAchada[b.cor] = 0;
+        if (!search(b)) {
           //corAchada[b.cor] = 0;
-          if (!search(b)) {
-            //corAchada[b.cor] = 0;
-            searchNew(b.cor);
-          }
+          searchNew(b.cor);
         }
       }
+
+
+      ////Descobre quais cores não foram encontradas
+      //for (int i = 0; i < oldBlobs.size(); i++) {
+
+      //  if (oldBlobs.get(i).id == -1) {
+      //    todosEncontrados = false;
+      //    //println("Nem todos encontrados");
+      //    coresNaoEncontradas.append(oldBlobs.get(i).cor);
+      //  } else {
+      //    coresEncontradas.add(oldBlobs.get(i));
+      //  }
+      //}
+
+      //for (Blob b : coresEncontradas) println("Encontrado: " + b.cor);
+      //for (int cor : coresNaoEncontradas) println("Nao encontrado: " + cor);
     }
   }
 }
@@ -432,13 +417,17 @@ void id() {
             continue;
           }
         } else {
-          
         }
       }
     }
   }
 
-  while (blobs.size() < elementos) blobs.add(new Blob());
+  //todosEncontrados = true;
+  while (blobs.size() < elementos) {
+    blobs.add(new Blob());
+    //todosEncontrados = false;
+  }
+
 
   ordenar();
 }
@@ -458,8 +447,31 @@ void ordenar() {
   for (Blob b : newBlobs) blobs.add(b.clone());
 
 
-  for (Blob b : blobs) {
-    if (b.id == 0) rastro.add(new PVector(b.center().x, b.center().y));
+  for (Blob b : blobs) if (b.id == 0) rastro.add(new PVector(b.center().x, b.center().y));
+
+
+  //Esse bloco de código garante que ao encontrar um novo elemento (robô)
+  //As informações dos outros como estágio, estratégia, posição, não se percam no próximo frame atualizado
+  if (todosEncontrados) {
+    for (Blob b : blobs) if (b.id == -1) todosEncontrados = false;
+  } else if (oldRobos.size() > 0) {
+
+    //Checar se todoEncontrados era false e virou true
+    //Seta true, passa pelo teste. Se virar false é porq não virou true. Se continuar true é porque virou.
+    todosEncontrados = true;
+
+    for (Blob b : blobs) if (b.id == -1) todosEncontrados = false;
+
+    if (todosEncontrados) {  //Virou true
+      println("VISAO: Novo elemento encontrado!");
+
+      oldRobos.set(0, new Robo(oldRobos.get(0).clone()));
+      oldRobos.get(0).index = 0;
+      oldRobos.set(1, new Robo(oldRobos.get(1).clone()));
+      oldRobos.get(1).index = 1;
+      oldRobos.set(2, new Robo(oldRobos.get(2).clone()));
+      oldRobos.get(2).index = 2;
+    }
   }
 }
 

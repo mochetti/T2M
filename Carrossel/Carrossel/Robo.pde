@@ -48,9 +48,21 @@ class Robo {
     if (n >= 0) {
       ang = getAng();
       pos = getPos();
+      atualiza();
+    }
+    vel = new PVector();
+    obj = new PVector();
+  }
+
+  Robo(int n, int b) {
+    index = n;
+    if (n >= 0) {
+      ang = getAng();
+      pos = getPos();
       vel = new PVector();
       obj = new PVector();
       atualiza();
+      estagio = b;
     }
   }
 
@@ -163,9 +175,8 @@ class Robo {
 
   void setEstrategia(int n) {
 
-      //println("Robô: " + index);
-      estrategia(this, n);
-    
+    //println("Robô: " + index);
+    estrategia(this, n);
   }
 
   // Retorna um vetor correspondente à direçao do robo
@@ -185,7 +196,7 @@ class Robo {
       //line(blobs.get(1).center().x, blobs.get(1).center().y, blobs.get(4).center().x, blobs.get(4).center().y);
       break;
 
-//Angulo do robô 1 é PI defasado
+      //Angulo do robô 1 é PI defasado
     case 1:    // Vermelho maior
       ang = atan2(- blobs.get(5).center().y + blobs.get(2).center().y, - blobs.get(5).center().x + blobs.get(2).center().x);
       ang -= atan(0.5);
@@ -203,7 +214,7 @@ class Robo {
     while (ang > 2*PI) ang -= 2*PI;
     while (ang < 0) ang += 2*PI;
 
-    println("ROBO: " + index + " ang = " + degrees(ang));
+    //println("ROBO: " + index + " ang = " + degrees(ang));
 
     return ang;
   }

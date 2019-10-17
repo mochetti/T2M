@@ -181,7 +181,7 @@ void estrategia(Robo r, int n) {
        */
       float distTol = 130;
       //Significa que tá muito longe, reseta tudo
-      println(r.obj);
+      //println(r.obj);
       if (distSq(r.obj, bola) > distTol*distTol) {
         println("ESTRATÉGIA: projeção se afastou demais da bola. Reiniciando estágios");
         r.estagio = 0;
@@ -262,7 +262,7 @@ void estrategia(Robo r, int n) {
        a bola e só irá parar caso a distância entre eles também fique muito grande
        */
     } else if (r.estagio == 3) {
-      println("passou por aqui");
+      //println("passou por aqui");
       //novo objetivo do robo é a própria bola
       r.setObj(bola);
       //noFill();

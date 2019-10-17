@@ -9,6 +9,8 @@ import processing.serial.*;
  
  */
 
+int tempoInicial;
+int tempoFinal;
 
 // Flags de debug
 boolean debug = true;
@@ -17,7 +19,7 @@ boolean debug = true;
 // 0 - camera
 // 1 - video 
 // 2 - simulador
-int inputVideo = 0;
+int inputVideo = 2;
 
 boolean calibra = true;  //Flag de controle se deve ou não calibrar as cores
 boolean visao = false;  //Flag de controle para parar o código logo após jogar a imagem no canvas (visão) a visão ou não
@@ -120,6 +122,7 @@ ArrayList<Blob> blobs = new ArrayList<Blob>();
 ArrayList<Blob> oldBlobs = new ArrayList<Blob>();
 ArrayList<Robo> robos = new ArrayList<Robo>();
 ArrayList<Robo> oldRobos = new ArrayList<Robo>();
+ArrayList<Robo> oldRobosEstrategias = new ArrayList<Robo>();
 ArrayList<Robo> robosSimulados = new ArrayList<Robo>();
 ArrayList<PVector> rastro = new ArrayList<PVector>();
 PVector bola = new PVector();
@@ -130,6 +133,7 @@ void setup() {
 
   for (int i : quantCor) elementos += i;
 
+  tempoInicial = millis();
 
   //mov = new Movie(this, "real.mp4");
   //mov.play();
@@ -159,6 +163,9 @@ void draw() {
   //loadPixels();
   background(0);
   tempo = millis();
+  //println(tempo);
+
+  //tempo = 0;
   if (inputVideo == 0) image(cam, 0, 0);
 
   //noFill();
@@ -196,21 +203,15 @@ void draw() {
     if (robos.size() > 0)
       for (Robo r : robos) oldRobos.add(new Robo(r.clone()));
 
-
-
-    //for(Robo r : oldRobos) print(r.estagio);
-    //println();
     robos.clear();
     blobs.clear();
     if (debug) return;
 
     //Atualiza blobs
 
+
     track();
     id();
-
-    //for (Blob b : blobs) print(b.id);
-
 
 
     for (int i = 1; i < 4; i++) {
@@ -233,7 +234,7 @@ void draw() {
       // Define as estratégias dos robos
 
 
-      if (robos.get(0).index >= 0) robos.get(0).setEstrategia(0);
+      if (robos.get(0).index >= 0) robos.get(0).setEstrategia(1);
       if (robos.get(1).index >= 0) robos.get(1).setEstrategia(6);
 
       if (robos.get(2).index >= 0) robos.get(2).setEstrategia(6);
@@ -241,7 +242,7 @@ void draw() {
     else for (Robo r : robos) if (r.index >= 0) r.setEstrategia(estFixa);
 
     //r.frente() não pode vir antes da estratégia, precisa ter os objetivos definidos.
-    for (Robo r : robos) if(r.index >= 0) r.frente();
+    for (Robo r : robos) if (r.index >= 0) r.frente();
 
     //print(robos.get(0).ang);
 
