@@ -205,22 +205,22 @@ class Robo {
     while (ang > 2*PI) ang -= 2*PI;
     while (ang < 0) ang += 2*PI;
 
-    println("ROBO: " + index + " ang = " + degrees(ang));
+    //println("ROBO: " + index + " ang = " + degrees(ang));
 
     return ang;
   }
 
+  // Verifica se é necessário mudar a frente do robo (só tem efeito se chamado depois de definir os objetivos de cada robo)
   void frente() {
     if (obj.mag() != 0) {
       PVector robObj = new PVector();
       robObj = PVector.sub(obj, pos);
       float dAng = PVector.angleBetween(robObj, getDir());
-      if (dAng > 6*PI/10) {
-
+      if (dAng > 7*PI/10) {
         frente = !frente;
-        if (inputVideo == 2) robosSimulados.get(index).frente = frente;
+        println("ROBO: dAng do robo " + index + " = " + degrees(dAng));
       }
-
+      if (inputVideo == 2) robosSimulados.get(index).frente = frente;
 
       getAng();
       debugAng();

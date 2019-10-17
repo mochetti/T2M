@@ -127,10 +127,10 @@ void estrategia(Robo r, int n) {
 
       //Set de funções para sempre definir qual o ponto do objetivo
       r.setObj(sombra);
-      noFill();
-      stroke(255);
-      ellipse(sombra.x, sombra.y, 20, 20);
-      arrow(sombra.x, sombra.y, bola.x, bola.y);
+      //noFill();
+      //stroke(255);
+      //ellipse(sombra.x, sombra.y, 20, 20);
+      //arrow(sombra.x, sombra.y, bola.x, bola.y);
 
       /*
         Até aqui apenas calculamos a posição da sombra e nesse meio tempo o robô está seguindo ela
@@ -147,13 +147,13 @@ void estrategia(Robo r, int n) {
          */
         if (sombra.y > height/2) r.setObj(new PVector(sombra.x, sombra.y - 60));  
         else r.setObj(new PVector(sombra.x, sombra.y + 60));
-        //println("ESTRATÉGIA: Encontrou a bola no caminho. Indo para a projeção da sombra");
+        println("ESTRATÉGIA: Robo " + r.index + " encontrou a bola no caminho. Indo para a projeção da sombra");
         r.estagio = 1;
         break;
       }
       //Nesta parte do código, o robô encontrou a sombra sem a bola estar entre eles e foi direto para o estágio de chutar a bola
       if (distSq(r.pos, sombra) < 15*15) {
-        println("ESTRATÉGIA: Chegou na sombra real. Indo em direção a bola");
+        println("ESTRATÉGIA: Robo " + r.index + " chegou na sombra real. Indo em direção a bola");
         r.estagio = 3;
         break;
       }
@@ -167,11 +167,11 @@ void estrategia(Robo r, int n) {
       //
 
       //pintamos na tela o novo objetivo do robô, que é a projeção da sombra
-      noFill();
-      stroke(255);
-      ellipse(r.obj.x, r.obj.y, 20, 20);
-      arrow(r.obj.x, r.obj.y, sombra.x, sombra.y);
-      ellipse(sombra.x, sombra.y, 10, 10);
+      //noFill();
+      //stroke(255);
+      //ellipse(r.obj.x, r.obj.y, 20, 20);
+      //arrow(r.obj.x, r.obj.y, sombra.x, sombra.y);
+      //ellipse(sombra.x, sombra.y, 10, 10);
 
 
       /*
@@ -206,11 +206,6 @@ void estrategia(Robo r, int n) {
       //Continuar indo até a projeção da sombra até chegar ou até a projeção se distanciar muito da bola
 
 
-
-
-
-
-
       //if (isInside(r.pos, shapeCampo.getChild(0))) {
       //}
 
@@ -237,10 +232,10 @@ void estrategia(Robo r, int n) {
 
       //Set de funções para sempre definir qual o ponto do objetivo
       r.setObj(sombra);
-      noFill();
-      stroke(255);
-      ellipse(sombra.x, sombra.y, 20, 20);
-      arrow(sombra.x, sombra.y, bola.x, bola.y);
+      //noFill();
+      //stroke(255);
+      //ellipse(sombra.x, sombra.y, 20, 20);
+      //arrow(sombra.x, sombra.y, bola.x, bola.y);
 
       if (distSq(r.pos, sombra) < 15*15) {
 
@@ -256,7 +251,7 @@ void estrategia(Robo r, int n) {
        Neste caso, devemos resetar para o estágio 0, onde existe a checagem se a bola está no meio ou não
        */
       if (distSq(r.pos, bola) > 150*150) {
-        println("ESTRATÉGIA: Robô se distanciou muito da bola enquanto perseguia sua sombra real. Resetando estágios");
+        println("ESTRATÉGIA: Robô " + r.index + " se distanciou muito da bola enquanto perseguia sua sombra real. Resetando estágios");
         r.estagio = 0;
       }
 
@@ -265,13 +260,13 @@ void estrategia(Robo r, int n) {
        a bola e só irá parar caso a distância entre eles também fique muito grande
        */
     } else if (r.estagio == 3) {
-
-      //pintamos na tela o novo objetivo do robô, que é a projeção da sombra
+      println("passou por aqui");
+      //novo objetivo do robo é a própria bola
       r.setObj(bola);
-      noFill();
-      stroke(255);
-      ellipse(r.obj.x, r.obj.y, 20, 20);
-      arrow(r.obj.x, r.obj.y, bola.x, bola.y);
+      //noFill();
+      //stroke(255);
+      //ellipse(r.obj.x, r.obj.y, 20, 20);
+      //arrow(r.obj.x, r.obj.y, bola.x, bola.y);
 
       /*
         Aqui, antes de mandarmos ele seguir a bola devemos checar se faz sentido correr atrás dela ou não. Isso checaremos
@@ -280,7 +275,7 @@ void estrategia(Robo r, int n) {
       float distTol = 130;
       //Significa que tá muito longe, reseta tudo
       if (distSq(r.pos, bola) > distTol*distTol) {
-        println("ESTRATÉGIA: robô se afastou demais da bola. Resetando os estágios");
+        println("ESTRATÉGIA: Robo " + r.index + " se afastou demais da bola. Resetando os estágios");
         r.estagio = 0;
         break;
       }
