@@ -147,8 +147,9 @@ void estrategia(Robo r, int n) {
          */
         if (sombra.y > height/2) r.setObj(new PVector(sombra.x, sombra.y - 60));  
         else r.setObj(new PVector(sombra.x, sombra.y + 60));
-        println("ESTRATÉGIA: Robo " + r.index + " encontrou a bola no caminho. Indo para a projeção da sombra");
+        //println("ESTRATÉGIA: Robo " + r.index + " encontrou a bola no caminho. Indo para a projeção da sombra");
         r.estagio = 1;
+        //print(r.estagio);
         break;
       }
       //Nesta parte do código, o robô encontrou a sombra sem a bola estar entre eles e foi direto para o estágio de chutar a bola
@@ -180,6 +181,7 @@ void estrategia(Robo r, int n) {
        */
       float distTol = 130;
       //Significa que tá muito longe, reseta tudo
+      println(r.obj);
       if (distSq(r.obj, bola) > distTol*distTol) {
         println("ESTRATÉGIA: projeção se afastou demais da bola. Reiniciando estágios");
         r.estagio = 0;
@@ -456,8 +458,9 @@ void estrategia(Robo r, int n) {
     else if (r.index == 2) r.setObj(golAmigo.x + 100, golAmigo.y + 100);  
     // Checa se já está perto do objetivo
     if (distSq(r.pos, r.obj) < tolDist*tolDist) {
-      r.angObj = 0;
-      if (abs(r.ang - PI/2) > PI/2) r.angObj = PI;
+      r.angObj = PI;
+      //println(degrees(r.ang) + " " + r.index);
+      if (cos(r.ang) > 0) r.angObj = 0;
       //println(degrees(r.ang - PI/2));
     } else r.angObj = -1;
     break;

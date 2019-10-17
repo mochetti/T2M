@@ -58,11 +58,13 @@ class Robo {
     pos = r.pos;
     vel = r.vel;
     ang = r.ang;
+    frente = r.frente;
     index = r.index;
-
+    estagio = r.estagio;
     angAnt = r.angAnt;
     obj = r.obj;
     objAnt = r.objAnt;
+    atualiza();
   }
 
   // construtor usado pelo simulador
@@ -160,15 +162,10 @@ class Robo {
   }
 
   void setEstrategia(int n) {
-    if (pos.x > 0) {
+
       //println("Robô: " + index);
       estrategia(this, n);
-    } else {
-      //println("Robô perdido: " + index);
-      //Valores arbitrários apenas para identificar que o robô não está em campo e não traçar nenhum objetivo no canvas que não seja verdadeiro.
-      //Assim que o robô voltar a ter posição X > 0 significa que foi reencontrado, e a partir daí o novo setObj dentro da estrategia dará o local certo que ele deve ir
-      setObj(new PVector());
-    }
+    
   }
 
   // Retorna um vetor correspondente à direçao do robo
@@ -188,9 +185,10 @@ class Robo {
       //line(blobs.get(1).center().x, blobs.get(1).center().y, blobs.get(4).center().x, blobs.get(4).center().y);
       break;
 
+//Angulo do robô 1 é PI defasado
     case 1:    // Vermelho maior
-      ang = atan2(- blobs.get(2).center().y + blobs.get(5).center().y, - blobs.get(2).center().x + blobs.get(5).center().x);
-      ang -= atan(0.5) + PI;
+      ang = atan2(- blobs.get(5).center().y + blobs.get(2).center().y, - blobs.get(5).center().x + blobs.get(2).center().x);
+      ang -= atan(0.5);
       //line(blobs.get(2).center().x, blobs.get(2).center().y, blobs.get(5).center().x, blobs.get(5).center().y);
       break;
 
@@ -205,7 +203,7 @@ class Robo {
     while (ang > 2*PI) ang -= 2*PI;
     while (ang < 0) ang += 2*PI;
 
-    //println("ROBO: " + index + " ang = " + degrees(ang));
+    println("ROBO: " + index + " ang = " + degrees(ang));
 
     return ang;
   }
@@ -218,7 +216,7 @@ class Robo {
       float dAng = PVector.angleBetween(robObj, getDir());
       if (dAng > 7*PI/10) {
         frente = !frente;
-        println("ROBO: dAng do robo " + index + " = " + degrees(dAng));
+        //println("ROBO: dAng do robo " + index + " = " + degrees(dAng));
       }
       if (inputVideo == 2) robosSimulados.get(index).frente = frente;
 
@@ -231,6 +229,9 @@ class Robo {
 
   // atualiza alguns parametros do robo
   void atualiza() {
+
+    getPos();
+    getAng();
 
     objAnt = obj;
 
@@ -260,7 +261,7 @@ class Robo {
   }
 
   void debugObj() {
-
+    //println(obj);
     arrow(pos.x, pos.y, obj.x, obj.y);
     fill(255, 0, 0);
     ellipse(obj.x, obj.y, 5, 5);

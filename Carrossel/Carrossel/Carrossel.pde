@@ -190,13 +190,18 @@ void draw() {
     oldBlobs.clear();
     if (blobs.size() > 0)
       for (Blob b : blobs) oldBlobs.add(new Blob(b.clone()));
-    blobs.clear();
+
 
     oldRobos.clear();
     if (robos.size() > 0)
       for (Robo r : robos) oldRobos.add(new Robo(r.clone()));
-    robos.clear();
 
+
+
+    //for(Robo r : oldRobos) print(r.estagio);
+    //println();
+    robos.clear();
+    blobs.clear();
     if (debug) return;
 
     //Atualiza blobs
@@ -206,9 +211,16 @@ void draw() {
 
     //for (Blob b : blobs) print(b.id);
 
+
+
     for (int i = 1; i < 4; i++) {
-      if (blobs.get(i).numPixels > 0 || blobs.get(i+3).numPixels > 0) robos.add(new Robo(i-1));
-      else robos.add(new Robo(-1));
+      if (oldRobos.size() == 0) {
+        if (blobs.get(i).numPixels > 0 || blobs.get(i+3).numPixels > 0) robos.add(new Robo(i-1));
+        else robos.add(new Robo(-1));
+      } else {
+        if (blobs.get(i).numPixels > 0 || blobs.get(i+3).numPixels > 0) robos.add(new Robo(oldRobos.get(i-1).clone()));
+        else robos.add(new Robo(-1));
+      }
     }
 
     //Defino a bola
@@ -219,15 +231,19 @@ void draw() {
     //Defino as estratégias
     if (estrategia) {
       // Define as estratégias dos robos
-      if (robos.get(0).index >= 0) robos.get(0).setEstrategia(1);
 
+
+      if (robos.get(0).index >= 0) robos.get(0).setEstrategia(1);
       if (robos.get(1).index >= 0) robos.get(1).setEstrategia(6);
 
       if (robos.get(2).index >= 0) robos.get(2).setEstrategia(6);
     } // posicoes fixas
     else for (Robo r : robos) if (r.index >= 0) r.setEstrategia(estFixa);
 
-    for(Robo r : robos) r.frente();
+    //r.frente() não pode vir antes da estratégia, precisa ter os objetivos definidos.
+    for (Robo r : robos) r.frente();  
+
+    //print(robos.get(0).ang);
 
     // Debugo as estrategias (mostra na tela)
     for (Robo r : robos) if (r.index >= 0) r.debugObj();
@@ -236,11 +252,11 @@ void draw() {
 
 
     if (controle) {
-      
-      
-      if(robos.get(0).index >= 0) alinhaAnda(robos.get(0));
-      if(robos.get(1).index >= 0) alinhaAnda(robos.get(1));
-      if(robos.get(2).index >= 0) alinhaAnda(robos.get(2));
+
+
+      if (robos.get(0).index >= 0) alinhaAnda(robos.get(0));
+      if (robos.get(1).index >= 0) alinhaAnda(robos.get(1));
+      if (robos.get(2).index >= 0) alinhaAnda(robos.get(2));
 
       if (gameplay) gameplay(robos.get(0));
     }
