@@ -8,7 +8,7 @@ void estrategia(Robo r, int n) {
   // Distancia que o robo pega pra empurrar a bola
   float distSombra = 100;
   // Distancia entre o X do goleiro e o X do centro do gol
-  float distGoleiro = 30;
+  float distGoleiro = 15;
   // Parametros da reta da bola
   float aBola, bBola;
   // Raio de tolerancia para colisao

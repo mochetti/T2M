@@ -239,17 +239,17 @@ class Robo {
     case 0:
       velEmin = 3;
       velDmin = 3;
-      kP = 0.25;
+      kP = 0;
       break;
     case 1:
-      velEmin = 1.5;
-      velDmin = 1.5;
-      kP = 0.5;
+      velEmin = 2.5;
+      velDmin = 2.5;
+      kP = 0.3;
       break;
     default:
       velEmin = 2.5;
       velDmin = 2.5;
-      kP = 0;
+      kP = 0.3;
       break;
     }
   }

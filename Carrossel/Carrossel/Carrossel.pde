@@ -17,7 +17,7 @@ boolean debug = true;
 // 0 - camera
 // 1 - video 
 // 2 - simulador
-int inputVideo = 2;
+int inputVideo = 0;
 
 boolean calibra = true;  //Flag de controle se deve ou não calibrar as cores
 boolean visao = false;  //Flag de controle para parar o código logo após jogar a imagem no canvas (visão) a visão ou não
@@ -233,7 +233,7 @@ void draw() {
       // Define as estratégias dos robos
 
 
-      if (robos.get(0).index >= 0) robos.get(0).setEstrategia(1);
+      if (robos.get(0).index >= 0) robos.get(0).setEstrategia(0);
       if (robos.get(1).index >= 0) robos.get(1).setEstrategia(6);
 
       if (robos.get(2).index >= 0) robos.get(2).setEstrategia(6);

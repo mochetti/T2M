@@ -163,7 +163,7 @@ float distColorSq(color c1, color c2) {
 // Checa se o blob está próximo ao do frame anterior
 boolean search (Blob b) {
   // raio de busca em relacao à ultima posicao de cada blob
-  int raioBusca = 25;
+  int raioBusca = 15;
   // Contagem de pixels por blob
   int count = 0;
   // offset 
