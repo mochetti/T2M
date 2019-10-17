@@ -7,7 +7,7 @@ byte velViagem = 30;
 
 // Alinha e anda
 void alinhaAnda(Robo r) {
-  
+
   // Verifica se a bola está perto
   //if (distSq(r.getPos(), bola) < 15*15) {
   //  gira(r, true);
@@ -21,7 +21,7 @@ void alinhaAnda(Robo r) {
     else alinhaP(r, r.angObj);
     return;
   }
-  if(r.obj == r.pos) return;
+  if (r.obj == r.pos) return;
   // Vetor robo -> obj
   PVector robObj = new PVector();
   robObj = PVector.sub(r.obj, r.pos);
@@ -33,9 +33,9 @@ void alinhaAnda(Robo r) {
   //println("CONTROLE: ang obj = " + degrees(ang));
   //println("CONTROLE: ang robo = " + degrees(r.ang));
   //println("CONTROLE: dAng = " + degrees(dAng));
-  if (abs(dAng) < radians(tolAng)) {
+  if (abs(dAng) < radians(r.tolAng)) {
     // Anda reto
-    
+
     //println("CONTROLE: Robo " + r.index + " Anda reto");
     //r.velE = r.velEmin;
     //r.velD = r.velDmin;
@@ -67,6 +67,13 @@ void alinha(Robo r, float ang) {
   }
 }
 
+//True é horario, e false é antihorário
+void chutaGirando(Robo r) {
+
+  r.setVel(50, -40);
+  
+}
+
 // Alinha proporcional à distancia do angulo desejado
 void alinhaP(Robo r, float ang) {
   // Constante de proporcionalidade
@@ -74,13 +81,32 @@ void alinhaP(Robo r, float ang) {
   float angRobo = r.ang;
   float dAng = ang - angRobo;
 
+  while (dAng < -7*PI/10) dAng += 2*PI;
+  while (dAng > 7*PI/10) dAng -= 2*PI;
+
+  //println("dAng = " + degrees(dAng));
+
+  float dVelE = abs(dAng)*10/(7*PI);
+  dVelE = map(dVelE, 0, 1, 0, 63 - r.velEmin);
+
+  float dVelD = abs(dAng)*10/(7*PI);
+  dVelD = map(dVelD, 0, 1, 0, 63 - r.velDmin);
+
+  //if (r.index == 0) println("dVelE = " + dVelE);
+
   if (sin(dAng) > 0) {
     //println("CONTROLE: Robo " + r.index + " Gira horário");
-    r.setVel(r.velEmin+r.kP*abs(dAng)*r.velEmin, -r.velDmin+r.kP*-abs(dAng)*r.velDmin);
+    //if (r.index == 0) {
+    //  print("ANG ROBO: " + degrees(angRobo) + " angObj: " + degrees(ang) + " velEmin: " + r.velEmin + " dVel: " + r.kP*abs(dAng)*r.velEmin);
+    //  println("CONTROLE: Robo " + r.index + " KP: " + r.kP + " dAng: " + degrees(dAng));
+    //}
+
+    r.setVel(r.velEmin+r.kP*dVelE, -r.velDmin-r.kP*dVelD);
     //r.setVel(r.kP*abs(dAng)*r.velEmin, r.kP*-abs(dAng)*r.velDmin);
   } else if (sin(dAng) < 0) {
     //println("CONTROLE: Robo " + r.index + " Gira anti horário");
-    r.setVel(-r.velEmin+r.kP*-abs(dAng)*r.velEmin, r.velDmin+r.kP*abs(dAng)*r.velDmin);
+    //println("CONTROLE: Robo " + r.index + " KP: " + r.kP + " dAng: " + dAng);
+    r.setVel(-r.velEmin-r.kP*dVelE, r.velDmin+r.kP*dVelD);
     //r.setVel(r.kP*abs(dAng)*r.velEmin, r.kP*-abs(dAng)*r.velDmin);
   }
 }
@@ -111,7 +137,7 @@ void alinhaGoleiro(Robo r) {
   //println("CONTROLE: ang obj = " + degrees(ang));
   //println("CONTROLE: ang robo = " + degrees(r.ang));
   //println("CONTROLE: dAng = " + degrees(dAng));
-  
+
   if (dAng < radians(tolAng)) {
     // Anda reto
     //println("CONTROLE: Robo " + r.index + " Anda reto");

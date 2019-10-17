@@ -19,7 +19,7 @@ boolean debug = true;
 // 0 - camera
 // 1 - video 
 // 2 - simulador
-int inputVideo = 2;
+int inputVideo = 0;
 
 boolean calibra = true;  //Flag de controle se deve ou não calibrar as cores
 boolean visao = false;  //Flag de controle para parar o código logo após jogar a imagem no canvas (visão) a visão ou não
@@ -51,9 +51,9 @@ Serial myPort;
 // Salvar as cores num txt pra poupar tempo na hora de calibrar (?)
 // Cores
 color cores[] = { 
-  color(255, 150, 0), // Laranja
-  color(0, 255, 0), // Verde
-  color(255, 0, 0) // Vermelho
+  color(245, 166, 73), // Laranja
+  color(16, 148, 238), // Verde
+  color(238, 96, 119) // Vermelho
 };
 
 // id de cada objeto
@@ -113,7 +113,7 @@ Capture cam;
 // quantidade de objetos de cada cor
 // [] - Cor
 // 0 - Laranja
-// 1 - Verde
+// 1 - Azul
 // 2 - Vermelho
 int[] quantCor = {1, 3, 3};
 int elementos = 0;
@@ -122,7 +122,6 @@ ArrayList<Blob> blobs = new ArrayList<Blob>();
 ArrayList<Blob> oldBlobs = new ArrayList<Blob>();
 ArrayList<Robo> robos = new ArrayList<Robo>();
 ArrayList<Robo> oldRobos = new ArrayList<Robo>();
-ArrayList<Robo> oldRobosEstrategias = new ArrayList<Robo>();
 ArrayList<Robo> robosSimulados = new ArrayList<Robo>();
 ArrayList<PVector> rastro = new ArrayList<PVector>();
 PVector bola = new PVector();
@@ -167,6 +166,8 @@ void draw() {
 
   //tempo = 0;
   if (inputVideo == 0) image(cam, 0, 0);
+
+
 
   //noFill();
   stroke(255);
@@ -234,7 +235,7 @@ void draw() {
       // Define as estratégias dos robos
 
 
-      if (robos.get(0).index >= 0) robos.get(0).setEstrategia(1);
+      if (robos.get(0).index >= 0) robos.get(0).setEstrategia(5);
       if (robos.get(1).index >= 0) robos.get(1).setEstrategia(6);
 
       if (robos.get(2).index >= 0) robos.get(2).setEstrategia(6);
@@ -242,7 +243,7 @@ void draw() {
     else for (Robo r : robos) if (r.index >= 0) r.setEstrategia(estFixa);
 
     //r.frente() não pode vir antes da estratégia, precisa ter os objetivos definidos.
-    for (Robo r : robos) if (r.index >= 0) r.frente();
+    for (Robo r : robos) if (r.index >= 0 && !r.girando) r.frente();
 
     //print(robos.get(0).ang);
 
@@ -254,10 +255,11 @@ void draw() {
 
     if (controle) {
 
+      println(robos.get(0).girando);
 
-      if (robos.get(0).index >= 0) alinhaAnda(robos.get(0));
-      if (robos.get(1).index >= 0) alinhaAnda(robos.get(1));
-      if (robos.get(2).index >= 0) alinhaAnda(robos.get(2));
+      if (robos.get(0).index >= 0 && !robos.get(0).girando) alinhaAnda(robos.get(0));
+      if (robos.get(1).index >= 0 && !robos.get(1).girando) alinhaAnda(robos.get(1));
+      if (robos.get(2).index >= 0 && !robos.get(2).girando) alinhaAnda(robos.get(2));
 
       if (gameplay) gameplay(robos.get(0));
     }

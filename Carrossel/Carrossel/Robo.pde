@@ -39,9 +39,11 @@ class Robo {
   int v = 0;
   int index;
   PShape corpo;
+  float tolAng;
   // 0 = verde -> vermelho
   // 1 = verde <- vermelho
   boolean frente = false;
+  boolean girando = false;
 
   Robo(int n) {
     index = n;
@@ -74,6 +76,7 @@ class Robo {
     index = r.index;
     estagio = r.estagio;
     angAnt = r.angAnt;
+    girando = r.girando;
     obj = r.obj;
     objAnt = r.objAnt;
     atualiza();
@@ -106,12 +109,14 @@ class Robo {
   void setVel(float vE, float vD) {
     // Verifica se as velocidades estão dentro dos limites estabelecidos
     // O ajuste para velocidade negativa é feito direto na serial
-    if (vE > velMax) vE = velMax;
-    else if (vE < -velMax) vE = -velMax;
-    if (vD > velMax) vD = velMax;
-    else if (vD < -velMax) vD = -velMax;
+    if (vE > velMax && !girando) vE = velMax;
+    else if (vE < -velMax && !girando) vE = -velMax;
+    if (vD > velMax && !girando) vD = velMax;
+    else if (vD < -velMax && !girando) vD = -velMax;
     velE = vE;
     velD = vD;
+    
+
     if (frente) {
       float aux = velE;
       velE = -velD;
@@ -154,21 +159,29 @@ class Robo {
 
     posAnt = new PVector(pos.x, pos.y);
     pos = new PVector(centro.x, centro.y);
+    pushMatrix();
+    translate(pos.x, pos.y);
+    fill(255);
+    text(index, 15, 15);
+    popMatrix();
     return centro;
   }
 
   // Define posicao do objetivo como vetor
   void setObj(PVector income) {
+    if (income.x > shapeCampo.getVertex(1).x) income.x = shapeCampo.getVertex(1).x;
+    if (income.x < shapeCampo.getVertex(0).x) income.x = shapeCampo.getVertex(0).x;
+    if (income.y > shapeCampo.getVertex(2).y) income.y = shapeCampo.getVertex(2).y;
+    if (income.y < shapeCampo.getVertex(0).y) income.y = shapeCampo.getVertex(0).y;
     obj = income;
   }
 
   // Define posicao do objetivo como coordenadas
   void setObj(float x, float y) {
-    if (x > width) x = width;
-    if (x < 0) x = 0;
-    if (y > height) y = height;
-    if (y < 0) y = 0;
-
+    if (x > shapeCampo.getVertex(1).x) x = shapeCampo.getVertex(1).x;
+    if (x < shapeCampo.getVertex(0).x) x = shapeCampo.getVertex(0).x;
+    if (y > shapeCampo.getVertex(2).y) y = shapeCampo.getVertex(2).y;
+    if (y < shapeCampo.getVertex(0).y) y = shapeCampo.getVertex(0).y;
     obj.x = x;
     obj.y = y;
   }
@@ -250,12 +263,20 @@ class Robo {
     case 0:
       velEmin = 3;
       velDmin = 3;
-      kP = 0;
+      kP = 0.1;
+      tolAng = 18;
       break;
     case 1:
-      velEmin = 2.5;
-      velDmin = 2.5;
-      kP = 0.3;
+      velEmin = 3;
+      velDmin = 3;
+      kP = 0.1;     
+      tolAng = 10;
+      break;
+    case 2:
+      velEmin = 3;
+      velDmin = 3;
+      kP = 0.05;  
+      tolAng = 10;
       break;
     default:
       velEmin = 2.5;

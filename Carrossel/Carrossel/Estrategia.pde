@@ -6,15 +6,15 @@ void estrategia(Robo r, int n) {
   noFill();
 
   // Distancia que o robo pega pra empurrar a bola
-  float distSombra = 100;
+  float distSombra = 60;
   // Distancia entre o X do goleiro e o X do centro do gol
-  float distGoleiro = 15;
+  float distGoleiro = 20;
   // Parametros da reta da bola
   float aBola, bBola;
   // Raio de tolerancia para colisao
   int distColisao = 100;
   // Raio de tolerancia pra considerar que o robo chegou
-  int tolDist = 20;
+  int tolDist = 10;
 
   PVector velBola = velBola();
 
@@ -35,7 +35,7 @@ void estrategia(Robo r, int n) {
 
       // Antes de qualquer coisa, checa se está perto da bola
       // Se estiver, gira no próprio eixo no próximo estágio
-      if (r.isNear(bola, 40)) {
+      if (r.isNear(bola, 30)) {
         println("ESTRATEGIA: Bola está proxima do goleiro, girando no próprio eixo.");
         r.estagio = 1;
         break;
@@ -51,7 +51,7 @@ void estrategia(Robo r, int n) {
 
       // Checa se o goleiro já está perto do objetivo
       if (distSq(r.pos, inter) < tolDist*tolDist) {
-
+        
         r.angObj = PI/2;
         if (abs(r.ang - PI/2) > PI/2) r.angObj = 3*PI/2;
         //println(degrees(r.ang - PI/2));
@@ -61,24 +61,25 @@ void estrategia(Robo r, int n) {
       break;
     } else if (r.estagio == 1) {
 
-      if (r.pos.y > height/2) {
-        do {
-          gira(r, false);
-          qtdFrames = qtdFrames + 1;
-        } while (qtdFrames < 45);
-        println("ESTRATÉGIA: Gira anti horário");
-      } else {
-        do {
-          gira(r, true);
-          qtdFrames = qtdFrames + 1;
-        } while (qtdFrames < 45);
-        println("ESTRATÉGIA: Gira anti horário");
-      }
+      if (r.isNear(bola, 30)) {
 
-      if (qtdFrames == 45) {
-        qtdFrames = 0;
+        if (!r.girando) {
+          qtdFrames = frameCount;
+          r.girando = true;
+        } else {
+          r.setObj(r.pos.x, r.pos.y);
+          chutaGirando(r);
+          //println("GIRANDO");
+          if (frameCount - qtdFrames > 45) {
+            r.girando = false;
+            r.estagio = 0;
+          }
+        }
+      } else {
+        r.girando = false;
         r.estagio = 0;
       }
+
 
       // Se estiver no campo inferior, gira anti horário
 
@@ -115,12 +116,12 @@ void estrategia(Robo r, int n) {
     PVector sombra = new PVector();
     sombra.x = bola.x + distSombra * cos(ang);
     sombra.y = bola.y + distSombra * sin(ang);
-    
+
     // Condiciona a sombra dentro do campo
-    if (sombra.x < shapeCampo.getVertex(0).x) sombra.x = shapeCampo.getVertex(0).x;
-    if (sombra.y < shapeCampo.getVertex(0).y) sombra.y = shapeCampo.getVertex(0).y;
-    if (sombra.x > shapeCampo.getVertex(2).x) sombra.x = shapeCampo.getVertex(2).x;
-    if (sombra.y > shapeCampo.getVertex(2).y) sombra.y = shapeCampo.getVertex(2).y;
+    if (sombra.x < shapeCampo.getVertex(0).x) sombra.x = shapeCampo.getVertex(0).x + 15;
+    if (sombra.y < shapeCampo.getVertex(0).y) sombra.y = shapeCampo.getVertex(0).y + 20;
+    if (sombra.x > shapeCampo.getVertex(2).x) sombra.x = shapeCampo.getVertex(2).x - 15;
+    if (sombra.y > shapeCampo.getVertex(2).y) sombra.y = shapeCampo.getVertex(2).y - 20;
     //println("ESTRATÉGIA: Estágio " + r.estagio);
 
     if (r.estagio == 0) {
@@ -464,8 +465,8 @@ void estrategia(Robo r, int n) {
       //println(degrees(r.ang - PI/2));
     } else r.angObj = -1;
     break;
-  ////Fica parado, perdeu o robô
-  //case 7:
-  //  r.
+    ////Fica parado, perdeu o robô
+    //case 7:
+    //  r.
   }
 }

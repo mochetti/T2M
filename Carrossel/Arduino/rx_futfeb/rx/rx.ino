@@ -23,8 +23,8 @@ unsigned long tempo = 0;
 int velPWMEsq, velPWMDir;
 
 /* ------------ Declarações Relacionadas aos Pinos do Rádio ----------- */
-#define RADIO_ENABLE 2 /* O pino ligado ao Chip Enable no módulo do rádio // 14 caso seja FUTFEB */  
-#define RADIO_SELECT 3 /* O pino ligado ao Chip Select no módulo do rádio // 15 caso seja FUTFEB*/  
+#define RADIO_ENABLE 14 /* O pino ligado ao Chip Enable no módulo do rádio // 14 caso seja FUTFEB */  
+#define RADIO_SELECT 15 /* O pino ligado ao Chip Select no módulo do rádio // 15 caso seja FUTFEB*/  
 
 RF24 radio(RADIO_ENABLE, RADIO_SELECT);
 byte rxBuffer[Config::BUFFER_SIZE]; /* Buffer usado para armazenar os bytes recebidos através do rádio. */
