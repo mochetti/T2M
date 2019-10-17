@@ -241,7 +241,7 @@ void draw() {
     else for (Robo r : robos) if (r.index >= 0) r.setEstrategia(estFixa);
 
     //r.frente() não pode vir antes da estratégia, precisa ter os objetivos definidos.
-    for (Robo r : robos) r.frente();  
+    for (Robo r : robos) if(r.index >= 0) r.frente();
 
     //print(robos.get(0).ang);
 
