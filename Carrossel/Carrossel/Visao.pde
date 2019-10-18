@@ -198,6 +198,7 @@ boolean search (Blob b) {
 
   noFill();
   rectMode(CORNER);
+  stroke(255);
   rect(-raioBusca, -raioBusca, 2*raioBusca, 2*raioBusca);
   popMatrix();
 

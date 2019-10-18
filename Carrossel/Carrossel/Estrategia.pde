@@ -51,7 +51,7 @@ void estrategia(Robo r, int n) {
 
       // Checa se o goleiro já está perto do objetivo
       if (distSq(r.pos, inter) < tolDist*tolDist) {
-        
+
         r.angObj = PI/2;
         if (abs(r.ang - PI/2) > PI/2) r.angObj = 3*PI/2;
         //println(degrees(r.ang - PI/2));
@@ -450,7 +450,8 @@ void estrategia(Robo r, int n) {
 
     // segue o mouse
   case 5:
-    r.setObj(mouseX, mouseY);
+    if (distSq(r.pos.x, r.pos.y, mouseX, mouseY) < 15*15) r.setObj(r.pos);
+    else r.setObj(mouseX, mouseY);
     break;
 
   case 6:

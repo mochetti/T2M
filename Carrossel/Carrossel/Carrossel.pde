@@ -198,22 +198,29 @@ void draw() {
     oldBlobs.clear();
     if (blobs.size() > 0)
       for (Blob b : blobs) oldBlobs.add(new Blob(b.clone()));
-
+    if (!todosEncontrados) {
+      print("DRAW: ids em blobs: ");
+      for (Blob b : blobs) print(b.id);
+      println();
+    }
 
     oldRobos.clear();
     if (robos.size() > 0)
       for (Robo r : robos) oldRobos.add(new Robo(r.clone()));
+    if (!todosEncontrados) {
+      print("DRAW: robos ativos: ");
+      for (Robo r : robos) print(r.index);
+      println();
+    }
 
     robos.clear();
     blobs.clear();
+
     if (debug) return;
 
     //Atualiza blobs
-
-
     track();
     id();
-
 
     for (int i = 1; i < 4; i++) {
       if (oldRobos.size() == 0) {
@@ -233,12 +240,15 @@ void draw() {
     //Defino as estratégias
     if (estrategia) {
       // Define as estratégias dos robos
+      // 5 - seguir mouse, 6 fazer nada (por enquanto), 1 - atacante, 3 - goleiro
 
-
-      if (robos.get(0).index >= 0) robos.get(0).setEstrategia(5);
-      if (robos.get(1).index >= 0) robos.get(1).setEstrategia(6);
-
-      if (robos.get(2).index >= 0) robos.get(2).setEstrategia(6);
+      if (robos.get(0).index >= 0) robos.get(0).setEstrategia(0);
+      if (robos.get(1).index >= 0) robos.get(1).setEstrategia(5);
+      if (robos.get(2).index >= 0) {
+        robos.get(2).setEstrategia(5);
+        robos.get(2).obj = new PVector(robos.get(2).obj.x, robos.get(2).obj.y + 100);
+      }
+      //if (robos.get(2).index >= 0) robos.get(2).setEstrategia(5);
     } // posicoes fixas
     else for (Robo r : robos) if (r.index >= 0) r.setEstrategia(estFixa);
 
@@ -252,10 +262,9 @@ void draw() {
 
     //A partir daqui controle assume
 
-
     if (controle) {
 
-      println(robos.get(0).girando);
+      //println(robos.get(0).girando);
 
       if (robos.get(0).index >= 0 && !robos.get(0).girando) alinhaAnda(robos.get(0));
       if (robos.get(1).index >= 0 && !robos.get(1).girando) alinhaAnda(robos.get(1));

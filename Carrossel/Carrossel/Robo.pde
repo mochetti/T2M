@@ -53,7 +53,7 @@ class Robo {
       atualiza();
     }
     vel = new PVector();
-    obj = new PVector();
+    obj = new PVector();  //
   }
 
   Robo(int n, int b) {
@@ -275,7 +275,7 @@ class Robo {
     case 2:
       velEmin = 3;
       velDmin = 3;
-      kP = 0.05;  
+      kP = 0.1;  
       tolAng = 10;
       break;
     default:
