@@ -29,7 +29,7 @@ void loop() {
   /* aguardando até a serial ficar disponível - se prepara para receber o array do pc*/
   if (Serial.available()) {
     /* lendo o que vem da serial (já vem com o primeiro byte 0x80.) */
-    Serial.println(Serial.read());
+    //    Serial.println(Serial.read());
     Serial.readBytes(txBuffer, Config::BUFFER_SIZE);
 
 
@@ -40,12 +40,20 @@ void loop() {
       Serial.print(txBuffer[i]);
       Serial.print(" ");
     }
+    Serial.println();
     /* BEGIN DEBUG
       END DEBUG */
 
     /* checando se o byte recebido é valido */
+
+    Serial.print("Caractere inicial: ");
+    Serial.println(txBuffer[0]);
     if (txBuffer[0] == Config::CARACTERE_INICIAL) {
+      Serial.println("ENVIOU OS DADOS");
       radio.write(&txBuffer, sizeof(txBuffer)); //& indica referencia a variável indicada, isso implica em utilizar o conteúdo da varíavel sem alterá-la
+      for (int i = 0; i < Config::BUFFER_SIZE; i++) {
+        txBuffer[i] = 0;
+      }
     }
     else {
       Serial.println("CARACTERE_INICIAL ERRADO!");
@@ -54,5 +62,5 @@ void loop() {
   else {
     Serial.println("SERIAL INDISPONÍVEL!");
   }
-  delay(5000);
+  delay(2000);
 }

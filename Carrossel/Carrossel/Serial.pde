@@ -1,7 +1,7 @@
 void enviar() {
   byte[] txBuffer = {};
   txBuffer = new byte[7];
-  txBuffer[0] = byte(128);
+  txBuffer[0] = byte(80);  //80 em ascii é P (p maiusculo)  
   if(radio) {
     for(Robo r : robos) {
       if(r.index < 0) continue;
