@@ -307,7 +307,7 @@ class Robo {
     // PShape
     corpo = createShape(GROUP);
     PShape vermelho = createShape();
-    PShape verde = createShape();
+    PShape azul = createShape();
     PShape fundo = createShape();
     fundo.beginShape();
     fundo.vertex(-lado/2, -lado/2);
@@ -321,27 +321,27 @@ class Robo {
       // goleiro
     case 0:
       vermelho = createShape(RECT, -lado/2, -lado/2, lado, lado/2);
-      verde = createShape(RECT, -lado/2, 0, lado, lado/2);
+      azul = createShape(RECT, -lado/2, 0, lado, lado/2);
       break;
 
       // zagueiro (metade vermelho 1/4 verde)
     case 1:
       vermelho = createShape(RECT, -lado/2, 0, lado, lado/2);
-      verde = createShape(RECT, 0, -lado/2, lado/2, lado/2);
+      azul = createShape(RECT, 0, -lado/2, lado/2, lado/2);
       break;
 
       // atacante (metade verde 1/4 vermelho)
     case 2:
       vermelho = createShape(RECT, 0, -lado/2, lado/2, lado/2);
-      verde = createShape(RECT, -lado/2, 0, lado, lado/2);
+      azul = createShape(RECT, -lado/2, 0, lado, lado/2);
       break;
     }
 
-    vermelho.setFill(color(255, 0, 0));
-    verde.setFill(color(0, 255, 0));
+    vermelho.setFill(color(238, 96, 119));
+    azul.setFill(color(16, 148, 238));
     fundo.setFill(color(0));
     corpo.addChild(fundo);
-    corpo.addChild(verde);
+    corpo.addChild(azul);
     corpo.addChild(vermelho);
   }
 

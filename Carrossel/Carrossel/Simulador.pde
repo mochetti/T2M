@@ -195,7 +195,7 @@ class Bola {
   }
 
   void display() {
-    fill(255, 150, 0);
+    fill(245, 166, 73);
     ellipse(pos.x, pos.y, 10, 10);
     
   }

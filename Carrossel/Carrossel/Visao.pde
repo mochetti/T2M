@@ -13,7 +13,7 @@ void camConfig() {
 
   if (cameras == null) {
     println("Failed to retrieve the list of available cameras, will try the default...");
-    cam = new Capture(this, 640, 480);
+    cam = new Capture(this, 800, 448, 30);
   } else if (cameras.length == 0) {
     println("There are no cameras available for capture.");
     exit();

@@ -1,22 +1,31 @@
 import processing.serial.*;
 Serial myPort;
-float velE, velD, vel = 10;
+float velE, velD, vel = 30;
 boolean radio = false;
 int indexRobo = 0;
+//int frames = 300;
 
 void setup() {
   printArray(Serial.list());
-  myPort = new Serial(this, Serial.list()[3], 115200);
+  frameRate(30);
+  myPort = new Serial(this, Serial.list()[0], 115200);
 }
 
 void draw() {
-  if(radio) enviar();
+  //println(frameCount);
+  //if (frameCount%30 == 0) {
+  //  radio = false;
+  //  println("SWITCH RADIO - " + radio);
+  //}else radio = true;
+
+  if (radio) enviar();
+  //delay(60);
 }
 
 void keyPressed() {
   if (key >= '0' && key <= '2') {
     indexRobo = key - 48;
-    println("Robo " + indexRobo);
+    //println("Robo " + indexRobo);
   }
   if (key == 'r') radio = !radio;
   if (key == CODED) {
@@ -62,5 +71,5 @@ void enviar() {
     myPort.write(data);
     print(data + "  ");
   }
-  println("");
+  //println("");
 }

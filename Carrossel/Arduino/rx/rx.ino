@@ -3,7 +3,7 @@
 
 /* ------------ Declarações Relacionadas ao Robo que terá este código gravodo ----------- */
 /* Define qual robo é esse (valores possíveis: 0, 1 ou 2) */
-const byte NUM_ROBO = 2;
+const byte NUM_ROBO = 0;
 
 /* Somamos 1 no inicio pois o primeiro elemento do buffer é fixo, nomalmente 0x80. */
 const int INDEX_RODA_ESQ = 1 + 2 * NUM_ROBO; /* index da roda esquerda no array rxBuffer. */
@@ -23,8 +23,8 @@ unsigned long tempo = 0;
 int velPWMEsq, velPWMDir;
 
 /* ------------ Declarações Relacionadas aos Pinos do Rádio ----------- */
-#define RADIO_ENABLE 2 /* O pino ligado ao Chip Enable no módulo do rádio // 14 caso seja FUTFEB */  
-#define RADIO_SELECT 3 /* O pino ligado ao Chip Select no módulo do rádio // 15 caso seja FUTFEB*/  
+#define RADIO_ENABLE 14 /* O pino ligado ao Chip Enable no módulo do rádio // 14 caso seja FUTFEB e 2 e 3 caso NORMAL */  
+#define RADIO_SELECT 15 /* O pino ligado ao Chip Select no módulo do rádio // 15 caso seja FUTFEB*/  
 
 RF24 radio(RADIO_ENABLE, RADIO_SELECT);
 byte rxBuffer[Config::BUFFER_SIZE]; /* Buffer usado para armazenar os bytes recebidos através do rádio. */
