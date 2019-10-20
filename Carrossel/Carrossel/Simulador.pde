@@ -81,7 +81,7 @@ PVector simulaVel (Robo r) {
   PVector vel = new PVector();
   int v = 5;
   int k = 1;
-  if(r.frente) k = -1;
+  if (r.frente) k = -1;
   //println("SIM: Robo " + r.index + " frente = " + r.frente);
   // usando como entrada as setas do teclado
   if (simManual) {
@@ -98,7 +98,7 @@ PVector simulaVel (Robo r) {
   }
 
   // usando como entrada o módulo de controle
-  else if(robos.size() > 0){
+  else if (robos.size() > 0) {
     if (robos.get(r.index).velE > 0 && robos.get(r.index).velD > 0) vel = new PVector(cos(r.ang)*v, sin(r.ang)*v);
     else if (robos.get(r.index).velE < 0 && robos.get(r.index).velD < 0) vel = new PVector(-cos(r.ang)*v, -sin(r.ang)*v);
   }
@@ -134,69 +134,4 @@ float simulaAng(Robo r) {
     else dAng = 0;
   }
   return dAng;
-}
-
-// classe que cuida da bola virtual
-class Bola {
-  PVector pos = new PVector();
-  PVector vel = new PVector();
-  PVector acc = new PVector();
-
-  Bola() {
-  }
-
-  Bola(PVector posicao) {
-    pos = posicao;
-  }
-
-  Bola(float x, float y) {
-    pos.x = x;
-    pos.y = y;
-  }
-
-  Bola(PVector posicao, PVector velocidade, PVector aceleracao) {
-    pos = posicao;
-    vel = velocidade;
-    acc = aceleracao;
-  }
-
-  void atualiza() {
-    // precisa de um valor minimo, caso contrario ela só "tende" a zero
-    if (vel.mag() < 0.05) vel.set(0, 0);
-    vel.add(acc);
-    pos.add(vel);
-
-    // rebote
-    if (pos.x < 0 || pos.x > width) vel = new PVector(-vel.x, vel.y);
-    if (pos.y < 0 || pos.y > height) vel = new PVector(vel.x, -vel.y);
-
-    // colisoes
-    
-    for (int i=0; i<robosSimulados.size(); i++) {
-
-
-      if (isInside(bolaV.pos, robosSimulados.get(i).corpo.getChild(0))) {
-        println("SIM: choque com o robo " + robosSimulados.get(i).index);
-        float angBola = atan(velBola().y / velBola().x);
-        float dAng = PVector.angleBetween(velBola(), robosSimulados.get(i).pos);
-        dAng *= 2;
-        float magAnt = vel.mag();
-        vel.set(cos(angBola) + cos(dAng), sin(angBola) + sin(dAng));
-        vel.setMag(magAnt);
-      }
-      // rebate e aumenta a velocidade
-    }
-  }
-
-  // retorna o vetor direçao da bola
-  PVector getDir() {
-    PVector dir = new PVector();
-    return dir;
-  }
-
-  void display() {
-    fill(245, 166, 73);
-    ellipse(pos.x, pos.y, 10, 10);
-    
-  }
 }
