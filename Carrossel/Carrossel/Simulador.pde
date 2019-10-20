@@ -7,10 +7,9 @@ int roboControlado = 0;
 Bola bolaV = new Bola();
 
 void simulador() {
-  background(0);
   if (robosSimulados.size() == 0) {
-    robosSimulados.add(new Robo(300, 100, 0));
-    robosSimulados.add(new Robo(100, 200, 1));
+    robosSimulados.add(new Robo(500, 100, 0));
+    robosSimulados.add(new Robo(400, 200, 1));
     robosSimulados.add(new Robo(100, 300, 2));
   }
 
@@ -26,7 +25,7 @@ void simulador() {
   // simula a bola
   // chute inicial
   if (bolaV.pos.x == 0 && bolaV.pos.y == 0) {
-    println("SIMULADOR: chute inicial");
+    println("SIM: chute inicial");
     bolaV.pos.x = width/2;
     bolaV.pos.y = height/2;
     bolaV.vel = new PVector(5, 5);
@@ -81,26 +80,29 @@ void simulador() {
 PVector simulaVel (Robo r) {
   PVector vel = new PVector();
   int v = 5;
+  int k = 1;
+  if(r.frente) k = -1;
+  //println("SIM: Robo " + r.index + " frente = " + r.frente);
   // usando como entrada as setas do teclado
   if (simManual) {
     if (!keyPressed) r.setVel(new PVector(0, 0));
     else if (key == CODED) {
       if (keyCode == UP) {
         //println("SIMULADOR: frente");
-        vel = new PVector(cos(r.ang)*v, sin(r.ang)*v);
+        vel = new PVector(k*cos(r.ang)*v, k*sin(r.ang)*v);
       } else if (keyCode == DOWN) {
         //println("SIMULADOR: trás");
-        vel = new PVector(-cos(r.ang)*v, -sin(r.ang)*v);
+        vel = new PVector(k*-cos(r.ang)*v, k*-sin(r.ang)*v);
       }
     }
   }
 
   // usando como entrada o módulo de controle
-  else {
+  else if(robos.size() > 0){
     if (robos.get(r.index).velE > 0 && robos.get(r.index).velD > 0) vel = new PVector(cos(r.ang), sin(r.ang));
     else if (robos.get(r.index).velE < 0 && robos.get(r.index).velD < 0) vel = new PVector(-cos(r.ang), -sin(r.ang));
   }
-
+  //println(vel);
   return vel;
 }
 
@@ -125,7 +127,7 @@ float simulaAng(Robo r) {
   }
 
   // usando como entrada o módulo de controle
-  else {
+  else if (robos.size() > 0) {
     if (robos.get(r.index).velE > 0 && robos.get(r.index).velD < 0) dAng += velAng;
     else if (robos.get(r.index).velE < 0 && robos.get(r.index).velD > 0) dAng -= velAng;
     // pra frente e pra trás
@@ -169,9 +171,12 @@ class Bola {
     if (pos.y < 0 || pos.y > height) vel = new PVector(vel.x, -vel.y);
 
     // colisoes
+    
     for (int i=0; i<robosSimulados.size(); i++) {
-      if (isInside(bolaV.pos, robosSimulados.get(i).corpo)) {
-        println("SIMULADOR: choque com o robo " + robosSimulados.get(i).index);
+
+
+      if (isInside(bolaV.pos, robosSimulados.get(i).corpo.getChild(0))) {
+        println("SIM: choque com o robo " + robosSimulados.get(i).index);
         float angBola = atan(velBola().y / velBola().x);
         float dAng = PVector.angleBetween(velBola(), robosSimulados.get(i).pos);
         dAng *= 2;
@@ -190,7 +195,8 @@ class Bola {
   }
 
   void display() {
-    fill(255, 150, 0);
+    fill(245, 166, 73);
     ellipse(pos.x, pos.y, 10, 10);
+    
   }
 }

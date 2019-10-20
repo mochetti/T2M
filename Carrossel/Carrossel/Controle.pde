@@ -1,5 +1,5 @@
 // Tolerancia de diferença entre os angulos em graus
-float tolAng = 20;
+float tolAng = 10;
 // Velocidade inicial de giro
 //byte velGiro = 30;
 // Velocidade inicial para andar reto
@@ -7,21 +7,36 @@ byte velViagem = 30;
 
 // Alinha e anda
 void alinhaAnda(Robo r) {
-  if(r.obj == r.pos) return;
+
+  // Verifica se a bola está perto
+  //if (distSq(r.getPos(), bola) < 15*15) {
+  //  gira(r, true);
+  //  return;
+  //}
+
+  if (r.angObj != -1) {
+    // Verifica se está dentro da tolerancia
+    if (abs(r.ang - r.angObj) < radians(tolAng)) r.setVel(0, 0);
+    // Se não estiver, alinha
+    else alinhaP(r, r.angObj);
+    return;
+  }
+  if (r.obj == r.pos) return;
   // Vetor robo -> obj
   PVector robObj = new PVector();
-  robObj = r.obj.sub(r.getPos());
+  robObj = PVector.sub(r.obj, r.pos);
   float ang = atan2(robObj.y, robObj.x);
   float dAng = PVector.angleBetween(robObj, r.getDir());
-  //if(dAng > PI) dAng = 2*PI - dAng;
+
   // Angulo do robo
-  float angRobo = r.getAng();
+
   //println("CONTROLE: ang obj = " + degrees(ang));
-  //println("CONTROLE: ang robo = " + degrees(r.getAng()));
+  //println("CONTROLE: ang robo = " + degrees(r.ang));
   //println("CONTROLE: dAng = " + degrees(dAng));
-  if (abs(dAng) < radians(tolAng)) {
+  if (abs(dAng) < radians(r.tolAng)) {
     // Anda reto
-    println("CONTROLE: Anda reto");
+
+    //println("CONTROLE: Robo " + r.index + " Anda reto");
     //r.velE = r.velEmin;
     //r.velD = r.velDmin;
     r.setVel(r.velMax, r.velMax);
@@ -31,41 +46,67 @@ void alinhaAnda(Robo r) {
   }
 }
 
-// Alinha
+// Alinha em velocidades constantes
 void alinha(Robo r, float ang) {
 
   // Angulo do robo
-  float angRobo = r.getAng();
+  float angRobo = r.ang;
 
   if (ang - angRobo > 0 && ang - angRobo < PI) {
-    println("CONTROLE: Gira horário");
+    //println("CONTROLE: Robo " + r.index + " Gira horário");
     gira(r, true);
   } else if (ang - angRobo > PI) {
-    println("CONTROLE: Gira anti horário");
+    //println("CONTROLE: Robo " + r.index + " Gira anti horário");
     gira(r, false);
   } else if (angRobo - ang > 0 && angRobo - ang < PI) {
-    println("CONTROLE: Gira anti horário");
+    //println("CONTROLE: Robo " + r.index + " Gira anti horário");
     gira(r, false);
   } else if (angRobo - ang > PI) {
-    println("CONTROLE: Gira horário");
+    //println("CONTROLE: Robo " + r.index + " Gira horário");
     gira(r, true);
   }
+}
+
+//True é horario, e false é antihorário
+void chutaGirando(Robo r) {
+
+  r.setVel(50, -40);
+  
 }
 
 // Alinha proporcional à distancia do angulo desejado
 void alinhaP(Robo r, float ang) {
   // Constante de proporcionalidade
   // Angulo do robo
-  float angRobo = r.getAng();
+  float angRobo = r.ang;
   float dAng = ang - angRobo;
 
+  while (dAng < -7*PI/10) dAng += 2*PI;
+  while (dAng > 7*PI/10) dAng -= 2*PI;
+
+  //println("dAng = " + degrees(dAng));
+
+  float dVelE = abs(dAng)*10/(7*PI);
+  dVelE = map(dVelE, 0, 1, 0, 63 - r.velEmin);
+
+  float dVelD = abs(dAng)*10/(7*PI);
+  dVelD = map(dVelD, 0, 1, 0, 63 - r.velDmin);
+
+  //if (r.index == 0) println("dVelE = " + dVelE);
+
   if (sin(dAng) > 0) {
-    println("CONTROLE: Gira horário");
-    r.setVel(r.velEmin+r.kP*abs(dAng)*r.velEmin, -r.velDmin+r.kP*-abs(dAng)*r.velDmin);
+    //println("CONTROLE: Robo " + r.index + " Gira horário");
+    //if (r.index == 0) {
+    //  print("ANG ROBO: " + degrees(angRobo) + " angObj: " + degrees(ang) + " velEmin: " + r.velEmin + " dVel: " + r.kP*abs(dAng)*r.velEmin);
+    //  println("CONTROLE: Robo " + r.index + " KP: " + r.kP + " dAng: " + degrees(dAng));
+    //}
+
+    r.setVel(r.velEmin+r.kP*dVelE, -r.velDmin-r.kP*dVelD);
     //r.setVel(r.kP*abs(dAng)*r.velEmin, r.kP*-abs(dAng)*r.velDmin);
   } else if (sin(dAng) < 0) {
-    println("CONTROLE: Gira anti horário");
-    r.setVel(-r.velEmin+r.kP*-abs(dAng)*r.velEmin, r.velDmin+r.kP*abs(dAng)*r.velDmin);
+    //println("CONTROLE: Robo " + r.index + " Gira anti horário");
+    //println("CONTROLE: Robo " + r.index + " KP: " + r.kP + " dAng: " + dAng);
+    r.setVel(-r.velEmin-r.kP*dVelE, r.velDmin+r.kP*dVelD);
     //r.setVel(r.kP*abs(dAng)*r.velEmin, r.kP*-abs(dAng)*r.velDmin);
   }
 }
@@ -73,7 +114,7 @@ void alinhaP(Robo r, float ang) {
 // Alinha e anda e alinha
 void alinhaGoleiro(Robo r) {
   // Verifica se a bola está perto
-  if (distSq(r.getPos(), bola) < 15*15) {
+  if (distSq(r.pos, bola) < 15*15) {
     gira(r, true);
     return;
   }
@@ -87,19 +128,19 @@ void alinhaGoleiro(Robo r) {
   }
   // Vetor robo -> obj
   PVector robObj = new PVector();
-  robObj = r.obj.sub(r.getPos());
+  robObj = PVector.sub(r.obj, r.pos);
   float ang = atan2(robObj.y, robObj.x);
   float dAng = PVector.angleBetween(robObj, r.getDir());
   //if(dAng > PI) dAng = 2*PI - dAng;
   // Angulo do robo
-  float angRobo = r.getAng();
+  float angRobo = r.ang;
   //println("CONTROLE: ang obj = " + degrees(ang));
-  //println("CONTROLE: ang robo = " + degrees(r.getAng()));
+  //println("CONTROLE: ang robo = " + degrees(r.ang));
   //println("CONTROLE: dAng = " + degrees(dAng));
-  
+
   if (dAng < radians(tolAng)) {
     // Anda reto
-    println("CONTROLE: Anda reto");
+    //println("CONTROLE: Robo " + r.index + " Anda reto");
     r.setVel(r.velMax, r.velMax);
   } else {
     // Alinha
@@ -153,13 +194,11 @@ void alinhandando(Robo r) {
 
   // Angulo do objetivo
   float angObj = atan2(r.obj.y, r.obj.x) - PI;
-  //PVector robObj = r.obj.sub(r.pos);
-  //PVector robObj = r.getPos().sub(r.obj);
-  float dAng = r.getAng() - angObj;
+  float dAng = r.ang - angObj;
 
-  println("CONTROLE: Angulo robObj = " + degrees(angObj));
-  println("CONTROLE: Angulo robo = " + degrees(r.getAng()));
-  println("CONTROLE: dAng = " + degrees(dAng));
+  //println("CONTROLE: Angulo robObj = " + degrees(angObj));
+  //println("CONTROLE: Angulo robo = " + degrees(r.ang));
+  //println("CONTROLE: dAng = " + degrees(dAng));
 
   /*// Verifica a inercia por distancia
    //if((velE == 0 && velD == 0) || (velE == 0 && velD == 0)) {
@@ -242,12 +281,12 @@ boolean configEsq = false;
 void configRobo(Robo r) {
   // Descobre as velocidades minimas para cada roda
   // Configura o angulo antigo pela primeira vez
-  if (r.angAnt == 0) r.angAnt = r.getAng();
+  if (r.angAnt == 0) r.angAnt = r.ang;
   // Acompanhamos a quanto tempo tá rolando a configuracao
   double agora = millis();
-  if (agora - tempo > 2000) r.angAnt = r.getAng();
+  if (agora - tempo > 2000) r.angAnt = r.ang;
   // Diferença entre o angulo atual e o inicial
-  float dAng = abs(r.getAng() - r.angAnt);
+  float dAng = abs(r.ang - r.angAnt);
   println("CONTROLE: angAnt = " + degrees(r.angAnt));
   println("CONTROLE: dAng = " + degrees(dAng));
   // Diferença mínima do angulo atual (em graus) para o inicial para configurar movimento
@@ -258,7 +297,7 @@ void configRobo(Robo r) {
   if (configEsq) {
     // Configura a direita depois
     if (dAng > radians(dAngMin)) {
-      r.angAnt = r.getAng();
+      r.angAnt = r.ang;
       println("CONTROLE: Velocidades definidas para o Robo " + r.index);
       println("CONTROLE: vEsq = " + r.velE + "  vDir = " + r.velD);
       //configRobo = false;
@@ -270,7 +309,7 @@ void configRobo(Robo r) {
   } else {
     // Configura a esquerda primeiro
     if (dAng > radians(dAngMin)) {
-      r.angAnt = r.getAng();
+      r.angAnt = r.ang;
       configEsq = true;
       return;
     } else {

@@ -3,7 +3,7 @@
 
 /* ------------ Declarações Relacionadas ao Robo que terá este código gravodo ----------- */
 /* Define qual robo é esse (valores possíveis: 0, 1 ou 2) */
-const byte NUM_ROBO = 1;
+const byte NUM_ROBO = 0;
 
 /* Somamos 1 no inicio pois o primeiro elemento do buffer é fixo, nomalmente 0x80. */
 const int INDEX_RODA_ESQ = 1 + 2 * NUM_ROBO; /* index da roda esquerda no array rxBuffer. */
@@ -23,8 +23,8 @@ unsigned long tempo = 0;
 int velPWMEsq, velPWMDir;
 
 /* ------------ Declarações Relacionadas aos Pinos do Rádio ----------- */
-#define RADIO_ENABLE 2 /* O pino ligado ao Chip Enable no módulo do rádio */
-#define RADIO_SELECT 3 /* O pino ligado ao Chip Select no módulo do rádio */
+#define RADIO_ENABLE 2 /* O pino ligado ao Chip Enable no módulo do rádio // 14 caso seja FUTFEB e 2 e 3 caso NORMAL */
+#define RADIO_SELECT 3 /* O pino ligado ao Chip Select no módulo do rádio // 15 caso seja FUTFEB*/
 
 RF24 radio(RADIO_ENABLE, RADIO_SELECT);
 byte rxBuffer[Config::BUFFER_SIZE]; /* Buffer usado para armazenar os bytes recebidos através do rádio. */
@@ -42,10 +42,12 @@ void setup() {
 
   Serial.begin(Config::SERIAL_BIT_RATE);
   radio.begin();
+//  radio.setDataRate(RF24_1MBPS);
   radio.setChannel(Config::CANAL);             //canal deve ser o mesmo de transmissão
   radio.setPALevel(RF24_PA_LOW);      //potência do módulo em baixa, para maiores distâncias aumentar a potência
   radio.openReadingPipe(Config::IND_PIPE_LEITURA, Config::PIPE_CHAVE); //abertura do tubo de leitura
   radio.startListening();         //garantir que o rádio é o receptor
+
 
 }
 
@@ -55,21 +57,22 @@ void loop() {
     Serial.println("Recebemos algo");
     /* lendo o buffer do rádio */
     radio.read(&rxBuffer, sizeof(rxBuffer));
-    
+
     ///* BEGIN DEBUG
-    for (int i = 0; i < Config::BUFFER_SIZE; i++){
+    for (int i = 0; i < Config::BUFFER_SIZE; i++) {
       Serial.print(rxBuffer[i]);
+      Serial.print(" ");
     }
     Serial.println("");
     //END DEBUG */
-    if(rxBuffer[0] == Config::CARACTERE_INICIAL) {
+    if (rxBuffer[0] == Config::CARACTERE_INICIAL) {
       Serial.println("Chave correta");
       tempo = millis();
       andar(rxBuffer[INDEX_RODA_ESQ], rxBuffer[INDEX_RODA_DIR]);
     }
     else {
       // Só considera desconectado se ficar 1s sem receber dados
-      if(millis() - tempo < 1000) return;
+      if (millis() - tempo < 1000) return;
       tempo = millis();
       Serial.println("Rádio Indisponível");
       andar(0, 0);
@@ -77,7 +80,7 @@ void loop() {
   }
   else {
     // Só considera desconectado se ficar 1s sem receber dados
-    if(millis() - tempo < 1000) return;
+    if (millis() - tempo < 1000) return;
     tempo = millis();
     Serial.println("Rádio Indisponível");
     andar(0, 0);
@@ -87,7 +90,7 @@ void loop() {
 //rotina para atuação dos motores e movimentação do robo.
 void andar(byte velEsq, byte velDir) {
   bool dirD, dirE;
-  
+
   // verifica roda esquerda
   /* (expression) ? (true-value) : (false-value). Logo, se velEsq < 64 então dirE é LOW, do contrário (velEsq >= 64), dirE é HIGH */
   dirE = velEsq <= 64 ? LOW : HIGH;
@@ -95,45 +98,45 @@ void andar(byte velEsq, byte velDir) {
   dirD = velDir <= 64 ? LOW : HIGH;
 
   //Mapeamento do PWM na estrutura veloDirecao
-  if(dirE) velEsq = velEsq - 64;
-  if(dirD) velDir = velDir - 64;
+  if (dirE) velEsq = velEsq - 64;
+  if (dirD) velDir = velDir - 64;
   velPWMEsq = velEsq * 4;
   velPWMDir = velDir * 4;
   // ------- Debug Serial -----------
-  
+
   Serial.print("vel Dir: " );
   Serial.println(velPWMDir);
   Serial.print("vel Esq: ");
-  Serial.println(velPWMEsq);  
-  
+  Serial.println(velPWMEsq);
+
   // Define a velocidade de cada roda
-  if (velEsq!= 128){ // MOTOR ESQUERDO
-      analogWrite(PWM_MOTOR_ESQ,velPWMEsq);
-      if(dirE){// andando para trás
-        digitalWrite(DIRECAO_PWM_MOTOR_ESQ_A, LOW);
-        digitalWrite(DIRECAO_PWM_MOTOR_ESQ_B, HIGH);
-      }else{ // andando para frente
-        digitalWrite(DIRECAO_PWM_MOTOR_ESQ_A, HIGH);
-        digitalWrite(DIRECAO_PWM_MOTOR_ESQ_B, LOW);
-      }
-  }else{ // PARA TUDO
+  if (velEsq != 128) { // MOTOR ESQUERDO
+    analogWrite(PWM_MOTOR_ESQ, velPWMEsq);
+    if (dirE) { // andando para trás
+      digitalWrite(DIRECAO_PWM_MOTOR_ESQ_A, LOW);
+      digitalWrite(DIRECAO_PWM_MOTOR_ESQ_B, HIGH);
+    } else { // andando para frente
+      digitalWrite(DIRECAO_PWM_MOTOR_ESQ_A, HIGH);
+      digitalWrite(DIRECAO_PWM_MOTOR_ESQ_B, LOW);
+    }
+  } else { // PARA TUDO
     analogWrite(PWM_MOTOR_ESQ, 0);
-        digitalWrite(DIRECAO_PWM_MOTOR_ESQ_A, LOW);
-        digitalWrite(DIRECAO_PWM_MOTOR_ESQ_B, LOW);
+    digitalWrite(DIRECAO_PWM_MOTOR_ESQ_A, LOW);
+    digitalWrite(DIRECAO_PWM_MOTOR_ESQ_B, LOW);
   }
-  
-   if (velDir!= 128){ // MOTOR DIREITO
-      analogWrite(PWM_MOTOR_DIR,velPWMDir);
-      if(dirD){// andando para trás
-        digitalWrite(DIRECAO_PWM_MOTOR_DIR_A, LOW);
-        digitalWrite(DIRECAO_PWM_MOTOR_DIR_B, HIGH);
-      }else{ // andando para frente
-        digitalWrite(DIRECAO_PWM_MOTOR_DIR_A, HIGH);
-        digitalWrite(DIRECAO_PWM_MOTOR_DIR_B, LOW);
-      }
-  }else{ // PARA TUDO
+
+  if (velDir != 128) { // MOTOR DIREITO
+    analogWrite(PWM_MOTOR_DIR, velPWMDir);
+    if (dirD) { // andando para trás
+      digitalWrite(DIRECAO_PWM_MOTOR_DIR_A, LOW);
+      digitalWrite(DIRECAO_PWM_MOTOR_DIR_B, HIGH);
+    } else { // andando para frente
+      digitalWrite(DIRECAO_PWM_MOTOR_DIR_A, HIGH);
+      digitalWrite(DIRECAO_PWM_MOTOR_DIR_B, LOW);
+    }
+  } else { // PARA TUDO
     analogWrite(PWM_MOTOR_DIR, 0);
-        digitalWrite(DIRECAO_PWM_MOTOR_DIR_A, LOW);
-        digitalWrite(DIRECAO_PWM_MOTOR_DIR_B, LOW);
+    digitalWrite(DIRECAO_PWM_MOTOR_DIR_A, LOW);
+    digitalWrite(DIRECAO_PWM_MOTOR_DIR_B, LOW);
   }
 }

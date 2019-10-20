@@ -58,7 +58,7 @@ class Blob {
     //rect(minx, miny, maxx, maxy);
     
     // Como elipse
-    ellipse((minx+maxx)/2, (miny+maxy)/2, 5, 5) ;
+    ellipse((minx+maxx)/2, (miny+maxy)/2, 2.5, 2.5) ;
   }
   PVector center() {
     
@@ -83,6 +83,7 @@ class Blob {
     miny = height;
     maxx = 0;
     maxy = 0;
+    numPixels = 0;
   }
  
   // Verifica se um ponto (x, y) está perto do blob

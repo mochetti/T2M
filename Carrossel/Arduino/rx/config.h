@@ -18,6 +18,6 @@ namespace Config {
 
   const byte CANAL = 88; /* canal sendo utilizado pelo rádio usado para a comunicação. */
 
-  const byte CARACTERE_INICIAL = 0x80; /* primeiro byte da transmissao - fixo - caso alterado deve ser alterado no código do pc também em radio.hpp. */
+  const byte CARACTERE_INICIAL = 80; /* primeiro byte da transmissao - fixo - caso alterado deve ser alterado no código do pc também em radio.hpp. */
 
 }
