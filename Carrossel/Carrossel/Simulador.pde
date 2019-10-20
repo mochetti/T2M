@@ -4,7 +4,7 @@
 int roboControlado = 0;
 
 // bola virtual
-Bola bolaV = new Bola();
+Bola bolaV = new Bola(false);
 
 void simulador() {
   if (robosSimulados.size() == 0) {

@@ -114,7 +114,7 @@ void alinhaP(Robo r, float ang) {
 // Alinha e anda e alinha
 void alinhaGoleiro(Robo r) {
   // Verifica se a bola está perto
-  if (distSq(r.pos, bola) < 15*15) {
+  if (distSq(r.pos, bola.pos) < 15*15) {
     gira(r, true);
     return;
   }

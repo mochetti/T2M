@@ -16,7 +16,7 @@ void estrategia(Robo r, int n) {
   // Raio de tolerancia pra considerar que o robo chegou
   int tolDist = 10;
 
-  PVector velBola = velBola();
+  //PVector velBola = velBola();
 
   // Raio de colisao da bola
   //ellipse(bola.x, bola.y, distColisao, distColisao);
@@ -35,7 +35,7 @@ void estrategia(Robo r, int n) {
 
       // Antes de qualquer coisa, checa se está perto da bola
       // Se estiver, gira no próprio eixo no próximo estágio
-      if (r.isNear(bola, 30)) {
+      if (r.isNear(bola.pos, 30)) {
         println("ESTRATEGIA: Bola está proxima do goleiro, girando no próprio eixo.");
         r.estagio = 1;
         break;
@@ -44,7 +44,7 @@ void estrategia(Robo r, int n) {
 
       // Mudar coordenada x para x da linha do gol 
       inter.x = golAmigo.x + distGoleiro;
-      inter.y = bola.y;
+      inter.y = bola.pos.y;
       if (inter.y > golAmigo.y + Y_AREA/2) inter.y = golAmigo.y + Y_AREA/2;
       if (inter.y < golAmigo.y - Y_AREA/2) inter.y = golAmigo.y - Y_AREA/2;
       //ellipse(inter.x, inter.y, 15, 15);
@@ -61,7 +61,7 @@ void estrategia(Robo r, int n) {
       break;
     } else if (r.estagio == 1) {
 
-      if (r.isNear(bola, 30)) {
+      if (r.isNear(bola.pos, 30)) {
 
         if (!r.girando) {
           qtdFrames = frameCount;
@@ -111,11 +111,11 @@ void estrategia(Robo r, int n) {
 
     //Informações referentes a angulos e posição da sombra real deverão estar disponíveis a qualquermomento em qualquer IF
     //Por isso o motivo de estar do lado de fora (se vamos usar assim ou não fica a caráter do estágio decidir)
-    float ang = atan2(golAmigo.y - bola.y, golAmigo.x - bola.x);
+    float ang = atan2(golAmigo.y - bola.pos.y, golAmigo.x - bola.pos.x);
     ang += PI;
     PVector sombra = new PVector();
-    sombra.x = bola.x + distSombra * cos(ang);
-    sombra.y = bola.y + distSombra * sin(ang);
+    sombra.x = bola.pos.x + distSombra * cos(ang);
+    sombra.y = bola.pos.y + distSombra * sin(ang);
 
     // Condiciona a sombra dentro do campo
     if (sombra.x < shapeCampo.getVertex(0).x) sombra.x = shapeCampo.getVertex(0).x + 15;
@@ -183,7 +183,7 @@ void estrategia(Robo r, int n) {
       float distTol = 130;
       //Significa que tá muito longe, reseta tudo
       //println(r.obj);
-      if (distSq(r.obj, bola) > distTol*distTol) {
+      if (distSq(r.obj, bola.pos) > distTol*distTol) {
         println("ESTRATÉGIA: projeção se afastou demais da bola. Reiniciando estágios");
         r.estagio = 0;
         break;
@@ -243,7 +243,7 @@ void estrategia(Robo r, int n) {
       if (distSq(r.pos, sombra) < 15*15) {
 
         println("ESTRATÉGIA: Chegou na sombra real. Indo em direção a bola");
-        r.setObj(bola);
+        r.setObj(bola.pos);
         r.estagio = 3;
         break;
       }
@@ -253,7 +253,7 @@ void estrategia(Robo r, int n) {
        ignorando a bola estando possivelmente entre o robô e a sombra, pois agora o código estaria preso no estagio == 2.
        Neste caso, devemos resetar para o estágio 0, onde existe a checagem se a bola está no meio ou não
        */
-      if (distSq(r.pos, bola) > 150*150) {
+      if (distSq(r.pos, bola.pos) > 150*150) {
         println("ESTRATÉGIA: Robô " + r.index + " se distanciou muito da bola enquanto perseguia sua sombra real. Resetando estágios");
         r.estagio = 0;
       }
@@ -265,7 +265,7 @@ void estrategia(Robo r, int n) {
     } else if (r.estagio == 3) {
       //println("passou por aqui");
       //novo objetivo do robo é a própria bola
-      r.setObj(bola);
+      r.setObj(bola.pos);
       //noFill();
       //stroke(255);
       //ellipse(r.obj.x, r.obj.y, 20, 20);
@@ -277,7 +277,7 @@ void estrategia(Robo r, int n) {
        */
       float distTol = 130;
       //Significa que tá muito longe, reseta tudo
-      if (distSq(r.pos, bola) > distTol*distTol) {
+      if (distSq(r.pos, bola.pos) > distTol*distTol) {
         println("ESTRATÉGIA: Robo " + r.index + " se afastou demais da bola. Resetando os estágios");
         r.estagio = 0;
         break;
@@ -292,10 +292,13 @@ void estrategia(Robo r, int n) {
   case 2:    // Interseccao na defesa
     // O robo precisa estar atras da bola e ela deve estar se aproximando
     // Garante que a bola ja possui rastro
-    if (velBola() == null) return;
+    if (bola.vel == null) {
+      r.setEstrategia(1);
+      return;
+    }
 
     // Se a bola estiver se afastando do nosso gol, deixa ela
-    if (!bolaIsAprox(golAmigo)) {
+    if (!bola.isAprox(golAmigo)) {
       // Meio do campo de defesa
       //r.setObj(width/4 + 50, height/2);
       r.setEstrategia(1);
@@ -303,8 +306,8 @@ void estrategia(Robo r, int n) {
     }
 
     // Equacao da reta da bola
-    aBola = velBola.y / velBola.x;
-    bBola = bola.y - aBola * bola.x;
+    aBola = bola.vel.y / bola.vel.x;
+    bBola = bola.pos.y - aBola * bola.pos.x;
     //line(bola.x, bola.y, bola.x + 100*velBola.x, bola.y + 100*velBola.y);
 
     // Preve choques da bola com as paredes
@@ -321,7 +324,7 @@ void estrategia(Robo r, int n) {
     float angInicial = 0;
 
     // Só são considerados choques em cima e embaixo
-    if (impacto.x > 0 && impacto.x < width && distSq(bola.x, bola.y, impacto.x, impacto.y) < distColisao*distColisao) {
+    if (impacto.x > 0 && impacto.x < width && distSq(bola.pos.x, bola.pos.y, impacto.x, impacto.y) < distColisao*distColisao) {
       // Considera a projecao pós impacto
       //println("ESTRATÉGIA: Colisão a caminho !");
       angInicial = atan2(r.pos.y - impacto.y, r.pos.x - impacto.x) + PI;
@@ -350,7 +353,7 @@ void estrategia(Robo r, int n) {
           // Verifica se a interseccao pode ser alcancada antes da bola
           // Sem levar em conta a velocidade
           // A distancia da bola até o inter é a soma das trajetorias até o impacto depois ate o inter
-          if (distSq(r.pos, inter) < distSq(bola, impacto) + distSq(impacto, inter)) {
+          if (distSq(r.pos, inter) < distSq(bola.pos, impacto) + distSq(impacto, inter)) {
             //println("ESTRATÉGIA: Da tempo !");
             //println("ESTRATÉGIA: inter = " + inter);
             stroke(255);
@@ -364,7 +367,7 @@ void estrategia(Robo r, int n) {
 
     // Não há colisões no caminho
     else {
-      angInicial = atan2(r.pos.y - bola.y, r.pos.x - bola.x) + PI;
+      angInicial = atan2(r.pos.y - bola.pos.y, r.pos.x - bola.pos.x) + PI;
       //println("ESTRATÉGIA: angulo inicial = " + degrees(angInicial));
 
       //Testa qual angulo permite chegar a tempo
@@ -391,7 +394,7 @@ void estrategia(Robo r, int n) {
 
           // Verifica se a interseccao pode ser alcancada antes da bola
           // Sem levar em conta a velocidade
-          if (distSq(r.pos, inter) < distSq(bola, inter)) {
+          if (distSq(r.pos, inter) < distSq(bola.pos, inter)) {
             //println("ESTRATÉGIA: Da tempo !");
             //println("ESTRATÉGIA: inter = " + inter);
             stroke(255);
@@ -405,25 +408,25 @@ void estrategia(Robo r, int n) {
 
     // Caso nenhum angulo permita interceder
     //r.setEstrategia(0);
-    r.setObj(bola);
+    r.setObj(bola.pos);
     break;
 
   case 3:     // Goleiro segue a projecao da bola
 
     // Garante que a bola ja possui rastro
-    if (velBola() == null) return;
+    if (bola.vel == null) return;
 
     // Garante que a bola está se aproximando
     // Mudar o argumento para r.pos (?)
-    if (!bolaIsAprox(golAmigo)) {
+    if (!bola.isAprox(golAmigo)) {
       // Se estiver se afastando, segue o Y da bola
       r.setEstrategia(0);
       return;
     }
 
     // Equacao da reta da bola
-    aBola = velBola.y / velBola.x;
-    bBola = bola.y - aBola * bola.x;
+    aBola = bola.vel.y / bola.vel.x;
+    bBola = bola.pos.y - aBola * bola.pos.x;
     //line(bola.x, bola.y, bola.x + 100*velBola.x, bola.y + 100*velBola.y);
 
     // Intereseccao com a linha do gol
@@ -446,7 +449,7 @@ void estrategia(Robo r, int n) {
 
     // segue a bola
   case 4:
-    r.setObj(bola);
+    r.setObj(bola.pos);
     break;
 
     // segue o mouse
