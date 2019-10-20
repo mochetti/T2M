@@ -101,10 +101,6 @@ int Y_AREA = 120;
 //PVector shapeCampo.getVertex(0) = new PVector();
 //PVector shapeCampo.getVertex(2) = new PVector();
 
-// define o campo como quatro pontos
-//PVector campo[] = {new PVector(), new PVector(), new PVector(), new PVector()};
-
-
 //Movie mov;
 Capture cam;
 //PImage screenshot;
@@ -227,6 +223,9 @@ void draw() {
 
       //Defino a bola
       bola = new PVector(blobs.get(0).center().x, blobs.get(0).center().y);
+      
+      // Calcula o vetor direção da bola
+      velBola();
 
       //A partir daqui pode definir os objetivos.
 
@@ -235,13 +234,12 @@ void draw() {
         // Define as estratégias dos robos
         // 5 - seguir mouse, 6 fazer nada (por enquanto), 1 - atacante, 3 - goleiro
 
-        if (robos.get(0).index >= 0) robos.get(0).setEstrategia(5);
-        if (robos.get(1).index >= 0) robos.get(1).setEstrategia(5);
-        if (robos.get(2).index >= 0) {
-          robos.get(2).setEstrategia(5);
-          robos.get(2).obj = new PVector(robos.get(2).obj.x, robos.get(2).obj.y + 100);
-        }
-        //if (robos.get(2).index >= 0) robos.get(2).setEstrategia(5);
+        if (robos.get(0).index >= 0) robos.get(0).setEstrategia(3);
+        //if (robos.get(1).index >= 0) robos.get(1).setEstrategia(5);
+        //if (robos.get(2).index >= 0) {
+        //  robos.get(2).setEstrategia(5);
+        //  robos.get(2).obj = new PVector(robos.get(2).obj.x, robos.get(2).obj.y + 100);
+        //}
       } // posicoes fixas
       else for (Robo r : robos) if (r.index >= 0) r.setEstrategia(estFixa);
 
@@ -260,8 +258,8 @@ void draw() {
         //println(robos.get(0).girando);
 
         if (robos.get(0).index >= 0 && !robos.get(0).girando) alinhaAnda(robos.get(0));
-        if (robos.get(1).index >= 0 && !robos.get(1).girando) alinhaAnda(robos.get(1));
-        if (robos.get(2).index >= 0 && !robos.get(2).girando) alinhaAnda(robos.get(2));
+        //if (robos.get(1).index >= 0 && !robos.get(1).girando) alinhaAnda(robos.get(1));
+        //if (robos.get(2).index >= 0 && !robos.get(2).girando) alinhaAnda(robos.get(2));
 
         if (gameplay) gameplay(robos.get(0));
       }

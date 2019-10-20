@@ -148,7 +148,7 @@ float distColorSq(color c1, color c2) {
 // Checa se o blob está próximo ao do frame anterior
 boolean search (Blob b) {
   // raio de busca em relacao à ultima posicao de cada blob
-  int raioBusca = 15;
+  int raioBusca = 20;
   // Contagem de pixels por blob
   int count = 0;
   // offset 
@@ -509,7 +509,7 @@ PVector velBola() {
   vel.x = modulo*cos(ang);
   vel.y = modulo*sin(ang);
   //vel.mult(10);
-  //arrow(bolaAtual.x, bolaAtual.y, PVector.add(bolaAtual, vel).x, PVector.add(bolaAtual, vel).y);
+  arrow(bolaAtual.x, bolaAtual.y, PVector.add(bolaAtual, vel).x, PVector.add(bolaAtual, vel).y);
 
   return vel;
 }

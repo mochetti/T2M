@@ -416,6 +416,7 @@ void estrategia(Robo r, int n) {
     // Garante que a bola está se aproximando
     // Mudar o argumento para r.pos (?)
     if (!bolaIsAprox(golAmigo)) {
+      // Se estiver se afastando, segue o Y da bola
       r.setEstrategia(0);
       return;
     }

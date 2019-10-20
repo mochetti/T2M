@@ -99,8 +99,8 @@ PVector simulaVel (Robo r) {
 
   // usando como entrada o módulo de controle
   else if(robos.size() > 0){
-    if (robos.get(r.index).velE > 0 && robos.get(r.index).velD > 0) vel = new PVector(cos(r.ang), sin(r.ang));
-    else if (robos.get(r.index).velE < 0 && robos.get(r.index).velD < 0) vel = new PVector(-cos(r.ang), -sin(r.ang));
+    if (robos.get(r.index).velE > 0 && robos.get(r.index).velD > 0) vel = new PVector(cos(r.ang)*v, sin(r.ang)*v);
+    else if (robos.get(r.index).velE < 0 && robos.get(r.index).velD < 0) vel = new PVector(-cos(r.ang)*v, -sin(r.ang)*v);
   }
   //println(vel);
   return vel;
