@@ -356,11 +356,11 @@ class Robo {
   boolean isBolaEntre(PVector objetivo) {  
 
     float distRoboObj = distSq(pos, objetivo);
-    float distRoboBola = distSq(pos, bola);
+    float distRoboBola = distSq(pos, bola.pos);
     //println(distRoboObj);
     //println(distRoboBola);
 
-    if (isNear(bola, 80) && distRoboObj > distRoboBola) {
+    if (isNear(bola.pos, 80) && distRoboObj > distRoboBola) {
 
 
       return true;

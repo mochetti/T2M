@@ -26,7 +26,7 @@ boolean controle = true;  // Flag para rodar o bloco de controle
 boolean estrategia = true; // Flag para rodar o bloco de estratégia
 boolean radio = true; //Flag de controle para emitir ou não sinais ao rádio (ultimo passo da checagem)
 boolean gameplay = false;  //Flag de controle que diz se o jogo está no automático ou no manual (apenas do robô 0 por enquanto)
-boolean simManual = true;
+boolean simManual = true;  // Flag de controle que define se os comandos vem pelas setas ou do modulo de controle
 
 // estretagia usada quando estrategia = false;
 int estFixa = 0;
@@ -119,7 +119,9 @@ ArrayList<Robo> robos = new ArrayList<Robo>();
 ArrayList<Robo> oldRobos = new ArrayList<Robo>();
 ArrayList<Robo> robosSimulados = new ArrayList<Robo>();
 ArrayList<PVector> rastro = new ArrayList<PVector>();
-PVector bola = new PVector();
+
+// bola real
+Bola bola = new Bola(true);
 
 void setup() {
 
@@ -142,11 +144,11 @@ void setup() {
 
   frame.removeNotify();
   frameRate(30);
-  //if (inputVideo == 0) {
+  if (inputVideo == 0) {
     printArray(Serial.list());
     myPort = new Serial(this, Serial.list()[1], 115200);
-    //camConfig();
-  //}
+    camConfig();
+  }
 }
 
 void movieEvent(Movie m) {
@@ -222,10 +224,7 @@ void draw() {
       }
 
       //Defino a bola
-      bola = new PVector(blobs.get(0).center().x, blobs.get(0).center().y);
-      
-      // Calcula o vetor direção da bola
-      velBola();
+      bola.atualiza();
 
       //A partir daqui pode definir os objetivos.
 
@@ -265,8 +264,8 @@ void draw() {
       }
 
       //A partir daqui envia dados
-      //if (inputVideo == 0) enviar();
-      enviar();
+      if (inputVideo == 0) enviar();
+
     } else {
       // no simulador, o campo é o próprio canvas
       if (inputVideo == 2) {

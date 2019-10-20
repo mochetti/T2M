@@ -157,7 +157,7 @@ boolean search (Blob b) {
   // relacao blob - robo
   int[] relacaoBlobRobo = {-1, 0, 1, 2, 0, 1, 2};
 
-  if (b.id == 0) offset = bola;
+  if (b.id == 0) offset = bola.pos;
   else if (b.id > 0) {
 
     //println(oldRobos.size());
@@ -447,9 +447,8 @@ void ordenar() {
   blobs.clear();
   for (Blob b : newBlobs) blobs.add(b.clone());
 
-
+  // Alimenta o array que guarda o rastro da bola
   for (Blob b : blobs) if (b.id == 0) rastro.add(new PVector(b.center().x, b.center().y));
-
 
   //Esse bloco de código garante que ao encontrar um novo elemento (robô)
   //As informações dos outros como estágio, estratégia, posição, não se percam no próximo frame atualizado
@@ -471,60 +470,6 @@ void ordenar() {
         oldRobos.get(i).index = i;
       }
     }
-  }
-}
-
-// Retorna o vetor velocidade da bola, originado no centro dela
-PVector velBola() {
-  // Remove os rastros mais antigos
-  while (rastro.size() > 15) rastro.remove(0);
-  // Espera colher dados o suficiente
-  if (rastro.size() < 14) return null;
-  // Coordenadas
-  PVector bolaAtual = new PVector();
-  if (inputVideo == 0) bolaAtual = new PVector(blobs.get(0).center().x, blobs.get(0).center().y);
-  else if (inputVideo == 2) bolaAtual = bolaV.pos;
-
-  // Mostra o rastro na tela
-  //for(int i = 0; i < rastro.size()-1; i++) ellipse(rastro.get(i).x, rastro.get(i).y, 15, 15);
-
-  // Descobre o angulo e o modulo da bola
-  float ang = 0;
-  float modulo = 50;
-  // Numero de frames entre duas bolas para calcular a velocidade
-  int frames = 3;
-
-  for (int i = 0; i < 9; i++) {
-    // Começa pelo mais antigo
-    PVector bolaAnt = new PVector(rastro.get(i).x, rastro.get(i).y);
-    //PVector bolaRec = new PVector(rastro.get(i+frames).x, rastro.get(i+frames).y);
-    //modulo += PVector.dist(bolaAnt, bolaRec);
-    ang += atan2(bolaAtual.y - bolaAnt.y, bolaAtual.x - bolaAnt.x);
-  }
-
-  ang /= 9;
-  //modulo /= 9;
-
-  PVector vel = new PVector();
-  vel.x = modulo*cos(ang);
-  vel.y = modulo*sin(ang);
-  //vel.mult(10);
-  arrow(bolaAtual.x, bolaAtual.y, PVector.add(bolaAtual, vel).x, PVector.add(bolaAtual, vel).y);
-
-  return vel;
-}
-
-// Retorna true se a bola estiver se aproximando do ponto fornecido
-boolean bolaIsAprox(PVector aqui) {
-  PVector bolaAtual = new PVector(blobs.get(0).center().x, blobs.get(0).center().y);
-  PVector velBola = velBola();
-  // Se a distancia entre a bola futura e o ponto for maior que a distancia entre a bola atual e o ponto, a abola esta se afastando
-  if (distSq(bolaAtual.x + velBola.x, bolaAtual.y + velBola.y, aqui.x, aqui.y) > distSq(bolaAtual.x, bolaAtual.y, aqui.x, aqui.y)) {
-    //println("VISÃO: afastando");
-    return false;
-  } else {
-    //println("VISÃO: aproximando");
-    return true;
   }
 }
 
@@ -726,21 +671,21 @@ void dimensionaCampo(int x, int y) {
  return count;
  }
  */
-boolean isInsride(PVector pos, PShape input) {
-  int i, j;
-  boolean c = false;
-  PShape forma = createShape();
-  forma.beginShape();
-  forma.vertex(input.getChild(0).getVertex(0).x, input.getChild(0).getVertex(0).y);
-  forma.endShape(CLOSE);
-  int sides = 4;          // descobrir como contar os lados de um PShape do tipo GROUP
-  for (i=0, j=sides-1; i<sides; j=i++) {
-    if (( ((forma.getVertex(i).y <= pos.y) && (pos.y < forma.getVertex(j).y)) || ((forma.getVertex(j).y <= pos.y) && (pos.y < forma.getVertex(i).y))) && (pos.x < (forma.getVertex(j).x - forma.getVertex(i).x) * (pos.y - forma.getVertex(i).y) / (forma.getVertex(j).y - forma.getVertex(i).y) + forma.getVertex(i).x)) {
-      c = !c;
-    }
-  }
-  return c;
-}
+//boolean isInsride(PVector pos, PShape input) {
+//  int i, j;
+//  boolean c = false;
+//  PShape forma = createShape();
+//  forma.beginShape();
+//  forma.vertex(input.getChild(0).getVertex(0).x, input.getChild(0).getVertex(0).y);
+//  forma.endShape(CLOSE);
+//  int sides = 4;          // descobrir como contar os lados de um PShape do tipo GROUP
+//  for (i=0, j=sides-1; i<sides; j=i++) {
+//    if (( ((forma.getVertex(i).y <= pos.y) && (pos.y < forma.getVertex(j).y)) || ((forma.getVertex(j).y <= pos.y) && (pos.y < forma.getVertex(i).y))) && (pos.x < (forma.getVertex(j).x - forma.getVertex(i).x) * (pos.y - forma.getVertex(i).y) / (forma.getVertex(j).y - forma.getVertex(i).y) + forma.getVertex(i).x)) {
+//      c = !c;
+//    }
+//  }
+//  return c;
+//}
 
 boolean isInside(PVector objeto, PShape forma) {
   if (objeto.x >= forma.getVertex(0).x && objeto.x <= forma.getVertex(2).x && objeto.y >= forma.getVertex(0).y && objeto.y <= forma.getVertex(2).y) {
