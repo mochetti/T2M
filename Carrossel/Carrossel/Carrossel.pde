@@ -3,14 +3,13 @@ import processing.serial.*;
 
 
 /*
+
+ Checar conexão do rádio com a serial do TX e também do receptor. Aparentemente está perdendo por mal contato do rádio.
   
  Por algum motivo os blobs não tão reconhecendo. Não to entendendo o porque o b.show() tá mostrando os blobs. Debugar a visão inteira e debugar a parte dos id's.
  Printar os id's e colocar robô por robô no campo e tentar separadamente para depois juntá-los. Garantir que estão na posição certa da array
  
  */
-
-int tempoInicial;
-int tempoFinal;
 
 // Flags de debug
 boolean debug = true;
@@ -132,7 +131,6 @@ void setup() {
 
   for (int i : quantCor) elementos += i;
 
-  tempoInicial = millis();
 
   //mov = new Movie(this, "real.mp4");
   //mov.play();
@@ -148,11 +146,11 @@ void setup() {
 
   frame.removeNotify();
   frameRate(30);
-  if (inputVideo == 0) {
+  //if (inputVideo == 0) {
     printArray(Serial.list());
-    myPort = new Serial(this, Serial.list()[0], 115200);
-    camConfig();
-  }
+    myPort = new Serial(this, Serial.list()[1], 115200);
+    //camConfig();
+  //}
 }
 
 void movieEvent(Movie m) {
@@ -163,7 +161,7 @@ void captureEvent(Capture c) {
 }
 
 void draw() {
-  if (cam.available() || inputVideo == 2) {
+  if (inputVideo == 0 && cam.available() || inputVideo == 2) {
     //loadPixels();
     background(0);
     tempo = millis();
@@ -237,7 +235,7 @@ void draw() {
         // Define as estratégias dos robos
         // 5 - seguir mouse, 6 fazer nada (por enquanto), 1 - atacante, 3 - goleiro
 
-        if (robos.get(0).index >= 0) robos.get(0).setEstrategia(0);
+        if (robos.get(0).index >= 0) robos.get(0).setEstrategia(5);
         if (robos.get(1).index >= 0) robos.get(1).setEstrategia(5);
         if (robos.get(2).index >= 0) {
           robos.get(2).setEstrategia(5);
@@ -269,7 +267,8 @@ void draw() {
       }
 
       //A partir daqui envia dados
-      if (inputVideo == 0) enviar();
+      //if (inputVideo == 0) enviar();
+      enviar();
     } else {
       // no simulador, o campo é o próprio canvas
       if (inputVideo == 2) {

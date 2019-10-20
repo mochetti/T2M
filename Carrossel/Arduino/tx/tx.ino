@@ -14,9 +14,10 @@ void setup() {
   Serial.begin(Config::SERIAL_BIT_RATE);
   Serial.println("TESTANDO");
   radio.begin();
-  //radio.setRetries(15,15);
-  //radio.setPayloadSize(6);          //Setando o tamanho dos pacotes que serão enviados, no caso 4 (limitando o tamanho do txbuffer para garantir a comunicação e evitar perca de dados
+  //radio.setRetries(15,15);        //Setando o tamanho dos pacotes que serão enviados, no caso 4 (limitando o tamanho do txbuffer para garantir a comunicação e evitar perca de dados
   //radio.setAutoAck(false);
+  //  radio.setPayloadSize(7);
+  //  radio.setDataRate(RF24_1MBPS);
   radio.setChannel(Config::CANAL);             //canal de comunicação, simboliza a frequência de comunicação, no caso 2400+88 Mhz.
   radio.setPALevel(RF24_PA_LOW);
   radio.openWritingPipe(Config::PIPE_CHAVE);   // abertura do "tubo" (endereços) de comunicação, operação de escrita
@@ -26,7 +27,10 @@ void setup() {
 
 void loop() {
 
+
+  delay(2);
   /* aguardando até a serial ficar disponível - se prepara para receber o array do pc*/
+
   if (Serial.available()) {
     /* lendo o que vem da serial (já vem com o primeiro byte 0x80.) */
     //    Serial.println(Serial.read());
@@ -51,16 +55,13 @@ void loop() {
     if (txBuffer[0] == Config::CARACTERE_INICIAL) {
       Serial.println("ENVIOU OS DADOS");
       radio.write(&txBuffer, sizeof(txBuffer)); //& indica referencia a variável indicada, isso implica em utilizar o conteúdo da varíavel sem alterá-la
-      for (int i = 0; i < Config::BUFFER_SIZE; i++) {
-        txBuffer[i] = 0;
-      }
     }
     else {
       Serial.println("CARACTERE_INICIAL ERRADO!");
     }
+
   }
   else {
     Serial.println("SERIAL INDISPONÍVEL!");
   }
-  delay(2000);
 }
