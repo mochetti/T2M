@@ -233,7 +233,7 @@ void draw() {
         // Define as estratégias dos robos
         // 5 - seguir mouse, 6 fazer nada (por enquanto), 1 - atacante, 3 - goleiro
 
-        if (robos.get(0).index >= 0) robos.get(0).setEstrategia(3);
+        if (robos.get(0).index >= 0) robos.get(0).setEstrategia(0);
         //if (robos.get(1).index >= 0) robos.get(1).setEstrategia(5);
         //if (robos.get(2).index >= 0) {
         //  robos.get(2).setEstrategia(5);
@@ -320,7 +320,7 @@ void keyPressed() {
   //MOVIE
   if (key == ' ') {
     // chute aleatorio na bola
-    bolaV.vel.set(random(10)-5, random(10)-5);
+    bolaV.vel.set(random(20)-10, random(20)-10);
     if (pausado) {
       //mov.play();
       pausado = false;

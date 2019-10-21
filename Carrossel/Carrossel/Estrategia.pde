@@ -26,74 +26,48 @@ void estrategia(Robo r, int n) {
 
   case 0:     // Goleiro segue o y da bola
 
-    /*
-      Estágio inicial é ir até o Y da bola dentro dos limites. Checa constantemente se a bola está próxima, se sim, gira no eixo baseado na posição do campo
-     */
-
-    if (r.estagio == 0) {
-
-
-      // Antes de qualquer coisa, checa se está perto da bola
-      // Se estiver, gira no próprio eixo no próximo estágio
-      if (r.isNear(bola.pos, 30)) {
-        println("ESTRATEGIA: Bola está proxima do goleiro, girando no próprio eixo.");
-        r.estagio = 1;
-        break;
-      }
-
-
-      // Mudar coordenada x para x da linha do gol 
-      inter.x = golAmigo.x + distGoleiro;
-      inter.y = bola.pos.y;
-      if (inter.y > golAmigo.y + Y_AREA/2) inter.y = golAmigo.y + Y_AREA/2;
-      if (inter.y < golAmigo.y - Y_AREA/2) inter.y = golAmigo.y - Y_AREA/2;
-      //ellipse(inter.x, inter.y, 15, 15);
-
-      // Checa se o goleiro já está perto do objetivo
-      if (distSq(r.pos, inter) < tolDist*tolDist) {
-
-        r.angObj = PI/2;
-        if (abs(r.ang - PI/2) > PI/2) r.angObj = 3*PI/2;
-        //println(degrees(r.ang - PI/2));
-      } else r.angObj = -1;
-      r.setObj(inter);
-
-      break;
-    } else if (r.estagio == 1) {
-
-      if (r.isNear(bola.pos, 30)) {
-
-        if (!r.girando) {
-          qtdFrames = frameCount;
-          r.girando = true;
-        } else {
-          r.setObj(r.pos.x, r.pos.y);
-          chutaGirando(r);
-          //println("GIRANDO");
-          if (frameCount - qtdFrames > 45) {
-            r.girando = false;
-            r.estagio = 0;
-          }
-        }
-      } else {
+    // Antes de qualquer coisa, checa se está perto da bola
+    if (r.isNear(bola.pos, 50)) {
+      if (frameCount - qtdFrames > 45) {
         r.girando = false;
-        r.estagio = 0;
+        qtdFrames = frameCount;
+        //println("ESTRATEGIA: Bola está proxima do goleiro, girando no próprio eixo.");
+      } else {
+        r.girando = true;
+        // checa o sentido do giro
+        if (bola.pos.y < r.pos.y) {
+          println("ESTRATEGIA: Bola está proxima do goleiro, girando no sentido horário.");
+          gira(r, true);
+        } else {
+          println("ESTRATEGIA: Bola está proxima do goleiro, girando no sentido anti horario.");
+          gira(r, false);
+        }
       }
-
-
-      // Se estiver no campo inferior, gira anti horário
-
-      // Se estiver no campo superior, gira horário
-
-      // Mantém o objetivo anterior
       break;
     }
+    r.girando = false;
 
+    // Mudar coordenada x para x da linha do gol 
+    inter.x = golAmigo.x + distGoleiro;
+    inter.y = bola.pos.y;
+    if (inter.y > golAmigo.y + Y_AREA/2) inter.y = golAmigo.y + Y_AREA/2;
+    if (inter.y < golAmigo.y - Y_AREA/2) inter.y = golAmigo.y - Y_AREA/2;
+    //ellipse(inter.x, inter.y, 15, 15);
 
+    // Checa se o goleiro já está perto do objetivo
+    if (distSq(r.pos, inter) < tolDist*tolDist) {
+
+      r.angObj = PI/2;
+      if (abs(r.ang - PI/2) > PI/2) r.angObj = 3*PI/2;
+      //println(degrees(r.ang - PI/2));
+    } else r.angObj = -1;
+    r.setObj(inter);
+
+    break; 
 
 
     /*
-  No case 1 tentarei separar a estratégia em etapas. O problema que estamos tendo é que cada sequência lógica de passo envolve uma variável booleana
+     No case 1 tentarei separar a estratégia em etapas. O problema que estamos tendo é que cada sequência lógica de passo envolve uma variável booleana
      na maioria das vezes para fazer as checagens. As coisas estão começando a se perder, pois para resetar seu estado inicial (como se fosse a primeira vez da execucao) as variáveis
      precisam ser zeradas e isso precisa ser feita no lugar certo na hora certa
      */
@@ -413,12 +387,32 @@ void estrategia(Robo r, int n) {
 
   case 3:     // Goleiro segue a projecao da bola
 
+    // Antes de qualquer coisa, checa se está perto da bola
+    if (r.isNear(bola.pos, 50)) {
+      if (frameCount - qtdFrames > 45) {
+        r.girando = false;
+        qtdFrames = frameCount;
+        //println("ESTRATEGIA: Bola está proxima do goleiro, girando no próprio eixo.");
+      } else {
+        r.girando = true;
+        // checa o sentido do giro
+        if (bola.pos.y < r.pos.y) {
+          println("ESTRATEGIA: Bola está proxima do goleiro, girando no sentido horário.");
+          gira(r, true);
+        } else {
+          println("ESTRATEGIA: Bola está proxima do goleiro, girando no sentido anti horario.");
+          gira(r, false);
+        }
+      }
+      break;
+    }
+    r.girando = false;
+
     // Garante que a bola ja possui rastro
     if (bola.vel == null) return;
 
-    // Garante que a bola está se aproximando
-    // Mudar o argumento para r.pos (?)
-    if (!bola.isAprox(golAmigo)) {
+    // Garante que a bola está se aproximando com velocidade minima
+    if (!bola.isAprox(golAmigo) || bola.vel.mag() < 5) {
       // Se estiver se afastando, segue o Y da bola
       r.setEstrategia(0);
       return;

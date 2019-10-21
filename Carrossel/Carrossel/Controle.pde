@@ -67,13 +67,6 @@ void alinha(Robo r, float ang) {
   }
 }
 
-//True é horario, e false é antihorário
-void chutaGirando(Robo r) {
-
-  r.setVel(50, -40);
-  
-}
-
 // Alinha proporcional à distancia do angulo desejado
 void alinhaP(Robo r, float ang) {
   // Constante de proporcionalidade
@@ -170,9 +163,9 @@ void alinhaGoleiro(Robo r) {
 // sentido false : gira anti horário
 void gira(Robo r, boolean sentido) {
   if (sentido) {
-    r.setVel(r.velMax, -r.velMax);
+    r.setVel(63, -63);
   } else {
-    r.setVel(-r.velMax, r.velMax);
+    r.setVel(-63, 63);
   }
 }
 
