@@ -233,7 +233,7 @@ void draw() {
         // Define as estratégias dos robos
         // 5 - seguir mouse, 6 fazer nada (por enquanto), 1 - atacante, 3 - goleiro
 
-        if (robos.get(0).index >= 0) robos.get(0).setEstrategia(0);
+        if (robos.get(0).index >= 0) robos.get(0).setEstrategia(1);
         //if (robos.get(1).index >= 0) robos.get(1).setEstrategia(5);
         //if (robos.get(2).index >= 0) {
         //  robos.get(2).setEstrategia(5);

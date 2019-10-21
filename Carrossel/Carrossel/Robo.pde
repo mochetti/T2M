@@ -3,6 +3,7 @@
 class Robo {
 
   //Variaveis de controle de estado para cada estratégia:
+  int qtdFrames;
   int estagio = 0;  //Variável que para cada estratégia vai ditar o que no estágio atual deveria acontecer
   //Estratégia 0:
   /*
@@ -14,9 +15,11 @@ class Robo {
   /*
    estagio:
    -0: vai até a sombra da bola
-   -1 vai até a posição projetada da sombra
-   -2´ir até a sombra da bola, tendo passado pelo estágio 1
+   -1: vai até a posição projetada da sombra
+   -2:´ir até a sombra da bola, tendo passado pelo estágio 1
    -3: Vai até a bola
+   -4: bola ta na margem superior, espirra ela
+   -5: bola ta na margem inferior, espirra ela
    Aqui percebemos que existem 2 caminhos lógicos que o robô poderá seguir:
    0 -> 3; OU  Nesta o robô chega direto na sombra da bola e vai direto até ela
    0 -> 1 -> 2 -> 3;  Enquanto nesta o robô vai até a sombra original, encontra a bola no caminho e passa a percorrer atrás da sombra projetada. Chega na projetada e vai até
@@ -79,6 +82,7 @@ class Robo {
     girando = r.girando;
     obj = r.obj;
     objAnt = r.objAnt;
+    qtdFrames = r.qtdFrames;
     atualiza();
   }
 

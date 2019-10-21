@@ -28,9 +28,9 @@ void estrategia(Robo r, int n) {
 
     // Antes de qualquer coisa, checa se está perto da bola
     if (r.isNear(bola.pos, 50)) {
-      if (frameCount - qtdFrames > 45) {
+      if (frameCount - r.qtdFrames > 45) {
         r.girando = false;
-        qtdFrames = frameCount;
+        r.qtdFrames = frameCount;
         //println("ESTRATEGIA: Bola está proxima do goleiro, girando no próprio eixo.");
       } else {
         r.girando = true;
@@ -85,7 +85,7 @@ void estrategia(Robo r, int n) {
 
     //Informações referentes a angulos e posição da sombra real deverão estar disponíveis a qualquermomento em qualquer IF
     //Por isso o motivo de estar do lado de fora (se vamos usar assim ou não fica a caráter do estágio decidir)
-    float ang = atan2(golAmigo.y - bola.pos.y, golAmigo.x - bola.pos.x);
+    float ang = atan2(golInimigo.y - bola.pos.y, golInimigo.x - bola.pos.x);
     ang += PI;
     PVector sombra = new PVector();
     sombra.x = bola.pos.x + distSombra * cos(ang);
@@ -96,7 +96,11 @@ void estrategia(Robo r, int n) {
     if (sombra.y < shapeCampo.getVertex(0).y) sombra.y = shapeCampo.getVertex(0).y + 20;
     if (sombra.x > shapeCampo.getVertex(2).x) sombra.x = shapeCampo.getVertex(2).x - 15;
     if (sombra.y > shapeCampo.getVertex(2).y) sombra.y = shapeCampo.getVertex(2).y - 20;
+    //Até aqui achei a sombra da bola
     //println("ESTRATÉGIA: Estágio " + r.estagio);
+    PShape margemSuperior = shapeCampo.getChild(0);
+    PShape margemInferior = shapeCampo.getChild(1);
+    if (isInside(bola.pos, margemSuperior) || isInside(bola.pos, margemInferior)) r.estagio = 4;
 
     if (r.estagio == 0) {
 
@@ -154,7 +158,7 @@ void estrategia(Robo r, int n) {
         Aqui, antes de mandarmos ele seguir a projeção da sombra devemos checar se faz sentido correr na projeção ou não. Isso checaremos
        através da distância entre a sombra projetada e a bola
        */
-      float distTol = 130;
+      float distTol = 80;
       //Significa que tá muito longe, reseta tudo
       //println(r.obj);
       if (distSq(r.obj, bola.pos) > distTol*distTol) {
@@ -258,8 +262,41 @@ void estrategia(Robo r, int n) {
       }
 
       //Caso não esteja muito longe, segue o baile.
-    }
+    } else if (r.estagio == 4) {
 
+      PVector bola_golInimigo = new PVector();
+      bola_golInimigo = PVector.sub(bola.pos, golInimigo);
+      ang = atan(bola_golInimigo.y/bola_golInimigo.x);
+
+      if (isInside(bola.pos, margemSuperior)) ang += PI/2;
+      else ang -= PI/2;
+
+
+      sombra.x = bola.pos.x + (distSombra - 30) * cos(ang);
+      sombra.y = bola.pos.y + (distSombra - 30) * sin(ang);
+
+      arrow(bola.pos.x, bola.pos.y, sombra.x, sombra.y);
+
+      r.setObj(sombra);
+
+      if (r.isNear(sombra, 10)) {
+        r.angObj = ang + PI;
+        if (frameCount - r.qtdFrames > 45) {
+          r.girando = false;
+          r.qtdFrames = frameCount;
+          //println("ESTRATEGIA: Bola está proxima do goleiro, girando no próprio eixo.");
+        } else {
+          r.girando = true;
+          // checa o sentido do giro
+          println("ESTRATEGIA: Bola está proxima do goleiro, girando no sentido horário.");
+          if (isInside(bola.pos, margemSuperior)) gira(r, true);
+          else gira(r, false);
+        }
+        break;
+      }
+      r.girando = false;
+      r.estagio = 0;
+    }
 
     break;
 
