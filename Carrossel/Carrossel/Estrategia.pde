@@ -416,9 +416,8 @@ void estrategia(Robo r, int n) {
     // Garante que a bola ja possui rastro
     if (bola.vel == null) return;
 
-    // Garante que a bola está se aproximando
-    // Mudar o argumento para r.pos (?)
-    if (!bola.isAprox(golAmigo)) {
+    // Garante que a bola está se aproximando com velocidade minima
+    if (!bola.isAprox(golAmigo) || bola.vel.mag() < 5) {
       // Se estiver se afastando, segue o Y da bola
       r.setEstrategia(0);
       return;

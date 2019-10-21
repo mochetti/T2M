@@ -6,6 +6,8 @@ class Bola {
   // real true - bola real
   // real false - bola virtual
   boolean real = true;
+  // angulo da bola no frame anterior
+  float angAnt = 0;
 
   Bola(boolean r) {
     real = r;
@@ -64,26 +66,33 @@ class Bola {
 
       // Descobre o angulo e o modulo da bola
       float ang = 0;
-      float modulo = 50;
+      float modulo = 0;
+      // numero de bolas antigas consideradas dentro do rastro
+      int iteracoes = 9;
       // Numero de frames entre duas bolas para calcular a velocidade
       int frames = 3;
 
-      for (int i = 0; i < 9; i++) {
+      for (int i = 0; i < iteracoes; i++) {
         // Começa pelo mais antigo
         PVector bolaAnt = new PVector(rastro.get(i).x, rastro.get(i).y);
-        //PVector bolaRec = new PVector(rastro.get(i+frames).x, rastro.get(i+frames).y);
-        //modulo += PVector.dist(bolaAnt, bolaRec);
+        PVector bolaRec = new PVector(rastro.get(i+frames).x, rastro.get(i+frames).y);
+        modulo += PVector.dist(bolaAnt, bolaRec);
         ang += atan2(pos.y - bolaAnt.y, pos.x - bolaAnt.x);
       }
 
       ang /= 9;
-      //modulo /= 9;
+      modulo /= 9;
+      
+      if(modulo < 2) ang = angAnt;
+      else angAnt = ang;
 
       vel.x = modulo*cos(ang);
       vel.y = modulo*sin(ang);
-      //vel.mult(10);
-      arrow(pos.x, pos.y, PVector.add(pos, vel).x, PVector.add(pos, vel).y);
-
+      vel.mult(5);
+      if(modulo > 2) arrow(pos.x, pos.y, PVector.add(pos, vel).x, PVector.add(pos, vel).y);
+      else arrow(pos.x, pos.y, pos.x + 10*cos(ang), pos.y + 10*sin(ang));
+      //println("BOLA: ang: " + ang);
+      //println("BOLA: módulo da velocidade: " + modulo);
       return vel;
     } else return vel;
   }
@@ -107,10 +116,10 @@ class Bola {
   boolean isAprox(PVector aqui) {
     // Se a distancia entre a bola futura e o ponto for maior que a distancia entre a bola atual e o ponto, a bola esta se afastando
     if (distSq(PVector.add(pos, vel), aqui) > distSq(pos, aqui)) {
-      println("BOLA: afastando");
+      //println("BOLA: afastando");
       return false;
     } else {
-      println("BOLA: aproximando");
+      //println("BOLA: aproximando");
       return true;
     }
   }
