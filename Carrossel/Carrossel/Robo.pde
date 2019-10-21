@@ -108,6 +108,7 @@ class Robo {
   // define a velocidade das rodas
   void setVel(float vE, float vD) {
     // Verifica se as velocidades estão dentro dos limites estabelecidos
+    // Não existe controle se girando = true
     // O ajuste para velocidade negativa é feito direto na serial
     if (vE > velMax && !girando) vE = velMax;
     else if (vE < -velMax && !girando) vE = -velMax;
