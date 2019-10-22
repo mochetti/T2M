@@ -189,7 +189,7 @@ boolean search (Blob b) {
       else if (inputVideo == 2) currentColor = get(x, y);
 
       // Compara as cores
-      if (filtroCor(currentColor) && msmCor(currentColor, cores[b.cor])) {
+      if (filtroCor(currentColor, hue(cores[b.cor]), false) && msmCor(currentColor, cores[b.cor])) {
         b.add(x, y);
         count++;
       }
@@ -242,7 +242,7 @@ void searchNew (int c) {
        a cor do pixel que está sendo avaliado seja a mesma cor que está sendo procurada. As propriedades da cor que está sendo procurada
        está dentro da array cores na posição "c"
        */
-      if (filtroCor(currentColor) && msmCor(currentColor, cores[c])) {
+      if (filtroCor(currentColor, hue(cores[c]), false) && msmCor(currentColor, cores[c])) {
         // Verifica se algum elemento dessa cor já foi encontrado aqui perto
         //Caso seja, veja se o tamanho da array blobs é maior que 0 (já contém algum blob salvo).
         if (blobAux.size() > 0) {
@@ -382,8 +382,8 @@ void id() {
           float vermelho = float(v.numPixels);
           float verde = float(b.numPixels);
 
-          //println("pixels Vermelho: " + vermelho);
-          //println("pixels verde: " + verde);
+          println("pixels Vermelho: " + vermelho);
+          println("pixels verde: " + verde);
           //println("Vermelho/Verde: " + vermelho/verde);
           //println("Verde/Vermelho: " + verde/vermelho);
           //println(float(v.numPixels/~b.numPixels));
@@ -486,13 +486,19 @@ void arrow(float x1, float y1, float x2, float y2) {
 } 
 
 // Funcao que checa se o pixel pode ser uma cor real
-boolean filtroCor(color c) {
+boolean filtroCor(color c, color corBase, boolean isHueImportant) {
   float soma = red(c) + green(c) + blue(c);
   int bgLimit = 100;
   int bgHValue = 100;
   int difLimit = 50;
 
+  float tol = 0.3;
+
   //É fundo ou não
+  
+  float hue = hue(corBase);
+
+  float hueCurrentColor = hue(c);
 
   // é fundo se as tres componentes forem menor q bgLimit
   boolean back = (red(c) < bgLimit && green(c) < bgLimit && blue(c) < bgLimit) || brightness(c) < 100;
@@ -500,9 +506,14 @@ boolean filtroCor(color c) {
   boolean highValue = red(c) > bgHValue || green(c) > bgHValue || blue(c) > bgHValue || brightness(c) > 100;
   // é cor se a distancia entre pelo menos duas das componentes for maior q difLimit
   boolean dif = (abs(red(c) - green(c)) > difLimit) || (abs(red(c) - blue(c)) > difLimit) || (abs(blue(c) - green(c)) > difLimit);
-  if (soma > 100 && soma < 600 && !back && highValue && dif) {
+
+  if (soma > 100 && soma < 600 && !back && highValue && dif && !isHueImportant) {
+
+    //print("soma: " + soma + "back: " + back + " highValue: " + highValue + " dif: " + dif);
+    //println();
     return true;
-  }
+  } else if (hueCurrentColor > hue*(1-tol) && hueCurrentColor < hue*(1+tol) && isHueImportant) return true;
+  //if(!back && saturation(c))
   return false;
 }
 // Funcao para ajustar as medias das cores
@@ -530,6 +541,10 @@ void calibra() {
   rect(xi, yi, xf, yf);
 
   //BUSCA AO REDOR DO CLIQUE COM RAIO DE 5 pixels
+  // Verifica se é colorido
+
+  color corBase = color(red(get(mouseX, mouseY)), green(get(mouseX, mouseY)), blue(get(mouseX, mouseY)));
+
   for (int x = xi; x < xf; x++) {
     for (int y = yi; y < yf; y++) {
       int loc = 0;
@@ -540,14 +555,16 @@ void calibra() {
       if (inputVideo == 0) currentColor = cam.pixels[loc];
       else if (inputVideo == 2) currentColor = get(x, y);
 
-      // Verifica se é colorido
-      if (filtroCor(currentColor)) {
+
+      if (filtroCor(currentColor, hue(corBase), false)) {
         quantidade++;
         //soma as componentes individualmente
         r += red(currentColor);
         g += green(currentColor);
         b += blue(currentColor);
-        //println("R = " + red(currentColor) + "  G = " + green(currentColor) + "  B = " + blue(currentColor));
+
+
+        println("TESTE: R = " + red(currentColor) + "  G = " + green(currentColor) + "  B = " + blue(currentColor));
         //Atualiza as menores cores e as maiores cores para cada componente
         if (red(currentColor) < menorR) menorR = red(currentColor);
         if (red(currentColor) > maiorR) maiorR = red(currentColor);
@@ -567,14 +584,14 @@ void calibra() {
     r /= quantidade;
     g /= quantidade;
     b /= quantidade;
-    println("Médias:");
-    print("R = " + r);
-    print("  G = " + g);
-    println("  B = " + b);
-    println("Intervalos:");
-    println("R: " + menorR + " -> " + maiorR);
-    println("G: " + menorG + " -> " + maiorG);
-    println("B: " + menorB + " -> " + maiorB);
+    //println("Médias:");
+    //print("R = " + r);
+    //print("  G = " + g);
+    //println("  B = " + b);
+    //println("Intervalos:");
+    //println("R: " + menorR + " -> " + maiorR);
+    //println("G: " + menorG + " -> " + maiorG);
+    //println("B: " + menorB + " -> " + maiorB);
     //Encontra a cor média
     color mediaColor = color(r, g, b);
     //println("Distancia Sq = " + distColorSq(mediaColor, cores[2]));
@@ -589,23 +606,56 @@ void calibra() {
       //  println("  B = " + blue(cores[i]));
       //}
     }
+  } else {
+    for (int x = xi; x < xf; x++) {
+      for (int y = yi; y < yf; y++) {
+        int loc = 0;
+        if (inputVideo == 0) loc = x + y * cam.width;
+
+        // cor do pixel atual
+        color currentColor = 0;
+        if (inputVideo == 0) currentColor = cam.pixels[loc];
+        else if (inputVideo == 2) currentColor = get(x, y);
+
+
+        if (filtroCor(currentColor, hue(corBase), true)) {
+          quantidade++;
+          //soma as componentes individualmente
+          r += red(currentColor);
+          g += green(currentColor);
+          b += blue(currentColor);
+
+
+          //println("TESTE: R = " + red(currentColor) + "  G = " + green(currentColor) + "  B = " + blue(currentColor));
+          //Atualiza as menores cores e as maiores cores para cada componente
+          if (red(currentColor) < menorR) menorR = red(currentColor);
+          if (red(currentColor) > maiorR) maiorR = red(currentColor);
+          if (green(currentColor) < menorG) menorG = green(currentColor);
+          if (green(currentColor) > maiorG) maiorG = green(currentColor);
+          if (blue(currentColor) < menorB) menorB = blue(currentColor);
+          if (blue(currentColor) > maiorB) maiorB = blue(currentColor);
+        }
+        //fill(255);
+        //point(x, y);
+      }
+    }
   }
 
-  println("LARANJA");
-  println("R = " + red(cores[0]));
-  println("  G = " + green(cores[0]));
-  println("  B = " + blue(cores[0]));
-  println("  Brilho = " + brightness(cores[0]));
-  println("VERDE");
-  println("R = " + red(cores[1]));
-  println("  G = " + green(cores[1]));
-  println("  B = " + blue(cores[1]));
-  println("  Brilho = " + brightness(cores[1]));
-  println("VERMELHO");
-  println("R = " + red(cores[2]));
-  println("  G = " + green(cores[2]));
-  println("  B = " + blue(cores[2]));
-  println("  Brilho = " + brightness(cores[2]));
+  //println("LARANJA");
+  //println("R = " + red(cores[0]));
+  //println("  G = " + green(cores[0]));
+  //println("  B = " + blue(cores[0]));
+  //println("  Brilho = " + brightness(cores[0]));
+  //println("VERDE");
+  //println("R = " + red(cores[1]));
+  //println("  G = " + green(cores[1]));
+  //println("  B = " + blue(cores[1]));
+  //println("  Brilho = " + brightness(cores[1]));
+  //println("VERMELHO");
+  //println("R = " + red(cores[2]));
+  //println("  G = " + green(cores[2]));
+  //println("  B = " + blue(cores[2]));
+  //println("  Brilho = " + brightness(cores[2]));
 }
 
 // Dimensiona o campo
@@ -699,11 +749,19 @@ boolean isInside(PVector objeto, PShape forma) {
 
 // Compara duas cores por intervalos em cada componente
 boolean msmCor(color c1, color c2) {
+
+  int bgLimit = 100;
+  int bgHValue = 100;
+  int difLimit = 50;
+
   // limite de diferenca de cor
   int lim = 30;
+  float saturationc1 = saturation(c1);
+  float saturationc2 = saturation(c2);
   float brightnessc1 = brightness(c1);
   float brightnessc2 = brightness(c2);
+  boolean back = (red(c1) < bgLimit && green(c1) < bgLimit && blue(c1) < bgLimit) || brightness(c1) < 100;
   // talvez seja necessario criar um limite diferente p cada componente
-  if (abs(red(c1) - red(c2)) < lim && abs(green(c1) - green(c2)) < lim && abs(blue(c1) - blue(c2)) < lim && brightnessc1 > brightnessc2 - lim && brightnessc1 < brightnessc2 + lim) return true;
+  if (abs(red(c1) - red(c2)) < lim && abs(green(c1) - green(c2)) < lim && abs(blue(c1) - blue(c2)) < lim && brightnessc1 > brightnessc2 - lim && brightnessc1 < brightnessc2 + lim && saturationc1 < saturationc2 + lim && saturationc1 > saturationc2 - 30 && !back) return true;
   else return false;
 }

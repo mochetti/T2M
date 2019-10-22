@@ -5,7 +5,7 @@ import processing.serial.*;
 /*
 
  Checar conexão do rádio com a serial do TX e também do receptor. Aparentemente está perdendo por mal contato do rádio.
-  
+ 
  Por algum motivo os blobs não tão reconhecendo. Não to entendendo o porque o b.show() tá mostrando os blobs. Debugar a visão inteira e debugar a parte dos id's.
  Printar os id's e colocar robô por robô no campo e tentar separadamente para depois juntá-los. Garantir que estão na posição certa da array
  
@@ -179,8 +179,10 @@ void draw() {
       shape(shapeCampo.getChild(0));
       shape(shapeCampo.getChild(1));
       // Mostra os gols
-      golInimigo = new PVector((shapeCampo.getVertex(1).x + shapeCampo.getVertex(2).x) /2, (shapeCampo.getVertex(1).y+shapeCampo.getVertex(2).y) / 2);
-      golAmigo = new PVector((shapeCampo.getVertex(0).x + shapeCampo.getVertex(3).x) /2, (shapeCampo.getVertex(0).y+shapeCampo.getVertex(3).y) / 2);
+      golInimigo = new PVector((shapeCampo.getVertex(0).x + shapeCampo.getVertex(3).x) /2, (shapeCampo.getVertex(0).y+shapeCampo.getVertex(3).y) / 2);  //LADO NOSSO = LADO DIREITO
+      //golInimigo = new PVector((shapeCampo.getVertex(1).x + shapeCampo.getVertex(2).x) /2, (shapeCampo.getVertex(1).y+shapeCampo.getVertex(2).y) / 2); //LADO NOSSO = LADO ESQUERDO
+      golAmigo = new PVector((shapeCampo.getVertex(1).x + shapeCampo.getVertex(2).x) /2, (shapeCampo.getVertex(1).y+shapeCampo.getVertex(2).y) / 2);  //LADO NOSSO = LADO DIREITO
+      //golAmigo = new PVector((shapeCampo.getVertex(0).x + shapeCampo.getVertex(3).x) /2, (shapeCampo.getVertex(0).y+shapeCampo.getVertex(3).y) / 2);  //LADO NOSSO = LADO EESQUERDO
 
       fill(0, 0);
       ellipse(golAmigo.x, golAmigo.y, 20, 20);
@@ -235,10 +237,10 @@ void draw() {
 
         if (robos.get(0).index >= 0) robos.get(0).setEstrategia(0);
         if (robos.get(1).index >= 0) robos.get(1).setEstrategia(1);
-        if (robos.get(2).index >= 0) {
-          robos.get(2).setEstrategia(6);
+        //if (robos.get(2).index >= 0) {
+        //robos.get(2).setEstrategia(6);
         //  robos.get(2).obj = new PVector(robos.get(2).obj.x, robos.get(2).obj.y + 100);
-        }
+        //}
       } // posicoes fixas
       else for (Robo r : robos) if (r.index >= 0) r.setEstrategia(estFixa);
 
@@ -258,14 +260,13 @@ void draw() {
 
         if (robos.get(0).index >= 0 && !robos.get(0).girando) alinhaAnda(robos.get(0));
         if (robos.get(1).index >= 0 && !robos.get(1).girando) alinhaAnda(robos.get(1));
-        if (robos.get(2).index >= 0 && !robos.get(2).girando) alinhaAnda(robos.get(2));
+        //if (robos.get(2).index >= 0 && !robos.get(2).girando) alinhaAnda(robos.get(2));
 
         if (gameplay) gameplay(robos.get(0));
       }
 
       //A partir daqui envia dados
       if (inputVideo == 0) enviar();
-
     } else {
       // no simulador, o campo é o próprio canvas
       if (inputVideo == 2) {
@@ -370,9 +371,12 @@ void mousePressed() {
   clique.x = mouseX;
   clique.y = mouseY;
 
-  print("R = " + red(mouseColor));
-  print("  G = " + green(mouseColor));
-  println("  B = " + blue(mouseColor));
+  print("R = " + red(get(mouseX, mouseY)));
+  print("  G = " + green(get(mouseX, mouseY)));
+  println("  B = " + blue(get(mouseX, mouseY)));
+  println("  Brilho = " + brightness(get(mouseX, mouseY)));
+  println("  Hue = " + hue(get(mouseX, mouseY)));
+  println("  Saturacao = " + saturation(get(mouseX, mouseY)));
   //println("X: " + mouseX + " Y: " + mouseY);
 
   if (!isCampoDimensionado) dimensionaCampo(mouseX, mouseY);
