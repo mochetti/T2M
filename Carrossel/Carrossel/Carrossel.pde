@@ -18,7 +18,7 @@ boolean debug = true;
 // 0 - camera
 // 1 - video 
 // 2 - simulador
-int inputVideo = 2;
+int inputVideo = 0;
 
 boolean calibra = true;  //Flag de controle se deve ou não calibrar as cores
 boolean visao = false;  //Flag de controle para parar o código logo após jogar a imagem no canvas (visão) a visão ou não
@@ -136,7 +136,7 @@ void setup() {
 
   //mov.frameRate(30);
   ellipseMode(RADIUS);
-  size(800, 448);
+  size(640, 360);
 
   //byte[] txBuffer = {};
   //txBuffer = new byte[7];
@@ -146,7 +146,7 @@ void setup() {
   frameRate(30);
   if (inputVideo == 0) {
     printArray(Serial.list());
-    myPort = new Serial(this, Serial.list()[1], 115200);
+    myPort = new Serial(this, Serial.list()[0], 115200);
     camConfig();
   }
 }
@@ -159,7 +159,7 @@ void captureEvent(Capture c) {
 }
 
 void draw() {
-  if (inputVideo == 0 && cam.available() || inputVideo == 2) {
+  if (inputVideo == 0 || inputVideo == 2) {
     //loadPixels();
     background(0);
     tempo = millis();
@@ -233,12 +233,12 @@ void draw() {
         // Define as estratégias dos robos
         // 5 - seguir mouse, 6 fazer nada (por enquanto), 1 - atacante, 3 - goleiro
 
-        if (robos.get(0).index >= 0) robos.get(0).setEstrategia(1);
-        //if (robos.get(1).index >= 0) robos.get(1).setEstrategia(5);
-        //if (robos.get(2).index >= 0) {
-        //  robos.get(2).setEstrategia(5);
+        if (robos.get(0).index >= 0) robos.get(0).setEstrategia(0);
+        if (robos.get(1).index >= 0) robos.get(1).setEstrategia(1);
+        if (robos.get(2).index >= 0) {
+          robos.get(2).setEstrategia(6);
         //  robos.get(2).obj = new PVector(robos.get(2).obj.x, robos.get(2).obj.y + 100);
-        //}
+        }
       } // posicoes fixas
       else for (Robo r : robos) if (r.index >= 0) r.setEstrategia(estFixa);
 
@@ -257,8 +257,8 @@ void draw() {
         //println(robos.get(0).girando);
 
         if (robos.get(0).index >= 0 && !robos.get(0).girando) alinhaAnda(robos.get(0));
-        //if (robos.get(1).index >= 0 && !robos.get(1).girando) alinhaAnda(robos.get(1));
-        //if (robos.get(2).index >= 0 && !robos.get(2).girando) alinhaAnda(robos.get(2));
+        if (robos.get(1).index >= 0 && !robos.get(1).girando) alinhaAnda(robos.get(1));
+        if (robos.get(2).index >= 0 && !robos.get(2).girando) alinhaAnda(robos.get(2));
 
         if (gameplay) gameplay(robos.get(0));
       }
