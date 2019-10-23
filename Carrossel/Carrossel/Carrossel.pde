@@ -12,7 +12,7 @@ import processing.serial.*;
  */
 
 // Flags de debug
-boolean debug = true;
+boolean debug = false;
 
 // Controla a entrada da imagem
 // 0 - camera
@@ -39,6 +39,12 @@ PVector clique = new PVector();
 int dragged = 0;
 
 // Verifica se ainda estamos configurando o robo
+
+//ID do robô
+int buscandoRobo = 0;
+
+boolean procurarRobo = false;
+
 //boolean configRobo = false;
 
 boolean pausado = false;
@@ -50,9 +56,9 @@ Serial myPort;
 // Salvar as cores num txt pra poupar tempo na hora de calibrar (?)
 // Cores
 color cores[] = { 
-  color(245, 166, 73), // Laranja
-  color(16, 148, 238), // Azul
-  color(238, 96, 119) // Vermelho
+  color(177, 178, 40), // Laranja
+  color(30, 87, 157), // Azul
+  color(143, 23, 26) // Vermelho
 };
 
 // id de cada objeto
@@ -113,10 +119,10 @@ Capture cam;
 int[] quantCor = {1, 3, 3};
 int elementos = 0;
 
-ArrayList<Blob> blobs = new ArrayList<Blob>();
-ArrayList<Blob> oldBlobs = new ArrayList<Blob>();
+//ArrayList<Blob> blobs = new ArrayList<Blob>();
+//ArrayList<Blob> oldBlobs = new ArrayList<Blob>();
 ArrayList<Robo> robos = new ArrayList<Robo>();
-ArrayList<Robo> oldRobos = new ArrayList<Robo>();
+
 ArrayList<Robo> robosSimulados = new ArrayList<Robo>();
 ArrayList<PVector> rastro = new ArrayList<PVector>();
 
@@ -126,8 +132,6 @@ Bola bola = new Bola(true);
 void setup() {
 
   shapeCampo = createShape();
-  
-  Visao visao = new Visao();
 
   for (int i : quantCor) elementos += i;
 
@@ -154,6 +158,9 @@ void setup() {
     mov.play();
     mov.loop();
   }
+
+  // nao destroi mais os elementos robos
+  for (int i=0; i<3; i++) robos.add(new Robo(i));
 }
 
 void movieEvent(Movie m) {
@@ -165,129 +172,104 @@ void captureEvent(Capture c) {
 }
 
 void draw() {
-  if (inputVideo == 1) {
-    image(mov, 0, 0);
-  } else if (inputVideo == 0 || inputVideo == 2) {
-    //loadPixels();
-    background(0);
-    tempo = millis();
-    //println(tempo);
-
-    //tempo = 0;
-    if (inputVideo == 0) image(cam, 0, 0);
 
 
+  background(0);
+  tempo = millis();
 
-    //noFill();
-    stroke(255);
-    if (isCampoDimensionado) {
-      // Mostra o campo na tela
 
-      shape(shapeCampo);
-      shape(shapeCampo.getChild(0));
-      shape(shapeCampo.getChild(1));
-      // Mostra os gols
-      golInimigo = new PVector((shapeCampo.getVertex(1).x + shapeCampo.getVertex(2).x) /2, (shapeCampo.getVertex(1).y+shapeCampo.getVertex(2).y) / 2);
-      golAmigo = new PVector((shapeCampo.getVertex(0).x + shapeCampo.getVertex(3).x) /2, (shapeCampo.getVertex(0).y+shapeCampo.getVertex(3).y) / 2);
+  //tempo = 0;
+  if (inputVideo == 0) image(cam, 0, 0);
+  else if (inputVideo == 1) image(mov, 0, 0, width, height);
 
-      fill(0, 0);
-      ellipse(golAmigo.x, golAmigo.y, 20, 20);
-      ellipse(golInimigo.x, golInimigo.y, 20, 20);
 
-      if  (inputVideo == 2) simulador();
 
-      /*
-    OBSERVAÇÕES RELACIONADAS A VISÃO PERTINENTES:
-       Antes de chamar a função track(), a array blobs precisa ser resetada para se buscar novos pontos na tela. Assim não deixa o negócio "lento"
-       */
+  //noFill();
+  stroke(255);
+  if (isCampoDimensionado) {
+    // Mostra o campo na tela
 
-      //oldBlobs.clear();
-      //blobs.clear();
-      //for(Robo r : robos) oldBlobs.add(new Robo(r.clone()));
-      oldBlobs.clear();
-      if (blobs.size() > 0)
-        for (Blob b : blobs) oldBlobs.add(new Blob(b.clone()));
+    shape(shapeCampo);
+    shape(shapeCampo.getChild(0));
+    shape(shapeCampo.getChild(1));
+    // Mostra os gols
+    golInimigo = new PVector((shapeCampo.getVertex(1).x + shapeCampo.getVertex(2).x) /2, (shapeCampo.getVertex(1).y+shapeCampo.getVertex(2).y) / 2);
+    golAmigo = new PVector((shapeCampo.getVertex(0).x + shapeCampo.getVertex(3).x) /2, (shapeCampo.getVertex(0).y+shapeCampo.getVertex(3).y) / 2);
 
-      oldRobos.clear();
-      if (robos.size() > 0)
-        for (Robo r : robos) oldRobos.add(new Robo(r.clone()));
+    fill(0, 0);
+    ellipse(golAmigo.x, golAmigo.y, 20, 20);
+    ellipse(golInimigo.x, golInimigo.y, 20, 20);
 
-      robos.clear();
-      blobs.clear();
+    if  (inputVideo == 2) simulador();
 
-      if (debug) return;
+    //for (Robo r : robos) println("Index: " + r.index);
 
-      //Atualiza blobs
-      track();
-      id();
+    if (!debug) return;
 
-      for (int i = 1; i < 4; i++) {
-        if (oldRobos.size() == 0) {
-          if (blobs.get(i).numPixels > 0 || blobs.get(i+3).numPixels > 0) robos.add(new Robo(i-1));
-          else robos.add(new Robo(-1));
-        } else {
-          if (blobs.get(i).numPixels > 0 || blobs.get(i+3).numPixels > 0) robos.add(new Robo(oldRobos.get(i-1).clone()));
-          else robos.add(new Robo(-1));
-        }
+    for (Robo r : robos) r.atualiza();
+
+    //Defino a bola
+    bola.atualiza();
+
+    fill(0, 255, 0);
+    for (Robo r : robos) ellipse(r.pos.x, r.pos.y, 10, 10);
+    ellipse(bola.pos.x, bola.pos.y, 10, 10);
+
+    //A partir daqui pode definir os objetivos.
+
+    //Defino as estratégias
+    if (estrategia) {
+      // Define as estratégias dos robos
+      // 5 - seguir mouse, 6 fazer nada (por enquanto), 1 - atacante, 3 - goleiro
+
+      if (robos.get(0).index >= 0) robos.get(0).setEstrategia(1);
+      if (robos.get(1).index >= 0) robos.get(1).setEstrategia(5);
+      if (robos.get(2).index >= 0) {
+        robos.get(2).setEstrategia(5);
+        //robos.get(2).obj = new PVector(robos.get(2).obj.x, robos.get(2).obj.y + 100);
       }
+    } // posicoes fixas
+    else for (Robo r : robos) if (r.index >= 0) r.setEstrategia(estFixa);
 
-      //Defino a bola
-      bola.atualiza();
+    //r.frente() não pode vir antes da estratégia, precisa ter os objetivos definidos.
+    for (Robo r : robos) if (r.index >= 0 && !r.girando) r.frente();
 
-      //A partir daqui pode definir os objetivos.
+    //print(robos.get(0).ang);
 
-      //Defino as estratégias
-      if (estrategia) {
-        // Define as estratégias dos robos
-        // 5 - seguir mouse, 6 fazer nada (por enquanto), 1 - atacante, 3 - goleiro
+    // Debugo as estrategias (mostra na tela)
+    for (Robo r : robos) if (r.index >= 0) r.debugObj();
 
-        if (robos.get(0).index >= 0) robos.get(0).setEstrategia(1);
-        //if (robos.get(1).index >= 0) robos.get(1).setEstrategia(5);
-        //if (robos.get(2).index >= 0) {
-        //  robos.get(2).setEstrategia(5);
-        //  robos.get(2).obj = new PVector(robos.get(2).obj.x, robos.get(2).obj.y + 100);
-        //}
-      } // posicoes fixas
-      else for (Robo r : robos) if (r.index >= 0) r.setEstrategia(estFixa);
+    //A partir daqui controle assume
 
-      //r.frente() não pode vir antes da estratégia, precisa ter os objetivos definidos.
-      for (Robo r : robos) if (r.index >= 0 && !r.girando) r.frente();
+    if (controle) {
 
-      //print(robos.get(0).ang);
+      //println(robos.get(0).girando);
 
-      // Debugo as estrategias (mostra na tela)
-      for (Robo r : robos) if (r.index >= 0) r.debugObj();
+      if (robos.get(0).index >= 0 && !robos.get(0).girando) alinhaAnda(robos.get(0));
+      if (robos.get(1).index >= 0 && !robos.get(1).girando) alinhaAnda(robos.get(1));
+      if (robos.get(2).index >= 0 && !robos.get(2).girando) alinhaAnda(robos.get(2));
 
-      //A partir daqui controle assume
+      if (gameplay) gameplay(robos.get(0));
+    }
 
-      if (controle) {
+    //A partir daqui envia dados
+    if (inputVideo == 0) enviar();
+    //for (Robo r : robos) print("Index: " + r.index);
+    for (Robo r : robos) r.oldRobo = new Robo(r.clone());
+  } else {
+    // no simulador, o campo é o próprio canvas
+    if (inputVideo == 2) {
+      dimensionaCampo(0, 0);
+      dimensionaCampo(width, 0);
+      dimensionaCampo(width, height);
+      dimensionaCampo(0, height);
+      return;
+    }
 
-        //println(robos.get(0).girando);
-
-        if (robos.get(0).index >= 0 && !robos.get(0).girando) alinhaAnda(robos.get(0));
-        //if (robos.get(1).index >= 0 && !robos.get(1).girando) alinhaAnda(robos.get(1));
-        //if (robos.get(2).index >= 0 && !robos.get(2).girando) alinhaAnda(robos.get(2));
-
-        if (gameplay) gameplay(robos.get(0));
-      }
-
-      //A partir daqui envia dados
-      if (inputVideo == 0) enviar();
-    } else {
-      // no simulador, o campo é o próprio canvas
-      if (inputVideo == 2) {
-        dimensionaCampo(0, 0);
-        dimensionaCampo(width, 0);
-        dimensionaCampo(width, height);
-        dimensionaCampo(0, height);
-        return;
-      }
-
-      //desenha as linhas na tela se formando
-      for (int i = 0; i < shapeCampo.getVertexCount() - 1; i++) {
-        strokeWeight(2);
-        line(shapeCampo.getVertex(i).x, shapeCampo.getVertex(i).y, shapeCampo.getVertex(i+1).x, shapeCampo.getVertex(i+1).y);
-      }
+    //desenha as linhas na tela se formando
+    for (int i = 0; i < shapeCampo.getVertexCount() - 1; i++) {
+      strokeWeight(2);
+      line(shapeCampo.getVertex(i).x, shapeCampo.getVertex(i).y, shapeCampo.getVertex(i+1).x, shapeCampo.getVertex(i+1).y);
     }
   }
 }
@@ -299,8 +281,14 @@ void keyPressed() {
     println("KEY: Controlando o robo " + roboControlado);
   }
   if (key == 'd') {
-    println("KEY: debug on/off");
-    debug = !debug;
+    print("KEY: ");
+    if (debug) {
+      println("debug off");
+      debug = false;
+    } else {
+      println("debug: on");
+      debug = true;
+    }
   }
   if (key == 'c') {
     calibra = !calibra;
@@ -311,8 +299,13 @@ void keyPressed() {
     }
   }
   if (key >= '0' && key <= '9') {
-    println("KEY: Cor " + key);
-    calColor = key;
+    if (calibra) {
+      println("KEY: Cor " + key);
+      calColor = key;
+    } else if (procurarRobo) {
+      buscandoRobo = key - 48;
+      println("KEY: buscando robô - " + buscandoRobo);
+    }
   }
   if (key == 'r') {
     println("KEY: radio on/off");
@@ -322,6 +315,16 @@ void keyPressed() {
     println("KEY: redefinir campo");
     isCampoDimensionado = false;
     shapeCampo = createShape();
+  }
+  if (key == 'i') {
+    if (procurarRobo) {
+      procurarRobo = false;
+      println("KEY: buscando robô off");
+    } else {
+      calibra = false;
+      procurarRobo = true;
+      println("KEY: buscando robô on");
+    }
   }
 
   //MOVIE
@@ -375,21 +378,17 @@ void keyReleased() {
 
 void mousePressed() {
 
-  if (inputVideo == 1) {
-  
-    //visao.filtrar();
-  
-  } else {
+  clique.x = mouseX;
+  clique.y = mouseY;
 
-    clique.x = mouseX;
-    clique.y = mouseY;
+  mouseColor = get(mouseX, mouseY);
 
-    print("R = " + red(mouseColor));
-    print("  G = " + green(mouseColor));
-    println("  B = " + blue(mouseColor));
-    //println("X: " + mouseX + " Y: " + mouseY);
+  print("R = " + red(mouseColor));
+  print("  G = " + green(mouseColor));
+  println("  B = " + blue(mouseColor));
+  //println("X: " + mouseX + " Y: " + mouseY);
 
-    if (!isCampoDimensionado) dimensionaCampo(mouseX, mouseY);
-    if (calibra) calibra();
-  }
+  if (!isCampoDimensionado) dimensionaCampo(mouseX, mouseY);
+  if (calibra) calibra();
+  if (procurarRobo) search(buscandoRobo);
 }

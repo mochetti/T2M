@@ -26,6 +26,11 @@ class Robo {
    a original. Chega na original e vai até a bola.
    */
 
+  Blob vermelho = new Blob();
+  Blob azul = new Blob();
+
+  Robo oldRobo;
+
   PVector pos = new PVector(), posAnt, vel, obj, objAnt;
   float ang = 0, angAnt = 0, angObj = -1;
   // Armazena o erro no valor do angulo do frame anterior
@@ -57,6 +62,9 @@ class Robo {
     }
     vel = new PVector();
     obj = new PVector();  //
+    
+    oldRobo = new Robo(this);
+    
   }
 
   Robo(int n, int b) {
@@ -72,6 +80,8 @@ class Robo {
   }
 
   Robo(Robo r) {
+    azul = r.azul;
+    vermelho = r.vermelho;
     pos = r.pos;
     vel = r.vel;
     ang = r.ang;
@@ -132,8 +142,8 @@ class Robo {
   // Calcula o centro real do robo
   PVector getPos() {
     PVector centro = new PVector();
-    PVector posVerde = new PVector(blobs.get(index+1).center().x, blobs.get(index+1).center().y);
-    PVector posVermelho = new PVector(blobs.get(index+4).center().x, blobs.get(index+4).center().y);
+    PVector posVerde = new PVector(azul.center().x, azul.center().y);
+    PVector posVermelho = new PVector(vermelho.center().x, vermelho.center().y);
     switch(index) {
       //Tamanhos iguais
     case 0:  // o centro é a media aritmética dos centros dos blobs
@@ -210,19 +220,19 @@ class Robo {
 
     switch(index) {
     case 0:    // Cores iguais
-      ang = atan2(- blobs.get(1).center().y + blobs.get(4).center().y, - blobs.get(1).center().x + blobs.get(4).center().x);
+      ang = atan2(- azul.center().y + vermelho.center().y, - azul.center().x + vermelho.center().x);
       //line(blobs.get(1).center().x, blobs.get(1).center().y, blobs.get(4).center().x, blobs.get(4).center().y);
       break;
 
       //Angulo do robô 1 é PI defasado
     case 1:    // Vermelho maior
-      ang = atan2(- blobs.get(5).center().y + blobs.get(2).center().y, - blobs.get(5).center().x + blobs.get(2).center().x);
+      ang = atan2(- vermelho.center().y + azul.center().y, - vermelho.center().x + azul.center().x);
       ang -= atan(0.5);
       //line(blobs.get(2).center().x, blobs.get(2).center().y, blobs.get(5).center().x, blobs.get(5).center().y);
       break;
 
     case 2:    // Verde maior
-      ang = atan2(- blobs.get(3).center().y + blobs.get(6).center().y, - blobs.get(3).center().x + blobs.get(6).center().x);
+      ang = atan2(- azul.center().y + vermelho.center().y, - azul.center().x + vermelho.center().x);
       ang -= atan(0.5);
       //line(blobs.get(3).center().x, blobs.get(3).center().y, blobs.get(6).center().x, blobs.get(6).center().y);
       break;
