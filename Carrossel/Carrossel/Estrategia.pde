@@ -28,9 +28,9 @@ void estrategia(Robo r, int n) {
 
     // Antes de qualquer coisa, checa se está perto da bola
     if (r.isNear(bola.pos, 50)) {
-      if (frameCount - r.qtdFrames > 45) {
+      if (frameCount - r.qtdfiltrados > 45) {
         r.girando = false;
-        r.qtdFrames = frameCount;
+        r.qtdfiltrados = frameCount;
         //println("ESTRATEGIA: Bola está proxima do goleiro, girando no próprio eixo.");
       } else {
         r.girando = true;
@@ -120,7 +120,7 @@ void estrategia(Robo r, int n) {
         /*
           Aqui é importante visualizarmos que neste ponto do código estaremos usando a variável dentro do robo "Obj"
          como uma variável que gaurdará a posição da sombra da sombra no momento em que a sombra for projetada.
-         Guardando assim a cópia dessa sombra (e não a atualizando), podemos checar a cada novo frame se a distancia
+         Guardando assim a cópia dessa sombra (e não a atualizando), podemos checar a cada novo filtrado se a distancia
          entre sombra projetada e posicao da bola é menor que um raio determinado, para sabermos se deve ou não
          resetar o estágio para 0
          */
@@ -281,9 +281,9 @@ void estrategia(Robo r, int n) {
 
       if (r.isNear(sombra, 10)) {
         r.angObj = ang + PI;
-        if (frameCount - r.qtdFrames > 45) {
+        if (frameCount - r.qtdfiltrados > 45) {
           r.girando = false;
-          r.qtdFrames = frameCount;
+          r.qtdfiltrados = frameCount;
           //println("ESTRATEGIA: Bola está proxima do goleiro, girando no próprio eixo.");
         } else {
           r.girando = true;
@@ -426,9 +426,9 @@ void estrategia(Robo r, int n) {
 
     // Antes de qualquer coisa, checa se está perto da bola
     if (r.isNear(bola.pos, 50)) {
-      if (frameCount - qtdFrames > 45) {
+      if (frameCount - qtdfiltrados > 45) {
         r.girando = false;
-        qtdFrames = frameCount;
+        qtdfiltrados = frameCount;
         //println("ESTRATEGIA: Bola está proxima do goleiro, girando no próprio eixo.");
       } else {
         r.girando = true;

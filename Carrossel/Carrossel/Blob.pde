@@ -1,14 +1,16 @@
 // Classe que gerencia os objetos lidos pela camera baseado na cor
 
 class Blob {
+  
+  Blob oldBlob;
   // Canto superior esquerdo e inferior direito
   float minx;
   float miny;
   float maxx;
   float maxy;
   int cor;
-  int id = -1;
-  int numPixels = 0;
+  int id;
+  int numPixels;
 
   Blob(float x, float y) {
     minx = x;
@@ -33,6 +35,12 @@ class Blob {
     numPixels = b.numPixels;
   }
   Blob() {
+    minx = 0;
+    miny = 0;
+    maxx = 0;
+    maxy = 0;
+    id = -1;
+    numPixels = 0;
   }
   
   Blob clone() {
@@ -84,6 +92,10 @@ class Blob {
     maxx = 0;
     maxy = 0;
     numPixels = 0;
+  }
+  
+  void atualiza(){
+    oldBlob = new Blob(this);
   }
  
   // Verifica se um ponto (x, y) está perto do blob

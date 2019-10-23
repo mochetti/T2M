@@ -219,7 +219,7 @@ void alinhandando(Robo r) {
   // Já estamos alinhando
   // PD
   float kp = 1, kd = 10;
-  // Se ao inves de ler o dt entre dois frames, ele for constante, a variacao do ang pro angAnt é maior
+  // Se ao inves de ler o dt entre dois filtrados, ele for constante, a variacao do ang pro angAnt é maior
   double dt = 50;
   if (tempo - antes < dt) {
     println("");
@@ -242,7 +242,7 @@ void alinhandando(Robo r) {
 
   // Atribui as velocidades ao robo
   r.setVel(velE, velD);
-  // Atualiza o erro antigo para o próximo frame
+  // Atualiza o erro antigo para o próximo filtrado
   r.dAngAnt = dAng;
 }
 
@@ -289,7 +289,7 @@ void configRobo(Robo r) {
   println("CONTROLE: dAng = " + degrees(dAng));
   // Diferença mínima do angulo atual (em graus) para o inicial para configurar movimento
   int dAngMin = 5;
-  // Taxa de incremento das velocidades por frame
+  // Taxa de incremento das velocidades por filtrado
   float taxaVel = 0.1;
 
   if (configEsq) {

@@ -16,11 +16,13 @@ boolean debug = true;
 
 boolean isRene = true;
 
+boolean inicializou = false;
+
 // Controla a entrada da imagem
 // 0 - camera
 // 1 - video 
 // 2 - simulador
-int inputVideo = 0;
+int inputVideo = 3;
 
 boolean calibra = true;  //Flag de controle se deve ou não calibrar as cores
 boolean visao = false;  //Flag de controle para parar o código logo após jogar a imagem no canvas (visão) a visão ou não
@@ -29,12 +31,13 @@ boolean estrategia = true; // Flag para rodar o bloco de estratégia
 boolean radio = true; //Flag de controle para emitir ou não sinais ao rádio (ultimo passo da checagem)
 boolean gameplay = false;  //Flag de controle que diz se o jogo está no automático ou no manual (apenas do robô 0 por enquanto)
 boolean simManual = true;  // Flag de controle que define se os comandos vem pelas setas ou do modulo de controle
+boolean filtro = false;
 
 // estretagia usada quando estrategia = false;
 int estFixa = 0;
 
-//Variavel para contar frames
-int qtdFrames = 0;
+//Variavel para contar filtrados
+int qtdfiltrados = 0;
 
 // variaveis pro controle do arrasto do mouse
 PVector clique = new PVector();
@@ -44,6 +47,8 @@ int dragged = 0;
 //boolean configRobo = false;
 
 boolean pausado = false;
+
+PImage filtrado;
 
 //boolean andaReto = false; //DENTRO DE INERCIA()
 
@@ -103,7 +108,7 @@ int Y_AREA = 120;
 //PVector shapeCampo.getVertex(0) = new PVector();
 //PVector shapeCampo.getVertex(2) = new PVector();
 
-//Movie mov;
+Movie mov;
 Capture cam;
 //PImage screenshot;
 
@@ -116,11 +121,10 @@ int[] quantCor = {1, 3, 3};
 int elementos = 0;
 
 ArrayList<Blob> blobs = new ArrayList<Blob>();
-ArrayList<Blob> oldBlobs = new ArrayList<Blob>();
 ArrayList<Robo> robos = new ArrayList<Robo>();
-ArrayList<Robo> oldRobos = new ArrayList<Robo>();
 ArrayList<Robo> robosSimulados = new ArrayList<Robo>();
 ArrayList<PVector> rastro = new ArrayList<PVector>();
+PImage foto;
 
 // bola real
 Bola bola = new Bola(true);
@@ -131,26 +135,34 @@ void setup() {
 
   for (int i : quantCor) elementos += i;
 
+  if (inputVideo == 1) {
+    mov = new Movie(this, "seis_robos_mais_bola.mov");
+    mov.play();
+    mov.loop();
+  }
 
-  //mov = new Movie(this, "real.mp4");
-  //mov.play();
-  //mov.loop();
 
-  //mov.frameRate(30);
+  //mov.filtradoRate(30);
   ellipseMode(RADIUS);
-  size(640, 480);
+  size(800, 448);
+  filtrado = createImage(width, height, RGB);
 
   //byte[] txBuffer = {};
   //txBuffer = new byte[7];
   //txBuffer[0] = byte(128);
 
+  for (int i = 0; i < 3; i++) robos.add(new Robo(-1));
+  for (int i = 0; i < elementos; i++) blobs.add(new Blob());
+
   frame.removeNotify();
   frameRate(30);
   if (inputVideo == 0) {
     printArray(Serial.list());
-    myPort = new Serial(this, Serial.list()[0], 115200);
+    //myPort = new Serial(this, Serial.list()[0], 115200);
     camConfig();
   }
+
+  foto = loadImage("teste.png");
 }
 
 void movieEvent(Movie m) {
@@ -161,16 +173,34 @@ void captureEvent(Capture c) {
 }
 
 void draw() {
-  if (inputVideo == 0 || inputVideo == 2) {
+
+  //tempo = 0;
+
+
+  if (inputVideo == 0 || inputVideo == 1 || inputVideo == 2 || inputVideo == 3) {
     //loadPixels();
     background(0);
     tempo = millis();
     //println(tempo);
 
-    //tempo = 0;
-    if (inputVideo == 0) image(cam, 0, 0);
+    //if (inputVideo == 0 && filtro) image(filtrado, 0, 0);
+    //else if (!filtro && inputVideo == 0) image(cam, 0, 0);
+    //else if (inputVideo == 1) image(mov, 0, 0, width, height);
 
-
+    if (inicializou) {
+      filtrado.loadPixels();
+      for (int x = 0; x < width; x++) {
+        for (int y = 0; y < height; y++) {
+          if (filtrado != null && cam != null) {
+            if (inputVideo == 0) filtrado.pixels[x + y * filtrado.width] = cam.pixels[x + y * filtrado.width];
+            else if (inputVideo == 1) filtrado.pixels[x + y * filtrado.width] = mov.pixels[x + y * filtrado.width];
+          }
+        }
+      }
+      filtrado.filter(THRESHOLD, 0.35);
+    }
+    
+    image(foto, 0, 0);
 
     //noFill();
     stroke(255);
@@ -197,40 +227,42 @@ void draw() {
        Antes de chamar a função track(), a array blobs precisa ser resetada para se buscar novos pontos na tela. Assim não deixa o negócio "lento"
        */
 
-      //oldBlobs.clear();
-      //blobs.clear();
-      //for(Robo r : robos) oldBlobs.add(new Robo(r.clone()));
-      oldBlobs.clear();
-      if (blobs.size() > 0)
-        for (Blob b : blobs) oldBlobs.add(new Blob(b.clone()));
-
-      oldRobos.clear();
-      if (robos.size() > 0)
-        for (Robo r : robos) oldRobos.add(new Robo(r.clone()));
-
-      robos.clear();
-      blobs.clear();
-
       if (debug) return;
 
       //Atualiza blobs
-      track();
-      id();
+      //for (Blob b : blobs) b.oldBlob = new Blob(b.clone());
 
-      
+      track();  //Procura blobs e só atualizo os blobs dos robôs que não foram encontrados
+      //for (Blob b : blobs) println(b.id);
+      //for (Robo r : robos) if (!r.encontrado) id(r);
+      //for (Blob b : blobs) println(b.id);
+      //id();  //Define id's;
 
-      for (int i = 1; i < 4; i++) {
-        if (oldRobos.size() == 0) {
-          if (blobs.get(i).numPixels > 0 || blobs.get(i+3).numPixels > 0) robos.add(new Robo(i-1));
-          else robos.add(new Robo(-1));
-        } else {
-          if (blobs.get(i).numPixels > 0 || blobs.get(i+3).numPixels > 0) robos.add(new Robo(oldRobos.get(i-1).clone()));
-          else robos.add(new Robo(-1));
-        }
+
+      //Robo 0 encontrado
+      if (blobs.get(1).numPixels > 0 && blobs.get(4).numPixels > 0) {
+        robos.get(0).index = 0;
+        robos.get(0).encontrado = true;
+      }
+
+      //Robo 1 encontrado
+      if (blobs.get(2).numPixels > 0 && blobs.get(5).numPixels > 0) {
+        robos.get(1).index = 1;
+        robos.get(1).encontrado = true;
+      }
+
+      //Robo 2 encontrado
+      if (blobs.get(3).numPixels > 0 && blobs.get(6).numPixels > 0) {
+        robos.get(2).index = 2;
+        robos.get(2).encontrado = true;
       }
 
       //Defino a bola
       bola.atualiza();
+      //println(bola.pos);
+      //
+      //Angulo do robô ainda depende dos blobs. aplicar o filtro threshhold APENAS depois de calculado o angulo.
+      //O threshhold vai apenas garantir a posição do robô
 
       //A partir daqui pode definir os objetivos.
 
@@ -243,7 +275,6 @@ void draw() {
         //println("Indexs");
         //for (Robo r : robos) println(r.index);
         if (robos.get(0).index >= 0) robos.get(0).setEstrategia(3);
-
         //println(bola.pos);
         if (robos.get(1).index >= 0) robos.get(1).setEstrategia(1);
         if (robos.get(2).index >= 0) {
@@ -276,8 +307,10 @@ void draw() {
         if (gameplay) gameplay(robos.get(0));
       }
 
+      //for (Robo r : robos) r.atualiza();
+      //for (Blob b : blobs) b.atualiza();
       //A partir daqui envia dados
-      if (inputVideo == 0) enviar();
+      //if (inputVideo == 0) enviar();
     } else {
       // no simulador, o campo é o próprio canvas
       if (inputVideo == 2) {
@@ -290,12 +323,14 @@ void draw() {
 
       //desenha as linhas na tela se formando
       for (int i = 0; i < shapeCampo.getVertexCount() - 1; i++) {
+        fill(255);
         strokeWeight(2);
         line(shapeCampo.getVertex(i).x, shapeCampo.getVertex(i).y, shapeCampo.getVertex(i+1).x, shapeCampo.getVertex(i+1).y);
       }
     }
   }
 }
+
 
 void keyPressed() {
   if (key == TAB) {
@@ -306,6 +341,15 @@ void keyPressed() {
   if (key == 'd') {
     println("KEY: debug on/off");
     debug = !debug;
+  }
+  if (key == 'f') {
+    if (filtro) {
+      println("KEY: filtro off");
+      filtro = false;
+    } else {
+      println("KEY: filtro on");
+      filtro = true;
+    }
   }
   if (key == 'c') {
     calibra = !calibra;
@@ -332,12 +376,12 @@ void keyPressed() {
   //MOVIE
   if (key == ' ') {
     // chute aleatorio na bola
-    bolaV.vel.set(random(20)-10, random(20)-10);
+    if (inputVideo == 2) bolaV.vel.set(random(20)-10, random(20)-10);
     if (pausado) {
-      //mov.play();
+      mov.play();
       pausado = false;
     } else {
-      //mov.pause();
+      mov.pause();
       pausado = true;
     }
   }
@@ -382,9 +426,9 @@ void mousePressed() {
   clique.x = mouseX;
   clique.y = mouseY;
 
-  print("R = " + red(get(mouseX, mouseY)));
-  print("  G = " + green(get(mouseX, mouseY)));
-  println("  B = " + blue(get(mouseX, mouseY)));
+  //print("R = " + red(mov.get(mouseX, mouseY)));
+  //print("  G = " + green(mov.get(mouseX, mouseY)));
+  //println("  B = " + blue(mov.get(mouseX, mouseY)));
   //println("  Brilho = " + brightness(get(mouseX, mouseY)));
   //println("  Hue = " + hue(get(mouseX, mouseY)));
   //println("  Saturacao = " + saturation(get(mouseX, mouseY)));

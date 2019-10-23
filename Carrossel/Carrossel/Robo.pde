@@ -3,8 +3,10 @@
 class Robo {
 
   //Variaveis de controle de estado para cada estratégia:
-  int qtdFrames;
+  int qtdfiltrados;
   int estagio = 0;  //Variável que para cada estratégia vai ditar o que no estágio atual deveria acontecer
+
+  boolean encontrado = false;
   //Estratégia 0:
   /*
     estagio:
@@ -26,9 +28,14 @@ class Robo {
    a original. Chega na original e vai até a bola.
    */
 
+  Robo oldRobo;
+
+  Blob b1 = new Blob();
+  Blob b2 = new Blob();
+
   PVector pos = new PVector(), posAnt, vel, obj, objAnt;
   float ang = 0, angAnt = 0, angObj = -1;
-  // Armazena o erro no valor do angulo do frame anterior
+  // Armazena o erro no valor do angulo do filtrado anterior
   // É propriedade da classe robo para evitar multiplas variaveis globais
   float dAngAnt = 0;
   float velD, velE, dAntiga, eAntiga;
@@ -48,6 +55,7 @@ class Robo {
   boolean frente = false;
   boolean girando = false;
 
+  //Construtora inicial
   Robo(int n) {
     index = n;
     if (n >= 0) {
@@ -59,6 +67,7 @@ class Robo {
     obj = new PVector();  //
   }
 
+  //Obsoleto
   Robo(int n, int b) {
     index = n;
     if (n >= 0) {
@@ -71,7 +80,9 @@ class Robo {
     }
   }
 
-  Robo(Robo r) {
+  //Chamar essa função apenas para atualizar o valor de oldRobo (uso INTERNO)
+  private
+    Robo(Robo r) {
     pos = r.pos;
     vel = r.vel;
     ang = r.ang;
@@ -82,18 +93,22 @@ class Robo {
     girando = r.girando;
     obj = r.obj;
     objAnt = r.objAnt;
-    qtdFrames = r.qtdFrames;
-    atualiza();
+    encontrado = r.encontrado;
+    qtdfiltrados = r.qtdfiltrados;
+    b1 = r.b1;
+    b2 = r.b2;
   }
 
-  // construtor usado pelo simulador
-  Robo(float x, float y, int n) {
+  public
+    // construtor usado pelo simulador
+    Robo(float x, float y, int n) {
     pos.x = x;
     pos.y = y;
     index = n;
     vel = new PVector();
   }
 
+  //Passar o clone para oldRobo
   Robo clone() {
     Robo r = new Robo(this);
     return r;
@@ -120,7 +135,7 @@ class Robo {
     else if (vD < -velMax && !girando) vD = -velMax;
     velE = vE;
     velD = vD;
-    
+
 
     if (frente) {
       float aux = velE;
@@ -132,38 +147,15 @@ class Robo {
   // Calcula o centro real do robo
   PVector getPos() {
     PVector centro = new PVector();
-    PVector posVerde = new PVector(blobs.get(index+1).center().x, blobs.get(index+1).center().y);
-    PVector posVermelho = new PVector(blobs.get(index+4).center().x, blobs.get(index+4).center().y);
-    switch(index) {
-      //Tamanhos iguais
-    case 0:  // o centro é a media aritmética dos centros dos blobs
-      centro.x = (posVerde.x + posVermelho.x) / 2;
-      centro.y = (posVerde.y + posVermelho.y) / 2;
-      break;
-      //Vermelho Maior
-    case 1: 
-      float angulo1 = ang;
-      if (frente) angulo1 -= PI;
-      //println("ROBO: angulo = " + degrees(angulo));
-      float distCentros1 = dist(posVerde.x, posVerde.y, posVermelho.x, posVermelho.y);
-      distCentros1 /= 2;
-      centro.x = (posVermelho.x + cos(angulo1)*distCentros1);
-      centro.y = (posVermelho.y + sin(angulo1)*distCentros1);
-      break;
-      //Verde Maior
-    case 2:  // o centro é deslocado (esse cálculo é aproximado mas muito bom)
-      float angulo2 = ang;
-      if (frente) angulo2 -= PI;
-      //println("ROBO: angulo = " + degrees(angulo));
-      float distCentros2 = dist(posVerde.x, posVerde.y, posVermelho.x, posVermelho.y);
-      distCentros2 /= 2;
-      centro.x = (posVerde.x + cos(angulo2)*distCentros2);
-      centro.y = (posVerde.y + sin(angulo2)*distCentros2);
-      break;
+    //PVector posVerde = new PVector(blobs.get(index+1).center().x, blobs.get(index+1).center().y);
+    //PVector posVermelho = new PVector(blobs.get(index+4).center().x, blobs.get(index+4).center().y);
+    if (encontrado) {
+      //search ao redor dele depois do filtro
+      //se retornar false seta o encontrado dele pra false
+    } else {
+      id(this);
     }
 
-    posAnt = new PVector(pos.x, pos.y);
-    pos = new PVector(centro.x, centro.y);
     pushMatrix();
     translate(pos.x, pos.y);
     fill(255);
@@ -208,33 +200,72 @@ class Robo {
   // Retorna o angulo do robo
   float getAng() {
 
-    switch(index) {
-    case 0:    // Cores iguais
-      ang = atan2(- blobs.get(1).center().y + blobs.get(4).center().y, - blobs.get(1).center().x + blobs.get(4).center().x);
-      //line(blobs.get(1).center().x, blobs.get(1).center().y, blobs.get(4).center().x, blobs.get(4).center().y);
-      break;
+    if (encontrado) {
+      switch(index) {
+      case 0:    // Cores iguais
+        ang = atan2(- b1.center().y + b2.center().y, - b1.center().x + b2.center().x);
+        //line(blobs.get(1).center().x, blobs.get(1).center().y, blobs.get(4).center().x, blobs.get(4).center().y);
+        break;
 
-      //Angulo do robô 1 é PI defasado
-    case 1:    // Vermelho maior
-      ang = atan2(- blobs.get(5).center().y + blobs.get(2).center().y, - blobs.get(5).center().x + blobs.get(2).center().x);
-      ang -= atan(0.5);
-      //line(blobs.get(2).center().x, blobs.get(2).center().y, blobs.get(5).center().x, blobs.get(5).center().y);
-      break;
+        //Angulo do robô 1 é PI defasado
+      case 1:    // Vermelho maior
+        ang = atan2(- pos.y + b2.center().y, - pos.x + b2.center().x);
+        //ang -= atan(0.5);
+        //line(blobs.get(2).center().x, blobs.get(2).center().y, blobs.get(5).center().x, blobs.get(5).center().y);
+        break;
 
-    case 2:    // Verde maior
-      ang = atan2(- blobs.get(3).center().y + blobs.get(6).center().y, - blobs.get(3).center().x + blobs.get(6).center().x);
-      ang -= atan(0.5);
-      //line(blobs.get(3).center().x, blobs.get(3).center().y, blobs.get(6).center().x, blobs.get(6).center().y);
-      break;
+      case 2:    // Verde maior
+        ang = atan2(- pos.y + b1.center().y, - pos.x + b1.center().x);
+        //ang -= atan(0.5);
+        //line(blobs.get(3).center().x, blobs.get(3).center().y, blobs.get(6).center().x, blobs.get(6).center().y);
+        break;
+      }
+      if (frente) ang += PI;
+
+      while (ang > 2*PI) ang -= 2*PI;
+      while (ang < 0) ang += 2*PI;
+
+      //println("ROBO: " + index + " ang = " + degrees(ang));
+
+      return ang;
+    } else {
+      switch(index) {
+      case 0:    // Cores iguais
+        ang = atan2(- blobs.get(1).center().y + blobs.get(4).center().y, - blobs.get(1).center().x + blobs.get(4).center().x);
+        //line(blobs.get(1).center().x, blobs.get(1).center().y, blobs.get(4).center().x, blobs.get(4).center().y);
+        break;
+
+        //Angulo do robô 1 é PI defasado
+      case 1:    // Vermelho maior
+        ang = atan2(- blobs.get(5).center().y + blobs.get(2).center().y, - blobs.get(5).center().x + blobs.get(2).center().x);
+        ang -= atan(0.5);
+        //line(blobs.get(2).center().x, blobs.get(2).center().y, blobs.get(5).center().x, blobs.get(5).center().y);
+        break;
+
+      case 2:    // Verde maior
+        ang = atan2(- blobs.get(3).center().y + blobs.get(6).center().y, - blobs.get(3).center().x + blobs.get(6).center().x);
+        ang -= atan(0.5);
+        //line(blobs.get(3).center().x, blobs.get(3).center().y, blobs.get(6).center().x, blobs.get(6).center().y);
+        break;
+      }
+      if (frente) ang += PI;
+
+      while (ang > 2*PI) ang -= 2*PI;
+      while (ang < 0) ang += 2*PI;
+
+      //println("ROBO: " + index + " ang = " + degrees(ang));
+
+      return ang;
     }
-    if (frente) ang += PI;
-
-    while (ang > 2*PI) ang -= 2*PI;
-    while (ang < 0) ang += 2*PI;
-
-    //println("ROBO: " + index + " ang = " + degrees(ang));
-
-    return ang;
+  }
+  
+  void centroBlob(){
+    //vermelho
+    fill(255, 0, 0);
+    rect(b2.center().x, b2.center().y, 5, 5);
+    //azul
+    fill(0, 0, 255);
+    rect(b1.center().x, b1.center().y, 5, 5);
   }
 
   // Verifica se é necessário mudar a frente do robo (só tem efeito se chamado depois de definir os objetivos de cada robo)
@@ -254,6 +285,12 @@ class Robo {
 
       //println("ROBO: robo " + index + " esta com a frente trocada");
     }
+  }
+
+  void debugRobo() {
+    //println(obj);
+    fill(0, 255, 0);
+    ellipse(pos.x, pos.y, 5, 5);
   }
 
   // atualiza alguns parametros do robo
@@ -289,6 +326,8 @@ class Robo {
       kP = 0.3;
       break;
     }
+
+    oldRobo = new Robo(this);
   }
 
   // Funcoes de debug

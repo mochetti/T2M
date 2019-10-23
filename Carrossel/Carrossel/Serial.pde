@@ -24,10 +24,10 @@ void enviar() {
       txBuffer[r.index+2] = 0;
     }
   }
-  print("SERIAL: ");
+  //print("SERIAL: ");
   for(byte data : txBuffer) {
     myPort.write(data);
-    print(data + "  ");
+    //print(data + "  ");
   }
-  println("");
+  //println("");
 }

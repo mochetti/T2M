@@ -6,7 +6,12 @@ class Bola {
   // real true - bola real
   // real false - bola virtual
   boolean real = true;
-  // angulo da bola no frame anterior
+  
+  Blob b = new Blob();
+
+  boolean encontrada = false;
+
+  // angulo da bola no filtrado anterior
   float angAnt = 0;
 
   Bola(boolean r) {
@@ -49,7 +54,16 @@ class Bola {
 
   PVector getPos() {
     if (real) {
-      pos = new PVector(blobs.get(0).center().x, blobs.get(0).center().y);
+      //Definindo a pos da bola dentro de id passando blob com cor 0
+      if (!encontrada) {
+        for (Blob b : blobs) { 
+          if (b.cor == 0) { 
+            id(b);
+          }
+        }
+      } else {
+        search(b);
+      }
       return pos;
     } else return pos;
   }
@@ -69,27 +83,27 @@ class Bola {
       float modulo = 0;
       // numero de bolas antigas consideradas dentro do rastro
       int iteracoes = 9;
-      // Numero de frames entre duas bolas para calcular a velocidade
-      int frames = 3;
+      // Numero de filtrados entre duas bolas para calcular a velocidade
+      int filtrados = 3;
 
       for (int i = 0; i < iteracoes; i++) {
         // Começa pelo mais antigo
         PVector bolaAnt = new PVector(rastro.get(i).x, rastro.get(i).y);
-        PVector bolaRec = new PVector(rastro.get(i+frames).x, rastro.get(i+frames).y);
+        PVector bolaRec = new PVector(rastro.get(i+filtrados).x, rastro.get(i+filtrados).y);
         modulo += PVector.dist(bolaAnt, bolaRec);
         ang += atan2(pos.y - bolaAnt.y, pos.x - bolaAnt.x);
       }
 
       ang /= 9;
       modulo /= 9;
-      
-      if(modulo < 2) ang = angAnt;
+
+      if (modulo < 2) ang = angAnt;
       else angAnt = ang;
 
       vel.x = modulo*cos(ang);
       vel.y = modulo*sin(ang);
       vel.mult(5);
-      if(modulo > 2) arrow(pos.x, pos.y, PVector.add(pos, vel).x, PVector.add(pos, vel).y);
+      if (modulo > 2) arrow(pos.x, pos.y, PVector.add(pos, vel).x, PVector.add(pos, vel).y);
       else arrow(pos.x, pos.y, pos.x + 10*cos(ang), pos.y + 10*sin(ang));
       //println("BOLA: ang: " + ang);
       //println("BOLA: módulo da velocidade: " + modulo);
