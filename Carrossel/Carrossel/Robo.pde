@@ -268,15 +268,15 @@ class Robo {
       tolAng = 18;
       break;
     case 1:
-      velEmin = 3;
-      velDmin = 3;
-      kP = 0.1;     
+      velEmin = 6;
+      velDmin = 6;
+      kP = 0;     
       tolAng = 10;
       break;
     case 2:
-      velEmin = 3;
-      velDmin = 3;
-      kP = 0.1;  
+      velEmin = 6;
+      velDmin = 6;
+      kP = 0;  
       tolAng = 10;
       break;
     default:
@@ -338,7 +338,7 @@ class Robo {
       break;
     }
 
-    vermelho.setFill(color(238, 96, 119));
+    vermelho.setFill(color(240, 50, 50));
     azul.setFill(color(16, 148, 238));
     fundo.setFill(color(0));
     corpo.addChild(fundo);

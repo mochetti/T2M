@@ -13,7 +13,7 @@ void camConfig() {
 
   if (cameras == null) {
     println("Failed to retrieve the list of available cameras, will try the default...");
-    cam = new Capture(this, 800, 448, 30);
+    cam = new Capture(this, 640, 400, 30);
   } else if (cameras.length == 0) {
     println("There are no cameras available for capture.");
     exit();
@@ -23,7 +23,7 @@ void camConfig() {
 
     // The camera can be initialized directly using an element
     // from the array returned by list():
-    cam = new Capture(this, cameras[19]);
+    cam = new Capture(this, cameras[3]);
     // Or, the settings can be defined based on the text in the list
     //cam = new Capture(this, 640, 480, "Built-in iSight", 30);
 
@@ -92,7 +92,7 @@ void track() {
         //corAchada[b.cor] = 0;
         if (!search(b)) {
           //corAchada[b.cor] = 0;
-          searchNew(b.cor);
+          //searchNew(b.cor);
         }
       }
 
@@ -157,8 +157,14 @@ boolean search (Blob b) {
   // relacao blob - robo
   int[] relacaoBlobRobo = {-1, 0, 1, 2, 0, 1, 2};
 
-  if (b.id == 0) offset = bola.pos;
-  else if (b.id > 0) {
+  if (b.id == 0) {
+    offset = bola.pos;
+    // condiciona a regiao de busca para dentro do campo apenas
+    if (offset.x + raioBusca > shapeCampo.getVertex(2).x) offset.x = shapeCampo.getVertex(2).x - raioBusca;
+    if (offset.x - raioBusca < shapeCampo.getVertex(0).x) offset.x = shapeCampo.getVertex(0).x + raioBusca;
+    if (offset.y + raioBusca > shapeCampo.getVertex(2).y) offset.y = shapeCampo.getVertex(2).y - raioBusca;
+    if (offset.y - raioBusca < shapeCampo.getVertex(0).y) offset.y = shapeCampo.getVertex(0).y + raioBusca;
+  } else if (b.id > 0) {
 
     //println(oldRobos.size());
 
@@ -343,7 +349,7 @@ void searchNew (int c) {
 // Funcao que atribui identidade aos objetos
 void id() {
   // raio de busca com o vermelho no centro
-  int raioBusca = 55;
+  int raioBusca = 25;
 
   //Itera em cima de blobs, função ID é chamada após track. Portanto, track() tem que criar a array blobs e popular mesmo que seja com -1.
   for (Blob b : blobs) {
@@ -382,16 +388,16 @@ void id() {
           float vermelho = float(v.numPixels);
           float verde = float(b.numPixels);
 
-          //println("pixels Vermelho: " + vermelho);
-          //println("pixels verde: " + verde);
-          //println("Vermelho/Verde: " + vermelho/verde);
-          //println("Verde/Vermelho: " + verde/vermelho);
-          //println(float(v.numPixels/~b.numPixels));
+          println("pixels Vermelho: " + vermelho);
+          println("pixels verde: " + verde);
+          println("Vermelho/Verde: " + vermelho/verde);
+          println("Verde/Vermelho: " + verde/vermelho);
+          println(float(v.numPixels/~b.numPixels));
           //println(b.numPixels);
           //Se for o vermelho comprido, significa que são os ids 1 e 4 para o verde e para o vermelho
           //Nesse caso testamos: Se o numero de pixels vermelhos for mais ou menos a mesma qtd de pixels verde:
           //é o robo 0: metade verde e metade vermelho
-          if (abs(vermelho/verde) > 0.80 && abs(vermelho/verde) < 1.2) {
+          if (abs(vermelho/verde) > 0.7 && abs(vermelho/verde) < 1.3) {
             //println("Achou CORES MESMA PROPORCAO");
             b.id = 1;
             v.id = 4;
@@ -418,11 +424,30 @@ void id() {
             continue;
           }
         } else {
+          // o blob nao pertence ao nosso time
+          //blobs.remove(b);
         }
       }
     }
   }
+  print("antes ");
+  for (Blob b : blobs) print(b.id);
+  println();
 
+  boolean aindaTem = true;
+  while (aindaTem) {
+    for (int i=0; i<blobs.size(); i++) {
+      aindaTem = false;
+      if (blobs.get(i).id == -1) {
+        aindaTem = true;
+        blobs.remove(i);
+      }
+    }
+  }
+
+  print("depois ");
+  for (Blob b : blobs) print(b.id);
+  println();
   //todosEncontrados = true;
   while (blobs.size() < elementos) {
     blobs.add(new Blob());
@@ -698,7 +723,7 @@ boolean isInside(PVector objeto, PShape forma) {
 // Compara duas cores por intervalos em cada componente
 boolean msmCor(color c1, color c2) {
   // limite de diferenca de cor
-  int lim = 30;
+  int lim = 25;
   float brightnessc1 = brightness(c1);
   float brightnessc2 = brightness(c2);
   // talvez seja necessario criar um limite diferente p cada componente

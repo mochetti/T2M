@@ -20,6 +20,11 @@ void simulador() {
   robosSimulados.get(0).display();
   robosSimulados.get(1).display();
   robosSimulados.get(2).display();
+  
+  // tentativa de confundir o código com simbolos aleatorios
+  //fill(color(240, 50, 50));
+  //ellipse(random(400), random(400), 15, 15);
+  //rect(100, random(100), random(30), 25);
 
 
   // simula a bola
