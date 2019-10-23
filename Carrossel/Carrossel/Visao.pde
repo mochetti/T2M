@@ -23,7 +23,7 @@ void camConfig() {
 
     // The camera can be initialized directly using an element
     // from the array returned by list():
-    cam = new Capture(this, cameras[25]);
+    cam = new Capture(this, cameras[1]);
     // Or, the settings can be defined based on the text in the list
     //cam = new Capture(this, 640, 480, "Built-in iSight", 30);
 
@@ -376,9 +376,9 @@ void id() {
 
         //println(distSq(b.center(), v.center()));
         //println(raioBusca*raioBusca);
-        println("V cor: " + v.cor);
-        println("B center: " + b.center());
-        println("V center: " + v.center());
+        //println("V cor: " + v.cor);
+        //println("B center: " + b.center());
+        //println("V center: " + v.center());
         if (v.cor == 2 && (distSq(b.center(), v.center()) < (raioBusca*raioBusca))) {
 
           //println("V cor: " + v.cor);

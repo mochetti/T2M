@@ -217,6 +217,8 @@ void draw() {
       track();
       id();
 
+      
+
       for (int i = 1; i < 4; i++) {
         if (oldRobos.size() == 0) {
           if (blobs.get(i).numPixels > 0 || blobs.get(i+3).numPixels > 0) robos.add(new Robo(i-1));
@@ -238,16 +240,16 @@ void draw() {
         // 5 - seguir mouse, 6 fazer nada (por enquanto), 1 - atacante, 3 - goleiro
 
         //println(robos.get(0).obj);
-        println("Indexs");
-        for (Robo r : robos) println(r.index);
+        //println("Indexs");
+        //for (Robo r : robos) println(r.index);
         if (robos.get(0).index >= 0) robos.get(0).setEstrategia(3);
 
         //println(bola.pos);
-        //if (robos.get(1).index >= 0) robos.get(1).setEstrategia(1);
-        //if (robos.get(2).index >= 0) {
-        //robos.get(2).setEstrategia(6);
-        //  robos.get(2).obj = new PVector(robos.get(2).obj.x, robos.get(2).obj.y + 100);
-        //}
+        if (robos.get(1).index >= 0) robos.get(1).setEstrategia(1);
+        if (robos.get(2).index >= 0) {
+          robos.get(2).setEstrategia(6);
+          //  robos.get(2).obj = new PVector(robos.get(2).obj.x, robos.get(2).obj.y + 100);
+        }
       } // posicoes fixas
       else for (Robo r : robos) if (r.index >= 0) r.setEstrategia(estFixa);
 
@@ -268,8 +270,8 @@ void draw() {
 
         //robos.get(0).velD = robos.get(0).velMin;
         if (robos.get(0).index >= 0 && !robos.get(0).girando) alinhaAnda(robos.get(0));
-        //if (robos.get(1).index >= 0 && !robos.get(1).girando) alinhaAnda(robos.get(1));
-        //if (robos.get(2).index >= 0 && !robos.get(2).girando) alinhaAnda(robos.get(2));
+        if (robos.get(1).index >= 0 && !robos.get(1).girando) alinhaAnda(robos.get(1));
+        if (robos.get(2).index >= 0 && !robos.get(2).girando) alinhaAnda(robos.get(2));
 
         if (gameplay) gameplay(robos.get(0));
       }
