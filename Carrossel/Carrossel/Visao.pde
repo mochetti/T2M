@@ -3,6 +3,21 @@
  Variáveis 
  
  */
+
+class Visao{
+  
+  Visao(){}
+  
+   void filtrar(int x, int y){
+     
+      color corClique = get(x, y);
+      
+      
+     
+   }
+  
+}
+
 boolean todosEncontrados = false;
 boolean isCampoDimensionado = false;
 PShape shapeCampo;
@@ -687,6 +702,8 @@ void dimensionaCampo(int x, int y) {
 //  return c;
 //}
 
+
+//Objeto dentro da forma
 boolean isInside(PVector objeto, PShape forma) {
   if (objeto.x >= forma.getVertex(0).x && objeto.x <= forma.getVertex(2).x && objeto.y >= forma.getVertex(0).y && objeto.y <= forma.getVertex(2).y) {
     println("VISAO: ISINSIDE() - TRUE");

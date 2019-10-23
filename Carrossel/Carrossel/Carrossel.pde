@@ -5,7 +5,7 @@ import processing.serial.*;
 /*
 
  Checar conexão do rádio com a serial do TX e também do receptor. Aparentemente está perdendo por mal contato do rádio.
-  
+ 
  Por algum motivo os blobs não tão reconhecendo. Não to entendendo o porque o b.show() tá mostrando os blobs. Debugar a visão inteira e debugar a parte dos id's.
  Printar os id's e colocar robô por robô no campo e tentar separadamente para depois juntá-los. Garantir que estão na posição certa da array
  
@@ -18,7 +18,7 @@ boolean debug = true;
 // 0 - camera
 // 1 - video 
 // 2 - simulador
-int inputVideo = 2;
+int inputVideo = 1;
 
 boolean calibra = true;  //Flag de controle se deve ou não calibrar as cores
 boolean visao = false;  //Flag de controle para parar o código logo após jogar a imagem no canvas (visão) a visão ou não
@@ -88,7 +88,7 @@ int pxMenorBlobVerde = 0;
 
 // Conta o tempo de execucao
 double tempo = millis();
-double antes = millis();
+double antes;
 
 // Quantidade de quadros para vencer a inercia no controle alinhandando
 //int contagemAlinhandando = 0;
@@ -101,7 +101,7 @@ int Y_AREA = 120;
 //PVector shapeCampo.getVertex(0) = new PVector();
 //PVector shapeCampo.getVertex(2) = new PVector();
 
-//Movie mov;
+Movie mov;
 Capture cam;
 //PImage screenshot;
 
@@ -126,6 +126,8 @@ Bola bola = new Bola(true);
 void setup() {
 
   shapeCampo = createShape();
+  
+  Visao visao = new Visao();
 
   for (int i : quantCor) elementos += i;
 
@@ -136,30 +138,36 @@ void setup() {
 
   //mov.frameRate(30);
   ellipseMode(RADIUS);
-  size(800, 448);
-
+  size(1240, 720);
+  //noLoop();
   //byte[] txBuffer = {};
   //txBuffer = new byte[7];
   //txBuffer[0] = byte(128);
 
-  frame.removeNotify();
   frameRate(30);
   if (inputVideo == 0) {
     printArray(Serial.list());
     myPort = new Serial(this, Serial.list()[1], 115200);
     camConfig();
+  } else if (inputVideo == 1) {
+    mov = new Movie(this, "seis_robos_mais_bola.mov");
+    mov.play();
+    mov.loop();
   }
 }
 
 void movieEvent(Movie m) {
   m.read();
+  //redraw();
 }
 void captureEvent(Capture c) {
   c.read();
 }
 
 void draw() {
-  if (inputVideo == 0 && cam.available() || inputVideo == 2) {
+  if (inputVideo == 1) {
+    image(mov, 0, 0);
+  } else if (inputVideo == 0 || inputVideo == 2) {
     //loadPixels();
     background(0);
     tempo = millis();
@@ -233,7 +241,7 @@ void draw() {
         // Define as estratégias dos robos
         // 5 - seguir mouse, 6 fazer nada (por enquanto), 1 - atacante, 3 - goleiro
 
-        if (robos.get(0).index >= 0) robos.get(0).setEstrategia(0);
+        if (robos.get(0).index >= 0) robos.get(0).setEstrategia(1);
         //if (robos.get(1).index >= 0) robos.get(1).setEstrategia(5);
         //if (robos.get(2).index >= 0) {
         //  robos.get(2).setEstrategia(5);
@@ -265,7 +273,6 @@ void draw() {
 
       //A partir daqui envia dados
       if (inputVideo == 0) enviar();
-
     } else {
       // no simulador, o campo é o próprio canvas
       if (inputVideo == 2) {
@@ -320,12 +327,12 @@ void keyPressed() {
   //MOVIE
   if (key == ' ') {
     // chute aleatorio na bola
-    bolaV.vel.set(random(20)-10, random(20)-10);
+    if (inputVideo == 2) bolaV.vel.set(random(20)-10, random(20)-10);
     if (pausado) {
-      //mov.play();
+      mov.play();
       pausado = false;
     } else {
-      //mov.pause();
+      mov.pause();
       pausado = true;
     }
   }
@@ -367,14 +374,22 @@ void keyReleased() {
 }
 
 void mousePressed() {
-  clique.x = mouseX;
-  clique.y = mouseY;
 
-  print("R = " + red(mouseColor));
-  print("  G = " + green(mouseColor));
-  println("  B = " + blue(mouseColor));
-  //println("X: " + mouseX + " Y: " + mouseY);
+  if (inputVideo == 1) {
+  
+    //visao.filtrar();
+  
+  } else {
 
-  if (!isCampoDimensionado) dimensionaCampo(mouseX, mouseY);
-  if (calibra) calibra();
+    clique.x = mouseX;
+    clique.y = mouseY;
+
+    print("R = " + red(mouseColor));
+    print("  G = " + green(mouseColor));
+    println("  B = " + blue(mouseColor));
+    //println("X: " + mouseX + " Y: " + mouseY);
+
+    if (!isCampoDimensionado) dimensionaCampo(mouseX, mouseY);
+    if (calibra) calibra();
+  }
 }
