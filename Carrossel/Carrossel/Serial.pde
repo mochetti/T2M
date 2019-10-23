@@ -4,6 +4,10 @@ void enviar() {
   txBuffer[0] = byte(80);  //80 em ascii é P (p maiusculo)  
   if(radio) {
     for(Robo r : robos) {
+      //if(isRene){
+      //  r.velE = -1*r.velE;
+      //  r.velD = -1*r.velD;
+      //}
       if(r.index < 0) continue;
       //if(r.velE != 0 || r.velD != 0) println("SERIAL: Robo " + r.index + "  Esq = " + r.velE + "  Dir = " + r.velD);
       if(r.velE < 0) txBuffer[2*(r.index)+1] = byte(abs(r.velE) + 64);

@@ -30,9 +30,9 @@ void alinhaAnda(Robo r) {
 
   // Angulo do robo
 
-  //println("CONTROLE: ang obj = " + degrees(ang));
-  //println("CONTROLE: ang robo = " + degrees(r.ang));
-  //println("CONTROLE: dAng = " + degrees(dAng));
+  println("CONTROLE: ang obj = " + degrees(ang));
+  println("CONTROLE: ang robo = " + degrees(r.ang));
+  println("CONTROLE: dAng = " + degrees(dAng));
   if (abs(dAng) < radians(r.tolAng)) {
     // Anda reto
 
@@ -82,6 +82,8 @@ void alinhaP(Robo r, float ang) {
   float dVelE = abs(dAng)*10/(7*PI);
   dVelE = map(dVelE, 0, 1, 0, 63 - r.velEmin);
 
+  //float aux;
+
   float dVelD = abs(dAng)*10/(7*PI);
   dVelD = map(dVelD, 0, 1, 0, 63 - r.velDmin);
 
@@ -95,11 +97,14 @@ void alinhaP(Robo r, float ang) {
     //}
 
     r.setVel(r.velEmin+r.kP*dVelE, -r.velDmin-r.kP*dVelD);
+    //if (isRene)  r.setVel(-r.velDmin-r.kP*dVelD, r.velEmin+r.kP*dVelE);
     //r.setVel(r.kP*abs(dAng)*r.velEmin, r.kP*-abs(dAng)*r.velDmin);
   } else if (sin(dAng) < 0) {
     //println("CONTROLE: Robo " + r.index + " Gira anti horário");
     //println("CONTROLE: Robo " + r.index + " KP: " + r.kP + " dAng: " + dAng);
     r.setVel(-r.velEmin-r.kP*dVelE, r.velDmin+r.kP*dVelD);
+
+    //if (isRene)  r.setVel(r.velDmin+r.kP*dVelD, -r.velEmin-r.kP*dVelE);
     //r.setVel(r.kP*abs(dAng)*r.velEmin, r.kP*-abs(dAng)*r.velDmin);
   }
 }

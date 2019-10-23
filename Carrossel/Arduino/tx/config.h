@@ -15,7 +15,7 @@ namespace Config {
   const byte PIPE_CHAVE[6] = {"00001"}; /* Chave para comunicação entre RX e TX. Deve ser a mesma em ambos os códigos. */
   const byte IND_PIPE_LEITURA = 0; /* indica qual pipe será aberta para leitura das informações vindas do rádio. Valores possíveis: [0,5]. 0 e 1 podem usar endereços de 5 bytes, os demais apenas 1. Talvez seja interessante trocar para 1 caso consideremos a comunicação bidirecional pois as escritas ocorrem  nesse pipe. */
 
-  const byte CANAL = 87; /* canal sendo utilizado pelo rádio usado para a comunicação. */
+  const byte CANAL = 88; /* canal sendo utilizado pelo rádio usado para a comunicação. */
 
   const byte CARACTERE_INICIAL = 80; /* primeiro byte da transmissao - fixo - caso alterado deve ser alterado no código do pc também em radio.hpp. */
 

@@ -23,7 +23,7 @@ void camConfig() {
 
     // The camera can be initialized directly using an element
     // from the array returned by list():
-    cam = new Capture(this, cameras[33]);
+    cam = new Capture(this, cameras[25]);
     // Or, the settings can be defined based on the text in the list
     //cam = new Capture(this, 640, 480, "Built-in iSight", 30);
 
@@ -189,7 +189,7 @@ boolean search (Blob b) {
       else if (inputVideo == 2) currentColor = get(x, y);
 
       // Compara as cores
-      if (filtroCor(currentColor, hue(cores[b.cor]), false) && msmCor(currentColor, cores[b.cor])) {
+      if (filtroCor(currentColor, cores[b.cor], false) && msmCor(currentColor, cores[b.cor])) {
         b.add(x, y);
         count++;
       }
@@ -242,7 +242,7 @@ void searchNew (int c) {
        a cor do pixel que está sendo avaliado seja a mesma cor que está sendo procurada. As propriedades da cor que está sendo procurada
        está dentro da array cores na posição "c"
        */
-      if (filtroCor(currentColor, hue(cores[c]), false) && msmCor(currentColor, cores[c])) {
+      if (filtroCor(currentColor, cores[c], false) && msmCor(currentColor, cores[c])) {
         // Verifica se algum elemento dessa cor já foi encontrado aqui perto
         //Caso seja, veja se o tamanho da array blobs é maior que 0 (já contém algum blob salvo).
         if (blobAux.size() > 0) {
@@ -376,21 +376,29 @@ void id() {
 
         //println(distSq(b.center(), v.center()));
         //println(raioBusca*raioBusca);
+        println("V cor: " + v.cor);
+        println("B center: " + b.center());
+        println("V center: " + v.center());
         if (v.cor == 2 && (distSq(b.center(), v.center()) < (raioBusca*raioBusca))) {
 
+          //println("V cor: " + v.cor);
+          //println("B center: " + b.center());
+          //println("V center: " + v.center());
 
           float vermelho = float(v.numPixels);
           float verde = float(b.numPixels);
 
-          println("pixels Vermelho: " + vermelho);
-          println("pixels verde: " + verde);
-          //println("Vermelho/Verde: " + vermelho/verde);
+          //println("pixels Vermelho: " + vermelho);
+          //println("pixels verde: " + verde);
           //println("Verde/Vermelho: " + verde/vermelho);
           //println(float(v.numPixels/~b.numPixels));
           //println(b.numPixels);
           //Se for o vermelho comprido, significa que são os ids 1 e 4 para o verde e para o vermelho
           //Nesse caso testamos: Se o numero de pixels vermelhos for mais ou menos a mesma qtd de pixels verde:
           //é o robo 0: metade verde e metade vermelho
+          //println(abs(vermelho/verde));
+          println(abs(vermelho/verde));
+          //println(verde);
           if (abs(vermelho/verde) > 0.80 && abs(vermelho/verde) < 1.2) {
             //println("Achou CORES MESMA PROPORCAO");
             b.id = 1;
@@ -492,13 +500,27 @@ boolean filtroCor(color c, color corBase, boolean isHueImportant) {
   int bgHValue = 100;
   int difLimit = 50;
 
-  float tol = 0.3;
+  float tol = 0.15;
+
+  float difRGB = 90;
+  float difBHS = 7;
+
+  //Primeiro filtrar por RGB;
+  //Depois filtrar por Brilho, Hue e brightness
 
   //É fundo ou não
-  
-  float hue = hue(corBase);
 
-  float hueCurrentColor = hue(c);
+  //float hue = hue(corBase);
+
+  //float hueCurrentColor = hue(c);
+
+  float difRed = abs(red(c) - red(corBase));
+  float difGreen = abs(green(c) - green(corBase));
+  float difBlue = abs(blue(c) - blue(corBase));
+
+  float difHue = abs(hue(c) - hue(corBase));
+  float difBright = abs(brightness(c) - brightness(corBase));
+  float difSaturation = abs(saturation(c) - saturation(corBase));
 
   // é fundo se as tres componentes forem menor q bgLimit
   boolean back = (red(c) < bgLimit && green(c) < bgLimit && blue(c) < bgLimit) || brightness(c) < 100;
@@ -507,14 +529,19 @@ boolean filtroCor(color c, color corBase, boolean isHueImportant) {
   // é cor se a distancia entre pelo menos duas das componentes for maior q difLimit
   boolean dif = (abs(red(c) - green(c)) > difLimit) || (abs(red(c) - blue(c)) > difLimit) || (abs(blue(c) - green(c)) > difLimit);
 
-  if (soma > 100 && soma < 600 && !back && highValue && dif && !isHueImportant) {
+  if (back) return false;
+  else if (soma > 100 && soma < 600 && !back && highValue && dif) return true;
+  else if (difHue + difBright + difSaturation < difBHS) return true;
+  else return false;
 
-    //print("soma: " + soma + "back: " + back + " highValue: " + highValue + " dif: " + dif);
-    //println();
-    return true;
-  } else if (hueCurrentColor > hue*(1-tol) && hueCurrentColor < hue*(1+tol) && isHueImportant) return true;
-  //if(!back && saturation(c))
-  return false;
+  //if (soma > 100 && soma < 600 && !back && highValue && dif && !isHueImportant) {
+
+  //  //print("soma: " + soma + "back: " + back + " highValue: " + highValue + " dif: " + dif);
+  //  //println();
+  //  return true;
+  //} else if (hueCurrentColor > hue*(1-tol) && hueCurrentColor < hue*(1+tol) && isHueImportant) return true;
+  ////if(!back && saturation(c))
+  //return false;
 }
 // Funcao para ajustar as medias das cores
 void calibra() {
@@ -556,7 +583,7 @@ void calibra() {
       else if (inputVideo == 2) currentColor = get(x, y);
 
 
-      if (filtroCor(currentColor, hue(corBase), false)) {
+      if (filtroCor(currentColor, corBase, false)) {
         quantidade++;
         //soma as componentes individualmente
         r += red(currentColor);
@@ -564,7 +591,7 @@ void calibra() {
         b += blue(currentColor);
 
 
-        println("TESTE: R = " + red(currentColor) + "  G = " + green(currentColor) + "  B = " + blue(currentColor));
+        //println("TESTE: R = " + red(currentColor) + "  G = " + green(currentColor) + "  B = " + blue(currentColor));
         //Atualiza as menores cores e as maiores cores para cada componente
         if (red(currentColor) < menorR) menorR = red(currentColor);
         if (red(currentColor) > maiorR) maiorR = red(currentColor);
@@ -593,7 +620,13 @@ void calibra() {
     //println("G: " + menorG + " -> " + maiorG);
     //println("B: " + menorB + " -> " + maiorB);
     //Encontra a cor média
+    println("  Brilho = " + brightness(get(mouseX, mouseY)));
+    println("  Hue = " + hue(get(mouseX, mouseY)));
+    println("  Saturacao = " + saturation(get(mouseX, mouseY)));
     color mediaColor = color(r, g, b);
+    println("  Brilho = " + brightness(mediaColor));
+    println("  Hue = " + hue(mediaColor));
+    println("  Saturacao = " + saturation(mediaColor));
     //println("Distancia Sq = " + distColorSq(mediaColor, cores[2]));
     fill(r, g, b);
     ellipse(mouseX + 100, mouseY, 30, 30);
@@ -605,39 +638,6 @@ void calibra() {
       //  print("  G = " + green(cores[i]));
       //  println("  B = " + blue(cores[i]));
       //}
-    }
-  } else {
-    for (int x = xi; x < xf; x++) {
-      for (int y = yi; y < yf; y++) {
-        int loc = 0;
-        if (inputVideo == 0) loc = x + y * cam.width;
-
-        // cor do pixel atual
-        color currentColor = 0;
-        if (inputVideo == 0) currentColor = cam.pixels[loc];
-        else if (inputVideo == 2) currentColor = get(x, y);
-
-
-        if (filtroCor(currentColor, hue(corBase), true)) {
-          quantidade++;
-          //soma as componentes individualmente
-          r += red(currentColor);
-          g += green(currentColor);
-          b += blue(currentColor);
-
-
-          //println("TESTE: R = " + red(currentColor) + "  G = " + green(currentColor) + "  B = " + blue(currentColor));
-          //Atualiza as menores cores e as maiores cores para cada componente
-          if (red(currentColor) < menorR) menorR = red(currentColor);
-          if (red(currentColor) > maiorR) maiorR = red(currentColor);
-          if (green(currentColor) < menorG) menorG = green(currentColor);
-          if (green(currentColor) > maiorG) maiorG = green(currentColor);
-          if (blue(currentColor) < menorB) menorB = blue(currentColor);
-          if (blue(currentColor) > maiorB) maiorB = blue(currentColor);
-        }
-        //fill(255);
-        //point(x, y);
-      }
     }
   }
 

@@ -14,6 +14,8 @@ import processing.serial.*;
 // Flags de debug
 boolean debug = true;
 
+boolean isRene = true;
+
 // Controla a entrada da imagem
 // 0 - camera
 // 1 - video 
@@ -136,7 +138,7 @@ void setup() {
 
   //mov.frameRate(30);
   ellipseMode(RADIUS);
-  size(640, 360);
+  size(640, 480);
 
   //byte[] txBuffer = {};
   //txBuffer = new byte[7];
@@ -235,8 +237,13 @@ void draw() {
         // Define as estratégias dos robos
         // 5 - seguir mouse, 6 fazer nada (por enquanto), 1 - atacante, 3 - goleiro
 
-        if (robos.get(0).index >= 0) robos.get(0).setEstrategia(0);
-        if (robos.get(1).index >= 0) robos.get(1).setEstrategia(1);
+        //println(robos.get(0).obj);
+        println("Indexs");
+        for (Robo r : robos) println(r.index);
+        if (robos.get(0).index >= 0) robos.get(0).setEstrategia(3);
+
+        //println(bola.pos);
+        //if (robos.get(1).index >= 0) robos.get(1).setEstrategia(1);
         //if (robos.get(2).index >= 0) {
         //robos.get(2).setEstrategia(6);
         //  robos.get(2).obj = new PVector(robos.get(2).obj.x, robos.get(2).obj.y + 100);
@@ -257,9 +264,11 @@ void draw() {
       if (controle) {
 
         //println(robos.get(0).girando);
+        //robos.get(0).velE = robos.get(0).velMin;
 
+        //robos.get(0).velD = robos.get(0).velMin;
         if (robos.get(0).index >= 0 && !robos.get(0).girando) alinhaAnda(robos.get(0));
-        if (robos.get(1).index >= 0 && !robos.get(1).girando) alinhaAnda(robos.get(1));
+        //if (robos.get(1).index >= 0 && !robos.get(1).girando) alinhaAnda(robos.get(1));
         //if (robos.get(2).index >= 0 && !robos.get(2).girando) alinhaAnda(robos.get(2));
 
         if (gameplay) gameplay(robos.get(0));
@@ -374,9 +383,9 @@ void mousePressed() {
   print("R = " + red(get(mouseX, mouseY)));
   print("  G = " + green(get(mouseX, mouseY)));
   println("  B = " + blue(get(mouseX, mouseY)));
-  println("  Brilho = " + brightness(get(mouseX, mouseY)));
-  println("  Hue = " + hue(get(mouseX, mouseY)));
-  println("  Saturacao = " + saturation(get(mouseX, mouseY)));
+  //println("  Brilho = " + brightness(get(mouseX, mouseY)));
+  //println("  Hue = " + hue(get(mouseX, mouseY)));
+  //println("  Saturacao = " + saturation(get(mouseX, mouseY)));
   //println("X: " + mouseX + " Y: " + mouseY);
 
   if (!isCampoDimensionado) dimensionaCampo(mouseX, mouseY);
