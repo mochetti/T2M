@@ -325,3 +325,18 @@ void gameplay(Robo r) {
   else if (key == 'D') gira(r, true);
   //}
 }
+
+void testaRobo(int index) {
+  if (index == 0 || index == 1 || index == 2) {
+
+    if (!keyPressed) enviar(index, 0, 0);
+    else {
+      //else if (key == CODED) {
+      if (key == 'w') enviar(index, 20, 20);
+      else if (key == 's') enviar(index, -20, -20);
+      else if (key == 'a') enviar(index, -63, 63);
+      else if (key == 'd') enviar(index, 63, -63);
+      //}
+    }
+  }
+}

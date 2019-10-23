@@ -23,7 +23,7 @@ void camConfig() {
 
     // The camera can be initialized directly using an element
     // from the array returned by list():
-    cam = new Capture(this, cameras[3]);
+    cam = new Capture(this, cameras[54]);
     // Or, the settings can be defined based on the text in the list
     //cam = new Capture(this, 640, 480, "Built-in iSight", 30);
 
@@ -61,7 +61,7 @@ void track() {
   for (int i=0; i<corAchada.length; i++) corAchada[i] = 0;
 
   // Verifica se há blobs salvos no frame anterior, se não houver:
-  if (!todosEncontrados) {
+  if (!todosEncontrados ) {
     //Itera a princípio 3x (numero de cores diferentes no jogo - laranja, verde, vermelho)
     for (int index = 0; index < quantCor.length; index++) {
       if (quantCor[index] > 0) {  //Se a qtd de blobs da cor selecionada pelo index for maior que 0, busca no campo pelo numero de cores que quantCor contem
@@ -342,7 +342,7 @@ void searchNew (int c) {
     //return encontramos;
   }
 
-
+  blobs.clear();
   for (int i = 0; i < blobAux.size(); i++) blobs.add(blobAux.get(i).clone());
 }
 
@@ -392,12 +392,14 @@ void id() {
           println("pixels verde: " + verde);
           println("Vermelho/Verde: " + vermelho/verde);
           println("Verde/Vermelho: " + verde/vermelho);
-          println(float(v.numPixels/~b.numPixels));
+          //println(float(v.numPixels/~b.numPixels));
           //println(b.numPixels);
           //Se for o vermelho comprido, significa que são os ids 1 e 4 para o verde e para o vermelho
           //Nesse caso testamos: Se o numero de pixels vermelhos for mais ou menos a mesma qtd de pixels verde:
           //é o robo 0: metade verde e metade vermelho
-          if (abs(vermelho/verde) > 0.7 && abs(vermelho/verde) < 1.3) {
+          if (abs(vermelho/verde) > 0.7 && abs(vermelho/verde) < 2) {
+            println("ROBO 0");
+
             //println("Achou CORES MESMA PROPORCAO");
             b.id = 1;
             v.id = 4;
@@ -410,14 +412,15 @@ void id() {
           //Se for o menor são os blobs verde e vermelho de id 2 e 5 respectivamente
           //Nesse caso testamos: Se o nmero de pixels de vermelho for mais ou menos 2x o numero de pixels de verde:
           //é o robô 1: Metade vermelho e 1/4 verde
-          if (abs(vermelho/verde) > 1.5) {
+          if (abs(vermelho/verde) < 1.5) {
+             println("ROBO 1");
             //println("Metade vermelho 1/4 verde");
             b.id = 2;
             v.id = 5;
             continue;
           }
 
-          if (abs(verde/vermelho) > 1.5) {
+          if (abs(verde/vermelho) < 1.5) {
             //println("Metade verde 1/4 vermelho");
             b.id = 3;
             v.id = 6;
@@ -430,9 +433,9 @@ void id() {
       }
     }
   }
-  print("antes ");
-  for (Blob b : blobs) print(b.id);
-  println();
+  //print("antes ");
+  //for (Blob b : blobs) print(b.id);
+  //println();
 
   boolean aindaTem = true;
   while (aindaTem) {
