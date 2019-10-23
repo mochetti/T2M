@@ -280,16 +280,6 @@ boolean search(Robo r) {
 void searchNew (int c) {
 
   ArrayList<Blob> blobAux = new ArrayList<Blob>();
-  //for (int i = 0; i < elementos; i++) blobAux.add(new Blob());
-
-  //blobAux.get(0).cor = 0;
-  //blobAux.get(1).cor = 1;
-  //blobAux.get(2).cor = 1;
-  //blobAux.get(3).cor = 1;
-  //blobAux.get(4).cor = 2;
-  //blobAux.get(5).cor = 2;
-  //blobAux.get(6).cor = 2;
-
   //Variavel de quantidade de blobs encontrados da cor que está sendo buscada
   int encontramos = 0;
   // Procura por todo o campo
@@ -302,10 +292,8 @@ void searchNew (int c) {
       // What is current color
       color currentColor = 0;
       if (inputVideo == 0) currentColor = cam.pixels[loc];
-      else if (inputVideo == 1) currentColor = mov.get(x, y);
       else if (inputVideo == 2) currentColor = get(x, y);
       else if (inputVideo == 3) currentColor = get(x, y);
-
       // Compara as cores
       /*
         caso a cor do pixel que está sendo avaliado que passa pelo filtroCor seja uma cor real e
@@ -315,46 +303,65 @@ void searchNew (int c) {
       if (filtroCor(currentColor, cores[c], false) && msmCor(currentColor, cores[c])) {
         // Verifica se algum elemento dessa cor já foi encontrado aqui perto
         //Caso seja, veja se o tamanho da array blobs é maior que 0 (já contém algum blob salvo).
-        //if (blobAux.size() > 0) {
-        //Booleana que testa se encontrou um blob no campo da cor c perto
-        /*
-            Checo dentro dos blobs já existentes se o blob tá perto da posição x, y e se tem a mesma cor. Se tiver perto e tiver a mesma cor, adiciona como mesmo elemento de blob
-         */
-        for (int i = 0; i < elementos; i++) {
+        if (blobAux.size() > 0) {
+          //Booleana que testa se encontrou um blob no campo da cor c
+          boolean found = false;
+
+
           /*
-              Caso o ponto x, y (loc)/pixel que está sendo avaliado no momento esteja próximo do blob em questão
-           e a cor do blob é igual à cor que está sendo procurada, a função add() do elemento blob define novos limites
-           (em x e y) tanto max quanto minimos para sabermos se aquele ponto faz parte do todo ou não
+            Checo dentro dos blobs já existentes se o blob tá perto da posição x, y e se tem a mesma cor. Se tiver perto e tiver a mesma cor, adiciona como mesmo elemento de blob
            */
-          //SE ta perto e é da mesma cor, agrega no blob
-          //Se não ta perto mas é da mesma cor, novo blob
-          if (blobAux.size() > 0) {
-            println("Entrei aqui");
-            if (blobAux.get(i).isNear(x, y) && blobAux.get(i).cor == c) {
-              blobAux.get(i).add(x, y);
-              //println(blobAux.get(i).numPixels);
+          for (Blob b : blobAux) {
+            /*
+              Caso o ponto x, y (loc)/pixel que está sendo avaliado no momento esteja próximo do blob em questão
+             e a cor do blob é igual à cor que está sendo procurada, a função add() do elemento blob define novos limites
+             (em x e y) tanto max quanto minimos para sabermos se aquele ponto faz parte do todo ou não
+             */
+            if (b.isNear(x, y) && b.cor == c) {
+              b.add(x, y);
               //a variável found atualiza para true, assim sabemos que encontramos um novo ponto que compoem o todo
-            } else if (blobAux.get(i).cor == c) {
-              Blob b = new Blob(x, y, c);
-              blobAux.add(b);
-              b.show(color(255));
-              //println(blobAux.get(i).numPixels);
-              encontramos++;
+              found = true;
+              break;
             }
-          } else if (blobAux.get(i).cor == c) {
-            println("Entrei aqui 2");
+          }
+          /*
+            Caso a variável found retorne falso (o ponto nao compoem o todo próximo)
+           ele entende que é o primeiro ponto que contem um novo blob na região. Gera um novo blob b na posição do ponto
+           com a cor c em questão. Atualiza também o valor do encontramos++ para sabermos que encontramos um novo blob.
+           Na próxima iterada provavelmente iremos entrar no bloco de cima, buscanndo os pontos próximos
+           */
+
+          //Caso seja uma cor, mas não estava próximo de nenhum blob existente de mesma cor, é um novo elemento de blob
+          if (!found) {
+            // É o pioneiro na região
+            //println("VISÃO: Novo blob encontrado");
             Blob b = new Blob(x, y, c);
             blobAux.add(b);
-            b.show(color(255));
-            //println(blobAux.get(i).numPixels);
             encontramos++;
+            //ellipse(x, y, 30, 30);
           }
         }
+        // Este é o primeiro blob
+        else {
+          // Primeiro blob no campo todo
+          //faz a mesma coisa que os outros. Gera novo elemento de blob, na posição x, y, com a cor c em questão e add na array
+          //println("VISÃO: Primeiro blob encontrado");
+          Blob b = new Blob(x, y, c);
+          blobAux.add(b);
+          encontramos++;
+          //fill(255);
+          //point(x, y);
+        }
+
+         //Debug
+        stroke(255);
+        strokeWeight(1);
+        point(x, y);
       }
     }
   }
 
-  //for (Blob b : blobAux) println(b.numPixels);
+  for (Blob b : blobAux) println(b.numPixels);
 
   /*
     Daqui pra baixo no código, já paramos de buscar todo o campo. A principio, a variável blobAux agora contem todos os blobs encontrados. Ainda estão sem ID, apenas possuem cor e coordenada
@@ -379,7 +386,7 @@ void searchNew (int c) {
   for (int i = 0; i < blobAux.size(); i++) {
     //Elimina impostores
     //println();
-    //println(blobAux.get(i).center());
+    println(blobAux.get(i).center());
     //blobAux.get(i).show(color(255));
     //println(i + " - " + blobAux.get(i).center());
     //println(blobAux.get(i).numPixels);
@@ -417,6 +424,10 @@ void searchNew (int c) {
   //  blobs.set(3, blobAux.get(3).clone());
   //  blobs.set(6, blobAux.get(6).clone());
   //}
+  
+  if(c == 0){
+    
+  }
 
   //Aqui vou ter a array blobs sem considerar a ordem dos elementos dentro dela mas a princípio com numPixels e seus minimos/maximos definidos (ainda sem ID) também
 }
