@@ -48,7 +48,8 @@ void estrategia(Robo r, int n) {
     r.girando = false;
 
     // Mudar coordenada x para x da linha do gol 
-    inter.x = golAmigo.x + distGoleiro;
+    if(ladoCampo)inter.x = golAmigo.x - distGoleiro;
+    if(!ladoCampo)inter.x = golAmigo.x + distGoleiro;
     inter.y = bola.pos.y;
     if (inter.y > golAmigo.y + Y_AREA/2) inter.y = golAmigo.y + Y_AREA/2;
     if (inter.y < golAmigo.y - Y_AREA/2) inter.y = golAmigo.y - Y_AREA/2;
@@ -85,7 +86,7 @@ void estrategia(Robo r, int n) {
 
     //Informações referentes a angulos e posição da sombra real deverão estar disponíveis a qualquermomento em qualquer IF
     //Por isso o motivo de estar do lado de fora (se vamos usar assim ou não fica a caráter do estágio decidir)
-    float ang = atan2(golInimigo.y - bola.pos.y, golInimigo.x - bola.pos.x);
+    float ang = atan2(golAmigo.y - bola.pos.y, golAmigo.x - bola.pos.x);
     ang += PI;
     PVector sombra = new PVector();
     sombra.x = bola.pos.x + distSombra * cos(ang);

@@ -64,15 +64,18 @@ float distColorSq(color c1, color c2) {
 }
 
 void search(int index) {
-  
-  // raio de busca em relacao à ultima posicao de cada blob
+
+  // raio de busca em relacao à ultima posicao de cada elemento
   int raioBusca = 20;
   // offset 
   PVector offset = new PVector();
   float angOff = 0;
+  int qtdPixelsV = 0;
+  int qtdPixelsA = 0;
 
-  if(index == 3) bola.bola.reset();
-  else {
+  // reseta os blobs anteriores
+  if (index == 3) bola.bola.reset();
+    else {
     robos.get(index).azul.reset();
     robos.get(index).vermelho.reset();
   }
@@ -82,13 +85,14 @@ void search(int index) {
     offset.x = mouseX;
     offset.y = mouseY;
     angOff = 0;
+    raioBusca = 30;
   }
   // estamos buscando a bola
-  else if(index == 3) {
-    offset.x = bola.bola.center().x;
-    offset.y = bola.bola.center().x;
+  else if (index == 3) {
+    offset.x = bola.bolaAntiga.center().x;
+    offset.y = bola.bolaAntiga.center().y;
     angOff = 0;
-    raioBusca = 40;
+    raioBusca = 60;
   }
   // o robo ja existia
   else {
@@ -100,6 +104,12 @@ void search(int index) {
   pushMatrix();
   translate(offset.x, offset.y);
   rotate(angOff);
+
+  // retangulo de busca
+  noFill();
+  stroke(255);
+  rectMode(CENTER);
+  rect(0, 0, 2*raioBusca, 2*raioBusca);
 
   for (int x = int(offset.x) - raioBusca; x < int(offset.x) + raioBusca; x++) {
     for (int y = int(offset.y) - raioBusca; y < int(offset.y) + raioBusca; y++) {
@@ -115,14 +125,35 @@ void search(int index) {
       } else if (inputVideo == 2) {
         currentColor = get(x, y);
       }
-
+      //println("r: " + red(currentColor) + " g: " + green(currentColor) + " b: " + blue(currentColor));
       //Preto
-      if (red(currentColor) + green(currentColor) + blue(currentColor) < 100) continue;
-      if(index == 3 && distColorSq(currentColor, cores[0]) < 1000) bola.bola.add(x, y);
-      else if (index < 3 && distColorSq(currentColor, cores[2]) < distColorSq(currentColor, cores[1])) robos.get(index).vermelho.add(x, y);  //Caso a cor seja vermelha
-      else if (index < 3 && distColorSq(currentColor, cores[2]) > distColorSq(currentColor, cores[1])) robos.get(index).azul.add(x, y);  //Caso a cor seja azul
+      if (red(currentColor) + green(currentColor) + blue(currentColor) < 100) {
+        //println("SEARCH: pixel preto");
+        //qtdPixelsPretos++;
+        continue;
+      }
+      // Laranja
+      if (index == 3 && distColorSq(currentColor, cores[0]) < 1000) {
+        //println("SEARCH: pixels add na bola");
+        //println(distColorSq(currentColor, cores[0]));
+        //qtdPixels++;
+        bola.bola.add(x, y);
+      }
+      // Vermelho
+      else if (index < 3 && distColorSq(currentColor, cores[2]) < distColorSq(currentColor, cores[1])) {
+        //println("SEARCH: pixel vermelho add");
+        //qtdPixelsV++;
+        robos.get(index).vermelho.add(x, y);
+      }
+      // Azul
+      else if (index < 3 && distColorSq(currentColor, cores[2]) > distColorSq(currentColor, cores[1])) {
+        //println("SEARCH: pixel azul add");
+        //qtdPixelsA++;
+        robos.get(index).azul.add(x, y);
+      }
     }
   }
+  //println("SEARCH: qtdPixelsV = " + qtdPixelsV + "  qntPixelsA = " + qtdPixelsA);
   popMatrix();
 }
 

@@ -1,6 +1,7 @@
 // classe que cuida da bola real e virtual
 class Bola {
   Blob bola = new Blob();
+  Blob bolaAntiga = new Blob();
   PVector pos = new PVector();
   PVector vel = new PVector();
   PVector acc = new PVector();
@@ -30,8 +31,9 @@ class Bola {
   //}
 
   void atualiza() {
-    // atualiza o blob da bola
-    search(3);
+    bolaAntiga = bola.clone();
+    // atualiza o blob da bola real
+    if(real) search(3);
     getPos();
     getVel();
     rastro.add(new PVector(bola.center().x, bola.center().y));

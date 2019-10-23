@@ -58,13 +58,12 @@ class Robo {
     if (n >= 0) {
       ang = getAng();
       pos = getPos();
-      atualiza();
+      //atualiza();
     }
     vel = new PVector();
     obj = new PVector();  //
-    
+
     oldRobo = new Robo(this);
-    
   }
 
   Robo(int n, int b) {
@@ -93,7 +92,6 @@ class Robo {
     obj = r.obj;
     objAnt = r.objAnt;
     qtdFrames = r.qtdFrames;
-    atualiza();
   }
 
   // construtor usado pelo simulador
@@ -130,7 +128,7 @@ class Robo {
     else if (vD < -velMax && !girando) vD = -velMax;
     velE = vE;
     velD = vD;
-    
+
 
     if (frente) {
       float aux = velE;
@@ -268,9 +266,11 @@ class Robo {
 
   // atualiza alguns parametros do robo
   void atualiza() {
-
     getPos();
     getAng();
+    oldRobo = new Robo(clone());
+    search(index);
+
 
     objAnt = obj;
 
