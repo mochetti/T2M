@@ -93,6 +93,12 @@ void search(int index) {
     offset.y = bola.bolaAntiga.center().y;
     angOff = 0;
     raioBusca = 60;
+    
+    // condiciona a regiao de busca para dentro do campo apenas
+    if(offset.x + raioBusca > shapeCampo.getVertex(2).x) offset.x = shapeCampo.getVertex(2).x - raioBusca;
+    if(offset.x - raioBusca < shapeCampo.getVertex(0).x) offset.x = shapeCampo.getVertex(0).x + raioBusca;
+    if(offset.y + raioBusca > shapeCampo.getVertex(2).y) offset.y = shapeCampo.getVertex(2).y - raioBusca;
+    if(offset.y - raioBusca < shapeCampo.getVertex(0).y) offset.y = shapeCampo.getVertex(0).y + raioBusca;
   }
   // o robo ja existia
   else {
@@ -209,11 +215,6 @@ void calibra() {
   int yi = mouseY - raio;
   int yf = mouseY + raio;
 
-  stroke(255);
-  noFill();
-  rectMode(CORNERS);
-  rect(xi, yi, xf, yf);
-
   //BUSCA AO REDOR DO CLIQUE COM RAIO DE 5 pixels
   for (int x = xi; x < xf; x++) {
     for (int y = yi; y < yf; y++) {
@@ -223,16 +224,18 @@ void calibra() {
       // cor do pixel atual
       color currentColor = 0;
       if (inputVideo == 0) currentColor = cam.pixels[loc];
-      else if (inputVideo == 2) currentColor = get(x, y);
+      else if (inputVideo == 1 || inputVideo == 2) currentColor = get(x, y);
 
       // Verifica se é colorido
       if (filtroCor(currentColor)) {
+        //println("CALIBRA: é cor");
+        //point(x, y);
         quantidade++;
         //soma as componentes individualmente
         r += red(currentColor);
         g += green(currentColor);
         b += blue(currentColor);
-        //println("R = " + red(currentColor) + "  G = " + green(currentColor) + "  B = " + blue(currentColor));
+        println(quantidade + ": R = " + red(currentColor) + "  G = " + green(currentColor) + "  B = " + blue(currentColor));
         //Atualiza as menores cores e as maiores cores para cada componente
         if (red(currentColor) < menorR) menorR = red(currentColor);
         if (red(currentColor) > maiorR) maiorR = red(currentColor);
@@ -245,6 +248,12 @@ void calibra() {
       //point(x, y);
     }
   }
+  
+  stroke(255);
+  noFill();
+  rectMode(CORNERS);
+  rect(xi, yi, xf, yf);
+  
   //Depois de rodar a área, se a quantidade de pixels for maior que 10
   if (quantidade > 10) {
     println("Q = " + quantidade);
@@ -276,21 +285,10 @@ void calibra() {
     }
   }
 
-  println("LARANJA");
-  println("R = " + red(cores[0]));
-  println("  G = " + green(cores[0]));
-  println("  B = " + blue(cores[0]));
-  println("  Brilho = " + brightness(cores[0]));
-  println("VERDE");
-  println("R = " + red(cores[1]));
-  println("  G = " + green(cores[1]));
-  println("  B = " + blue(cores[1]));
-  println("  Brilho = " + brightness(cores[1]));
-  println("VERMELHO");
-  println("R = " + red(cores[2]));
-  println("  G = " + green(cores[2]));
-  println("  B = " + blue(cores[2]));
-  println("  Brilho = " + brightness(cores[2]));
+  println("LARANJA: R = " + red(cores[0]) + "  G = " + green(cores[0]) + "  B = " + blue(cores[0]) + "  Brilho = " + brightness(cores[0]));
+  println("AZUL: R = " + red(cores[1]) + "  G = " + green(cores[1]) + "  B = " + blue(cores[1]) + "  Brilho = " + brightness(cores[1]));
+  println("VERMELHO: R = " + red(cores[2]) + "  G = " + green(cores[2]) + "  B = " + blue(cores[2]) + "  Brilho = " + brightness(cores[2]));
+
 }
 
 // Dimensiona o campo

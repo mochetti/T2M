@@ -18,7 +18,8 @@ boolean radio = true; //Flag de controle para emitir ou não sinais ao rádio (u
 boolean gameplay = false;  //Flag de controle que diz se o jogo está no automático ou no manual (apenas do robô 0 por enquanto)
 boolean simManual = true;  // Flag de controle que define se os comandos vem pelas setas ou do modulo de controle
 
-boolean ladoCampo = false;
+boolean ladoCampo = false;  // Atacamos pra qual lado (true é pra direita)
+boolean posicionarParado = false;  // Controla se a estratégia engloba o posicionamento ou somente o jogo
 
 // estretagia usada quando estrategia = false;
 int estFixa = 0;
@@ -74,9 +75,6 @@ int calColor = -1;
 double tempo = millis();
 double antes;
 
-// Propriedades do campo
-int Y_AREA = 120;
-
 Movie mov;
 Capture cam;
 //PImage screenshot;
@@ -113,7 +111,7 @@ void setup() {
     myPort = new Serial(this, Serial.list()[1], 115200);
     camConfig();
   } else if (inputVideo == 1) {
-    mov = new Movie(this, "seis_robos_mais_bola.mov");
+    mov = new Movie(this, "aliado_com_bola_borda_campo.mov");
     mov.play();
     mov.loop();
   }
@@ -164,11 +162,12 @@ void draw() {
 
     if  (inputVideo == 2) simulador();
 
-    //fill(0, 255, 0);
-    //for (Robo r : robos) ellipse(r.pos.x, r.pos.y, 10, 10);
-    //ellipse(bola.pos.x, bola.pos.y, 10, 10);
-
-
+    fill(0, 255, 0);
+    for (Robo r : robos) {
+      ellipse(r.azul.center().x, r.azul.center().y, 5, 5);
+      ellipse(r.vermelho.center().x, r.vermelho.center().y, 5, 5);
+    }
+    ellipse(bola.pos.x, bola.pos.y, 5, 5);
 
     if (!debug) return;
 
@@ -182,11 +181,10 @@ void draw() {
     //Defino as estratégias
     if (estrategia) {
       // Define as estratégias dos robos
-      // 5 - seguir mouse, 6 fazer nada (por enquanto), 1 - atacante, 3 - goleiro
 
       if (robos.get(0).index >= 0) robos.get(0).setEstrategia(0);
       if (robos.get(1).index >= 0) robos.get(1).setEstrategia(5);
-      if (robos.get(2).index >= 0) robos.get(2).setEstrategia(5);
+      if (robos.get(2).index >= 0) robos.get(2).setEstrategia(3);
     } // posicoes fixas
     else for (Robo r : robos) if (r.index >= 0) r.setEstrategia(estFixa);
 
@@ -313,11 +311,48 @@ void keyPressed() {
     println("KEY: gameplay on/off");
     gameplay = !gameplay;
   }
+  // posicionamento ainda é necessário ?
+  if (key == 'l') {
+    if (posicionarParado) {
+      println("KEY: posicionar antes off");
+      posicionarParado = false;
+    } else {
+      println("KEY: posicionar antes on");
+      posicionarParado = true;
+    }
+  }
   // posicao inicial
   if (key == 'P') {
-    println("KEY: posicao inicial");
-    estFixa = 6;
-    estrategia = !estrategia;
+    if (estrategia) {
+      println("KEY: posicao inicial off");
+      estrategia = false;
+    } else {
+      println("KEY: posicao inicial on");
+      estFixa = 6;
+      estrategia = true;
+    }
+  }
+  // falta para nós
+  if (key == 'f') {
+    if (estrategia) {
+      println("KEY: falta para nós off");
+      estrategia = false;
+    } else {
+      println("KEY: falta para nós on");
+      estFixa = 7;
+      estrategia = true;
+    }
+  }
+  // falta para eles
+  if (key == 'F') {
+    if (estrategia) {
+      println("KEY: falta para eles off");
+      estrategia = false;
+    } else {
+      println("KEY: falta para eles on");
+      estFixa = 8;
+      estrategia = true;
+    }
   }
 }
 
@@ -351,6 +386,6 @@ void mousePressed() {
   //println("X: " + mouseX + " Y: " + mouseY);
 
   if (!isCampoDimensionado) dimensionaCampo(mouseX, mouseY);
-  //if (calibra) calibra();
+  if (calibra) calibra();
   if (procurarRobo) search(buscandoRobo);
 }
